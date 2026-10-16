@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>每日市场脉搏 · Apple 设计语言高保真原型</title>
+<meta name="description" content="以 Apple 官网设计语言重设计的每日市场脉搏原型：日期分组时间线、五档评级徽章、深色模式、零 emoji 图标方案。">
+<meta name="color-scheme" content="light dark">
+<style>
+/* ==========================================================================
+ * 每日市场脉搏 · Apple 设计语言原型
+ * 本文件内联 design-tokens.css 全部 Token（单文件交付，零外部依赖、零 JS）
+ * 图标：Lucide 描边 SVG（viewBox 24 / stroke 1.75 / round cap-join / 无填充）
+ * 禁止：emoji 图标 · 紫粉渐变 · 弹跳缓动 · 硬编码颜色（除 #fff / #000）
+ * ========================================================================== */
+
+/* =========================== LAYER 0 — PRIMITIVE ========================== */
+:root{
+  --ap-white:#ffffff; --ap-canvas:#ffffff; --ap-surface-alt:#f5f5f7; --ap-surface-nav:#fafafc;
+  --ap-ink:#1d1d1f; --ap-ink-secondary:#515154; --ap-ink-tertiary:#6e6e73; --ap-ink-muted:#86868b;
+  --ap-hairline:#d2d2d7; --ap-hairline-soft:#e8e8ed; --ap-overlay:rgba(210,210,215,.64);
+  --ap-blue:#0071e3; --ap-blue-hover:#0077ed; --ap-blue-link:#0066cc; --ap-blue-link-dk:#2997ff; --ap-blue-press:#006edb;
+  --ap-black:#000000; --ap-dark-1:#1c1c1e; --ap-dark-2:#2c2c2e; --ap-dark-3:#3a3a3c;
+  --ap-dark-sep:#38383a; --ap-dark-ink:#f5f5f7; --ap-dark-ink-2:#a1a1a6; --ap-dark-ink-3:#86868b; --ap-dark-nav:#161617;
+  --rt-offensive:#b91c1c; --rt-balanced:#b45309; --rt-conflict:#475569; --rt-defensive:#15803d; --rt-avoid:#166534;
+  --rt-offensive-dk:#f87171; --rt-balanced-dk:#fbbf24; --rt-conflict-dk:#94a3b8; --rt-defensive-dk:#4ade80; --rt-avoid-dk:#22c55e;
+}
+
+/* ===================== LAYER 1 — A1 IDENTITY（身份层） ===================== */
+:root{
+  color-scheme:light dark;
+  --bg:var(--ap-canvas); --surface:var(--ap-canvas); --surface-alt:var(--ap-surface-alt);
+  --surface-nav:var(--ap-surface-nav); --surface-sunken:var(--ap-surface-alt);
+  --fg:var(--ap-ink); --fg-2:var(--ap-ink-secondary); --fg-3:var(--ap-ink-tertiary); --fg-muted:var(--ap-ink-muted);
+  --fg-on-accent:var(--ap-white);
+  --border:var(--ap-hairline); --border-soft:var(--ap-hairline-soft); --separator:var(--ap-hairline-soft);
+  --accent:var(--ap-blue); --accent-hover:var(--ap-blue-hover); --accent-active:var(--ap-blue-press);
+  --link:var(--ap-blue-link); --link-hover:var(--ap-blue);
+  --font-display:"SF Pro Display",-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei","Helvetica Neue",sans-serif;
+  --font-text:"SF Pro Text",-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei","Helvetica Neue",sans-serif;
+  --font-mono:"SF Mono",ui-monospace,SFMono-Regular,Menlo,Monaco,"Cascadia Mono","Roboto Mono",monospace;
+}
+
+/* ==================== LAYER 2 — A1 STRUCTURE（结构层） ==================== */
+:root{
+  --fs-display:3.5rem; --fs-title1:2.125rem; --fs-title2:1.75rem; --fs-title3:1.375rem; --fs-title4:1.25rem;
+  --fs-headline:1.0625rem; --fs-body:1.0625rem; --fs-callout:1rem; --fs-subhead:.9375rem;
+  --fs-footnote:.8125rem; --fs-caption1:.75rem; --fs-caption2:.6875rem;
+  --lh-display:1.07; --lh-title1:1.206; --lh-title2:1.214; --lh-title3:1.273; --lh-title4:1.25;
+  --lh-headline:1.294; --lh-body:1.47; --lh-callout:1.35; --lh-subhead:1.4; --lh-footnote:1.385; --lh-caption:1.333;
+  /* CJK 安全 tracking（Apple 拉丁负值按约 40% 补偿，避免全角汉字粘连） */
+  --tracking-display:0; --tracking-title1:-.010em; --tracking-title2:-.012em; --tracking-title3:-.014em; --tracking-title4:-.012em;
+  --tracking-headline:-.010em; --tracking-body:-.010em; --tracking-callout:-.006em; --tracking-subhead:0;
+  --tracking-footnote:.01em; --tracking-caption:.02em; --tracking-caps:.06em;
+  --fw-regular:400; --fw-medium:500; --fw-semibold:600; --fw-bold:700;
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:20px; --space-6:24px;
+  --space-8:32px; --space-10:40px; --space-12:48px; --space-16:64px; --space-20:80px; --space-24:96px; --space-32:128px;
+  --section-y-desktop:80px; --section-y-tablet:48px; --section-y-phone:32px;
+  --container-max:980px; --container-wide:1180px; --container-prose:680px; --container-narrow:760px;
+  --gutter-desktop:32px; --gutter-tablet:24px; --gutter-phone:20px;
+  --radius-xs:4px; --radius-sm:8px; --radius-md:12px; --radius-lg:18px; --radius-xl:28px; --radius-pill:980px;
+  --elev-flat:none; --elev-hairline:inset 0 0 0 .5px var(--border); --elev-overlay:0 8px 28px rgba(0,0,0,.12);
+}
+
+/* ============================ LAYER 3 — A2 ================================ */
+:root{
+  --ease-out:cubic-bezier(.215,.61,.355,1); --ease-standard:cubic-bezier(.4,0,.2,1); --ease-out-soft:cubic-bezier(.25,.1,.25,1);
+  --motion-instant:80ms; --motion-fast:150ms; --motion-base:200ms; --motion-slow:300ms; --motion-slower:400ms;
+  --focus-ring-color:var(--ap-blue); --focus-ring-width:2px; --focus-ring-offset:2px;
+  --nav-h:44px; --localnav-h:52px;
+  --z-base:0; --z-sticky:100; --z-nav:1100; --z-dropdown:1200; --z-modal:1300; --z-toast:1400;
+  --success:#008009; --warn:#b45309; --danger:#e30000; --info:var(--ap-blue-link);
+}
+
+/* =========================== LAYER 4 — B-SLOT ============================== */
+:root{
+  --nav-bg:rgba(250,250,252,.72); --nav-blur:saturate(180%) blur(20px);
+  --nav-fg:var(--ap-ink-secondary); --nav-fg-hover:var(--ap-ink); --nav-fg-active:var(--ap-ink);
+  --nav-underline:var(--ap-ink); --nav-border:var(--ap-hairline);
+  --localnav-bg:rgba(255,255,255,.72); --localnav-border:var(--ap-hairline);
+  --card-bg:var(--ap-canvas); --card-border:none; --card-shadow:none; --card-radius:var(--radius-md); --card-pad:var(--space-6);
+  --panel-bg:var(--ap-surface-alt); --panel-radius:var(--radius-lg);
+  --feature-bg:var(--ap-canvas); --feature-radius:var(--radius-xl); --feature-pad:var(--space-8);
+  --tl-separator:var(--ap-hairline-soft); --tl-gutter:92px; --tl-row-pad-y:var(--space-6); --tl-row-gap:var(--space-5);
+  --tl-dot:var(--ap-ink); --tl-time-fg:var(--ap-ink); --tl-run-fg:var(--ap-ink-tertiary);
+  --tl-kicker-fg:var(--ap-ink-tertiary); --tl-title-fg:var(--ap-ink); --tl-summary-fg:var(--ap-ink-secondary);
+  --badge-radius:var(--radius-xs); --badge-pad:3px 10px; --badge-fs:var(--fs-caption1);
+  --chip-bg:var(--ap-surface-alt); --chip-fg:var(--ap-ink-secondary); --chip-border:var(--ap-hairline);
+  --chip-radius:var(--radius-xs); --chip-pad:2px 9px; --chip-fs:var(--fs-footnote);
+  --table-border:var(--ap-hairline); --table-head-fg:var(--ap-ink-tertiary);
+  --table-cell-pad:12px var(--space-4); --table-cell-fs:var(--fs-subhead); --table-head-fs:var(--fs-caption1);
+  --foot-bg:var(--ap-surface-alt); --foot-fg:var(--ap-ink-secondary); --foot-fs:var(--fs-footnote); --foot-border:var(--ap-hairline);
+  --crumb-fg:var(--ap-ink-tertiary); --crumb-fg-hover:var(--ap-blue-link);
+}
+
+/* ====================== LAYER 5 — C-EXTENSION（金融） ====================== */
+:root{
+  --rating-offensive-bg:var(--rt-offensive); --rating-offensive-fg:var(--ap-white); --rating-offensive-ring:rgba(185,28,28,.28);
+  --rating-balanced-bg:var(--rt-balanced);   --rating-balanced-fg:var(--ap-white);   --rating-balanced-ring:rgba(180,83,9,.28);
+  --rating-conflict-bg:var(--rt-conflict);   --rating-conflict-fg:var(--ap-white);   --rating-conflict-ring:rgba(71,85,105,.28);
+  --rating-defensive-bg:var(--rt-defensive); --rating-defensive-fg:var(--ap-white); --rating-defensive-ring:rgba(21,128,61,.28);
+  --rating-avoid-bg:var(--rt-avoid);         --rating-avoid-fg:var(--ap-white);     --rating-avoid-ring:rgba(22,101,52,.28);
+  --stage-intraday-fg:var(--ap-blue-link); --stage-intraday-bg:rgba(0,102,204,.08); --stage-intraday-ring:rgba(0,102,204,.24);
+  --stage-close-fg:var(--ap-ink-secondary); --stage-close-bg:var(--ap-surface-alt); --stage-close-ring:var(--ap-hairline);
+  --quote-up:var(--rt-offensive); --quote-down:var(--rt-defensive); --quote-flat:var(--ap-ink-tertiary);
+  --numeric:tabular-nums; --numeric-feature:"tnum" 1,"lnum" 1;
+  --icon-stroke:1.75; --icon-size-inline:16px; --icon-size-btn:20px; --icon-size-stand:24px;
+}
+
+/* ============================== DARK MODE ================================= */
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:var(--ap-black); --surface:var(--ap-black); --surface-alt:var(--ap-dark-1); --surface-nav:var(--ap-dark-nav); --surface-sunken:var(--ap-dark-1);
+    --fg:var(--ap-dark-ink); --fg-2:var(--ap-dark-ink-2); --fg-3:var(--ap-dark-ink-3); --fg-muted:#6e6e73;
+    --border:var(--ap-dark-sep); --border-soft:var(--ap-dark-sep); --separator:var(--ap-dark-sep);
+    --accent:#2997ff; --accent-hover:#47a8ff; --accent-active:#1a8cff; --link:var(--ap-blue-link-dk); --link-hover:#5eb3ff;
+    --success:#30d158; --warn:#fbbf24; --danger:#ff453a; --info:var(--ap-blue-link-dk);
+    --rating-offensive-bg:rgba(248,113,113,.16); --rating-offensive-fg:var(--rt-offensive-dk); --rating-offensive-ring:rgba(248,113,113,.42);
+    --rating-balanced-bg:rgba(251,191,36,.16);   --rating-balanced-fg:var(--rt-balanced-dk);   --rating-balanced-ring:rgba(251,191,36,.42);
+    --rating-conflict-bg:rgba(148,163,184,.16);  --rating-conflict-fg:var(--rt-conflict-dk);   --rating-conflict-ring:rgba(148,163,184,.42);
+    --rating-defensive-bg:rgba(74,222,128,.16);  --rating-defensive-fg:var(--rt-defensive-dk); --rating-defensive-ring:rgba(74,222,128,.42);
+    --rating-avoid-bg:rgba(34,197,94,.16);       --rating-avoid-fg:var(--rt-avoid-dk);       --rating-avoid-ring:rgba(34,197,94,.42);
+    --stage-intraday-fg:#5eb3ff; --stage-intraday-bg:rgba(41,151,255,.16); --stage-intraday-ring:rgba(41,151,255,.4);
+    --stage-close-fg:var(--ap-dark-ink-2); --stage-close-bg:var(--ap-dark-2); --stage-close-ring:var(--ap-dark-sep);
+    --quote-up:#f87171; --quote-down:#4ade80; --quote-flat:#a1a1a6;
+    --card-bg:var(--ap-black); --panel-bg:var(--ap-dark-1); --feature-bg:var(--ap-dark-1);
+    --nav-bg:rgba(22,22,23,.72); --localnav-bg:rgba(22,22,23,.72); --localnav-border:var(--ap-dark-sep); --nav-border:var(--ap-dark-sep);
+    --nav-fg:var(--ap-dark-ink-2); --nav-fg-hover:var(--ap-dark-ink); --nav-fg-active:var(--ap-dark-ink); --nav-underline:var(--ap-dark-ink);
+    --chip-bg:var(--ap-dark-2); --chip-fg:var(--ap-dark-ink-2); --chip-border:var(--ap-dark-sep);
+    --table-border:var(--ap-dark-sep); --table-head-fg:var(--ap-dark-ink-3);
+    --foot-bg:var(--ap-dark-1); --foot-border:var(--ap-dark-sep);
+    --crumb-fg:var(--ap-dark-ink-3); --crumb-fg-hover:var(--ap-blue-link-dk);
+    --tl-separator:var(--ap-dark-sep); --tl-dot:var(--ap-dark-ink); --tl-time-fg:var(--ap-dark-ink); --tl-run-fg:var(--ap-dark-ink-3);
+    --tl-summary-fg:var(--ap-dark-ink-2);
+    --elev-overlay:0 8px 28px rgba(0,0,0,.55); --focus-ring-color:var(--ap-blue-link-dk);
+  }
+}
+/* 连续圆角渐进增强：Chrome/Edge 139+ 还原 iOS squircle，Safari/Firefox 自动回落 */
+@supports (corner-shape:squircle){ :root{ --corner-shape:squircle; } }
+@media (prefers-reduced-motion:reduce){
+  :root{ --motion-instant:.01ms; --motion-fast:.01ms; --motion-base:.01ms; --motion-slow:.01ms; --motion-slower:.01ms; }
+  *,*::before,*::after{ animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; scroll-behavior:auto!important; }
+}
+
+/* ============================== RESET ===================================== */
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+html{ -webkit-text-size-adjust:100%; scroll-behavior:smooth; scroll-padding-top:calc(var(--nav-h) + var(--localnav-h) + 16px); }
+body{
+  font-family:var(--font-text); background:var(--bg); color:var(--fg);
+  font-size:var(--fs-body); line-height:var(--lh-body); letter-spacing:var(--tracking-body);
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  font-feature-settings:var(--numeric-feature); overflow-x:hidden;
+}
+a{ color:inherit; text-decoration:none; }
+ul{ list-style:none; }
+img,svg{ display:block; max-width:100%; }
+button{ font:inherit; color:inherit; background:none; border:none; }
+::selection{ background:rgba(0,113,227,.18); }
+@media (prefers-color-scheme:dark){ ::selection{ background:rgba(41,151,255,.28); } }
+
+/* 键盘可达：所有可聚焦元素统一焦点环，绝不移除 */
+:focus-visible{ outline:2px solid var(--focus-ring-color); outline-offset:2px; border-radius:var(--radius-xs); }
+a:focus-visible,button:focus-visible{ outline-offset:3px; }
+
+/* 跳过导航：键盘用户首Tab 直达正文 */
+.skip-link{
+  position:absolute; left:var(--space-3); top:var(--space-2); z-index:calc(var(--z-toast) + 1);
+  background:var(--accent); color:var(--fg-on-accent); font-size:var(--fs-footnote); font-weight:var(--fw-medium);
+  padding:10px 18px; border-radius:var(--radius-pill); min-height:44px; display:inline-flex; align-items:center;
+  transform:translateY(-160%); transition:transform var(--motion-base) var(--ease-out);
+}
+.skip-link:focus{ transform:translateY(0); }
+@media (prefers-color-scheme:dark){ .skip-link{ color:#000; } }
+
+/* ============================ 排版基元 ==================================== */
+.t-display{ font-family:var(--font-display); font-size:var(--fs-display); line-height:var(--lh-display); letter-spacing:var(--tracking-display); font-weight:var(--fw-bold); }
+.t-title1{ font-family:var(--font-display); font-size:var(--fs-title1); line-height:var(--lh-title1); letter-spacing:var(--tracking-title1); font-weight:var(--fw-bold); }
+.t-title2{ font-family:var(--font-display); font-size:var(--fs-title2); line-height:var(--lh-title2); letter-spacing:var(--tracking-title2); font-weight:var(--fw-semibold); }
+.t-title3{ font-family:var(--font-display); font-size:var(--fs-title3); line-height:var(--lh-title3); letter-spacing:var(--tracking-title3); font-weight:var(--fw-semibold); }
+.t-title4{ font-family:var(--font-display); font-size:var(--fs-title4); line-height:var(--lh-title4); letter-spacing:var(--tracking-title4); font-weight:var(--fw-semibold); }
+.t-headline{ font-family:var(--font-text); font-size:var(--fs-headline); line-height:var(--lh-headline); letter-spacing:var(--tracking-headline); font-weight:var(--fw-semibold); }
+.t-body{ font-family:var(--font-text); font-size:var(--fs-body); line-height:var(--lh-body); letter-spacing:var(--tracking-body); font-weight:var(--fw-regular); }
+.t-callout{ font-family:var(--font-text); font-size:var(--fs-callout); line-height:var(--lh-callout); letter-spacing:var(--tracking-callout); }
+.t-subhead{ font-family:var(--font-text); font-size:var(--fs-subhead); line-height:var(--lh-subhead); letter-spacing:var(--tracking-subhead); }
+.t-footnote{ font-family:var(--font-text); font-size:var(--fs-footnote); line-height:var(--lh-footnote); letter-spacing:var(--tracking-footnote); }
+.t-caps{ text-transform:uppercase; letter-spacing:var(--tracking-caps); font-size:var(--fs-caption1); font-weight:var(--fw-semibold); }
+.num{ font-family:var(--font-mono); font-variant-numeric:var(--numeric); font-feature-settings:var(--numeric-feature); letter-spacing:-.02em; }
+
+/* ============================== 图标 ====================================== */
+.ic{ width:var(--icon-size-inline); height:var(--icon-size-inline); flex:0 0 auto; stroke:currentColor; stroke-width:var(--icon-stroke); stroke-linecap:round; stroke-linejoin:round; fill:none; }
+.ic-20{ width:var(--icon-size-btn); height:var(--icon-size-btn); }
+.ic-24{ width:var(--icon-size-stand); height:var(--icon-size-stand); }
+/* squircle：支持 corner-shape 时还原 Apple 连续圆角 */
+@supports (corner-shape:squircle){ .ic{ corner-shape:squircle; } }
+
+/* ============================ 原型导航条 ================================= */
+/* 说明：此条为「设计评审用原型chrome」，不属于最终站点 chrome */
+.proto-bar{
+  position:relative; z-index:var(--z-toast); background:var(--ap-dark-1); color:var(--ap-dark-ink);
+  font-size:var(--fs-caption1); letter-spacing:.02em; border-bottom:1px solid var(--ap-dark-sep);
+}
+.proto-in{ max-width:var(--container-wide); margin:0 auto; padding:8px var(--gutter-tablet); display:flex; align-items:center; gap:var(--space-3); flex-wrap:wrap; }
+.proto-tag{ display:inline-flex; align-items:center; gap:6px; color:var(--rt-balanced-dk); font-weight:var(--fw-semibold); }
+.proto-sep{ color:var(--ap-dark-ink-3); }
+.proto-links{ display:flex; gap:var(--space-1); flex-wrap:wrap; margin-left:auto; }
+.proto-links a{ padding:4px 10px; border-radius:var(--radius-pill); color:var(--ap-dark-ink-2); transition:background var(--motion-fast) var(--ease-out),color var(--motion-fast) var(--ease-out); display:inline-flex; align-items:center; gap:5px; }
+.proto-links a:hover{ background:rgba(255,255,255,.1); color:var(--ap-dark-ink); }
+.proto-note{ color:var(--ap-dark-ink-3); font-size:var(--fs-caption2); }
+
+/* ============================== 全局导航 ================================== */
+.nav{
+  position:sticky; top:0; z-index:var(--z-nav); background:var(--nav-bg);
+  -webkit-backdrop-filter:var(--nav-blur); backdrop-filter:var(--nav-blur);
+  border-bottom:1px solid var(--nav-border);
+}
+.nav-in{ max-width:var(--container-wide); margin:0 auto; padding:0 var(--gutter-tablet); height:var(--nav-h); display:flex; align-items:center; gap:var(--space-6); }
+.nav-brand{ font-family:var(--font-display); font-size:var(--fs-subhead); font-weight:var(--fw-semibold); letter-spacing:var(--tracking-subhead); color:var(--fg); white-space:nowrap; display:inline-flex; align-items:center; gap:7px; flex-shrink:0; }
+.nav-brand .mark{ width:18px; height:18px; color:var(--accent); }
+.nav-links{ display:flex; align-items:center; gap:var(--space-5); margin-left:auto; overflow-x:auto; scrollbar-width:none; }
+.nav-links::-webkit-scrollbar{ display:none; }
+.nav-links a{ font-size:var(--fs-footnote); color:var(--nav-fg); white-space:nowrap; padding:2px 0; transition:color var(--motion-fast) var(--ease-out); position:relative; }
+.nav-links a:hover{ color:var(--nav-fg-hover); }
+.nav-links a[aria-current="page"]{ color:var(--nav-fg-active); font-weight:var(--fw-medium); }
+.nav-links a[aria-current="page"]::after{ content:""; position:absolute; left:0; right:0; bottom:-1px; height:2px; background:var(--nav-underline); }
+@media (max-width:640px){ .nav-links a[data-optional]{ display:none; } }
+
+/* ============================== 二级导航 ================================== */
+.localnav{
+  position:sticky; top:var(--nav-h); z-index:calc(var(--z-nav) - 1);
+  background:var(--localnav-bg); -webkit-backdrop-filter:var(--nav-blur); backdrop-filter:var(--nav-blur);
+  border-bottom:1px solid var(--localnav-border);
+}
+.localnav-in{ max-width:var(--container-wide); margin:0 auto; padding:0 var(--gutter-tablet); height:var(--localnav-h); display:flex; align-items:center; gap:var(--space-5); overflow-x:auto; scrollbar-width:none; }
+.localnav-in::-webkit-scrollbar{ display:none; }
+.localnav-in a{ font-size:var(--fs-footnote); color:var(--fg-2); white-space:nowrap; padding:var(--space-2) 0; position:relative; display:inline-flex; align-items:center; gap:6px; }
+.localnav-in a:hover{ color:var(--fg); }
+.localnav-in a[aria-current="page"]{ color:var(--fg); font-weight:var(--fw-medium); }
+.localnav-in a[aria-current="page"]::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:2px; background:var(--nav-underline); }
+.localnav-spacer{ margin-left:auto; }
+
+/* ============================== 容器 ====================================== */
+.shell{ max-width:var(--container-max); margin:0 auto; padding:0 var(--gutter-tablet); }
+.shell-wide{ max-width:var(--container-wide); }
+.shell-prose{ max-width:var(--container-prose); }
+
+/* ============================ 页面区块 ==================================== */
+.band{ padding:var(--section-y-desktop) 0; }
+.band-alt{ background:var(--surface-alt); }
+.band-tight{ padding:var(--space-16) 0; }
+.frame{ padding-top:var(--space-12); }
+.frame + .frame{ border-top:1px solid var(--border-soft); }
+.frame-label{
+  display:inline-flex; align-items:center; gap:7px; font-family:var(--font-mono); font-size:var(--fs-caption2);
+  letter-spacing:.06em; text-transform:uppercase; color:var(--fg-3);
+  background:var(--surface-alt); border:1px solid var(--border-soft); border-radius:var(--radius-pill);
+  padding:5px 12px; margin-bottom:var(--space-6);
+}
+@media (prefers-color-scheme:dark){ .frame-label{ background:var(--ap-dark-2); border-color:var(--ap-dark-sep); } }
+
+/* ============================== 面包屑 ==================================== */
+.crumb{ font-size:var(--fs-footnote); color:var(--crumb-fg); padding:var(--space-6) 0 0; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.crumb a{ display:inline-flex; align-items:center; gap:5px; transition:color var(--motion-fast) var(--ease-out); }
+.crumb a:hover{ color:var(--crumb-fg-hover); }
+.crumb .sep{ color:var(--border); }
+
+/* ============================== 页头 ====================================== */
+.page-head{ padding:var(--space-12) 0 var(--space-10); }
+.page-head .eyebrow{ display:flex; align-items:center; gap:var(--space-2); color:var(--fg-3); margin-bottom:var(--space-3); flex-wrap:wrap; }
+.page-head h1{ margin-bottom:var(--space-3); }
+.page-head h1 .sub{ display:block; font-family:var(--font-display); font-size:var(--fs-title3); line-height:var(--lh-title3); letter-spacing:var(--tracking-title3); font-weight:var(--fw-semibold); color:var(--fg-3); margin-top:var(--space-2); }
+.page-head .lede{ color:var(--fg-2); max-width:var(--container-prose); }
+.page-head .lede-en{ color:var(--fg-3); font-size:var(--fs-subhead); margin-top:var(--space-2); max-width:var(--container-prose); }
+.page-head .meta{ margin-top:var(--space-6); display:flex; align-items:center; gap:var(--space-2); flex-wrap:wrap; font-size:var(--fs-footnote); color:var(--fg-3); }
+
+/* 首页档案条：真实内容，不是口号 */
+.archive-strip{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+}
+.archive-strip > div{ padding:var(--space-5) var(--space-4); border-left:1px solid var(--border-soft); }
+.archive-strip > div:first-child{ border-left:none; padding-left:0; }
+.archive-strip dt{ font-size:var(--fs-caption1); color:var(--fg-3); letter-spacing:var(--tracking-caption); margin-bottom:6px; }
+.archive-strip dd{ font-family:var(--font-mono); font-size:var(--fs-title4); font-weight:var(--fw-semibold); color:var(--fg); font-variant-numeric:var(--numeric); letter-spacing:-.02em; }
+.archive-strip dd .u{ font-size:var(--fs-footnote); color:var(--fg-3); font-weight:var(--fw-regular); margin-left:3px; }
+@media (max-width:640px){
+  .archive-strip{ grid-template-columns:1fr 1fr; }
+  .archive-strip > div{ padding:var(--space-4) 0; border-left:none; border-top:1px solid var(--border-soft); }
+  .archive-strip > div:nth-child(-n+2){ border-top:none; }
+  .archive-strip > div:nth-child(odd){ padding-right:var(--space-3); }
+}
+
+/* ============================== 区块标题 ================================== */
+.sec-head{ display:flex; align-items:baseline; gap:var(--space-4); flex-wrap:wrap; margin-bottom:var(--space-8); }
+.sec-head h2{ flex-shrink:0; }
+.sec-head .spacer{ flex:1 1 auto; }
+.sec-head .aside{ font-size:var(--fs-footnote); color:var(--fg-3); display:inline-flex; align-items:center; gap:6px; }
+
+/* ============================== 时间线 ==================================== */
+/* Apple 做法：不用卡片堆叠，靠 hairline + 留白 */
+.issue{ margin-bottom:var(--space-16); }
+.issue:last-of-type{ margin-bottom:0; }
+.issue-head{
+  display:flex; align-items:baseline; gap:var(--space-3); flex-wrap:wrap;
+  padding-bottom:var(--space-3); margin-bottom:var(--space-2);
+  border-bottom:1px solid var(--border);
+}
+.issue-date{ font-family:var(--font-mono); font-size:var(--fs-title4); font-weight:var(--fw-semibold); letter-spacing:-.02em; font-variant-numeric:var(--numeric); color:var(--fg); }
+.issue-dow{ font-size:var(--fs-subhead); color:var(--fg-3); }
+.issue-head .spacer{ flex:1 1 auto; }
+.issue-summary{ display:inline-flex; align-items:center; gap:var(--space-2); flex-wrap:wrap; }
+
+.tl{ margin-top:var(--space-2); }
+.tl-item{
+  display:grid; grid-template-columns:var(--tl-gutter) 1fr auto; gap:var(--space-5);
+  padding:var(--tl-row-pad-y) 0; border-bottom:1px solid var(--tl-separator); align-items:start;
+}
+.tl-item:last-child{ border-bottom:none; }
+@media (max-width:900px){
+  .tl-item{ grid-template-columns:76px 1fr; gap:var(--space-4); }
+  .tl-meta{ grid-column:2; justify-self:start; }
+}
+@media (max-width:640px){
+  .tl-item{ grid-template-columns:1fr; gap:var(--space-3); padding:var(--space-5) 0; }
+  .tl-meta{ grid-column:1; }
+}
+
+.tl-time{ display:flex; flex-direction:column; gap:5px; padding-top:3px; }
+.tl-sched{ display:inline-flex; align-items:center; gap:7px; font-family:var(--font-mono); font-size:var(--fs-subhead); font-weight:var(--fw-semibold); color:var(--tl-time-fg); font-variant-numeric:var(--numeric); letter-spacing:-.02em; }
+.tl-sched .dot{ width:6px; height:6px; border-radius:50%; background:var(--tl-dot); flex:0 0 auto; }
+.tl-run{ display:inline-flex; align-items:center; gap:5px; font-size:var(--fs-caption2); color:var(--tl-run-fg); line-height:1.3; }
+.tl-run .ic{ width:12px; height:12px; stroke-width:2; }
+
+.tl-body{ min-width:0; }
+.tl-kicker{ display:flex; align-items:center; gap:6px; font-size:var(--fs-caption1); font-weight:var(--fw-semibold); color:var(--tl-kicker-fg); letter-spacing:var(--tracking-caption); margin-bottom:5px; }
+.tl-kicker .ic{ width:13px; height:13px; stroke-width:2; }
+.tl-title{ font-family:var(--font-display); font-size:var(--fs-title4); line-height:var(--lh-title4); letter-spacing:var(--tracking-title4); font-weight:var(--fw-semibold); color:var(--tl-title-fg); margin-bottom:7px; }
+/* 超长中文标题钳制两行，防止溢出 */
+.tl-title a,.tl-title span{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.tl-title a{ transition:color var(--motion-fast) var(--ease-out); }
+.tl-title a:hover{ color:var(--link); }
+.tl-title .go{ display:inline-flex; vertical-align:-1px; margin-left:5px; width:15px; height:15px; color:var(--link); transition:transform var(--motion-base) var(--ease-out); }
+.tl-title a:hover .go{ transform:translateX(3px); }
+.tl-sum{ font-size:var(--fs-callout); line-height:var(--lh-callout); color:var(--tl-summary-fg); max-width:var(--container-prose); }
+.tl-sum .quote{ font-family:var(--font-mono); font-variant-numeric:var(--numeric); }
+.tl-sum .up{ color:var(--quote-up); font-weight:var(--fw-medium); }
+.tl-sum .down{ color:var(--quote-down); font-weight:var(--fw-medium); }
+/* 行内 SVG 箭头，替代 emoji（红涨绿跌冗余编码） */
+.tl-sum .vt{ display:inline-flex; vertical-align:-2px; width:13px; height:13px; margin-right:2px; stroke-width:2.2; }
+.tl-sum .up .vt,.vt.up{ color:var(--quote-up); }
+.tl-sum .down .vt,.vt.down{ color:var(--quote-down); }
+.tl-sum .vt.flat{ color:var(--quote-flat); }
+
+.tl-meta{ display:flex; flex-direction:column; align-items:flex-end; gap:var(--space-2); padding-top:3px; }
+@media (max-width:640px){ .tl-meta{ flex-direction:row; align-items:center; flex-wrap:wrap; } }
+.tl-sigma{ display:inline-flex; align-items:center; gap:5px; font-family:var(--font-mono); font-size:var(--fs-caption1); color:var(--fg-3); font-variant-numeric:var(--numeric); letter-spacing:-.02em; }
+.tl-sigma .ic{ width:12px; height:12px; stroke-width:2; opacity:.75; }
+
+/* ---- 评级徽章：SVG 图标 + 箭头冗余编码 + 文字，三重编码不依赖颜色 ---- */
+.rating{
+  display:inline-flex; align-items:center; gap:5px; white-space:nowrap;
+  font-size:var(--badge-fs); font-weight:var(--fw-semibold); letter-spacing:.01em;
+  padding:var(--badge-pad); border-radius:var(--badge-radius); line-height:1.35;
+  background:var(--rating-bg); color:var(--rating-fg); border:1px solid var(--rating-ring);
+}
+@supports (corner-shape:squircle){ .rating{ corner-shape:squircle; } }
+.rating .ic{ width:13px; height:13px; stroke-width:2.1; flex:0 0 auto; }
+.rating .arrow{ font-family:var(--font-mono); font-size:10px; letter-spacing:-.04em; opacity:.9; }
+.rating-lg{ font-size:var(--fs-subhead); padding:6px 14px; gap:7px; }
+.rating-lg .ic{ width:16px; height:16px; }
+.rating-offensive{ background:var(--rating-offensive-bg); color:var(--rating-offensive-fg); border-color:var(--rating-offensive-ring); }
+.rating-balanced{ background:var(--rating-balanced-bg); color:var(--rating-balanced-fg); border-color:var(--rating-balanced-ring); }
+.rating-conflict{ background:var(--rating-conflict-bg); color:var(--rating-conflict-fg); border-color:var(--rating-conflict-ring); }
+.rating-defensive{ background:var(--rating-defensive-bg); color:var(--rating-defensive-fg); border-color:var(--rating-defensive-ring); }
+.rating-avoid{ background:var(--rating-avoid-bg); color:var(--rating-avoid-fg); border-color:var(--rating-avoid-ring); }
+
+/* ---- 芯片：数据时点 / 任务名 / 归档提示 ---- */
+.chip{
+  display:inline-flex; align-items:center; gap:5px; white-space:nowrap;
+  font-size:var(--chip-fs); color:var(--chip-fg); background:var(--chip-bg);
+  border:1px solid var(--chip-border); border-radius:var(--chip-radius); padding:var(--chip-pad); line-height:1.4;
+}
+@supports (corner-shape:squircle){ .chip{ corner-shape:squircle; } }
+.chip .ic{ width:12px; height:12px; stroke-width:2; }
+.chip-intraday{ color:var(--stage-intraday-fg); background:var(--stage-intraday-bg); border-color:var(--stage-intraday-ring); }
+.chip-close{ color:var(--stage-close-fg); background:var(--stage-close-bg); border-color:var(--stage-close-ring); }
+.chip-pending{ color:var(--fg-3); background:transparent; border-style:dashed; }
+
+/* ============================== 按钮 ====================================== */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  font-family:var(--font-text); font-size:var(--fs-subhead); font-weight:var(--fw-medium);
+  letter-spacing:var(--tracking-subhead); line-height:1.2;
+  padding:11px 21px; border-radius:var(--radius-pill); border:1px solid transparent;
+  transition:background var(--motion-fast) var(--ease-out),border-color var(--motion-fast) var(--ease-out),color var(--motion-fast) var(--ease-out),opacity var(--motion-fast) var(--ease-out);
+  min-height:44px; cursor:pointer;
+}
+@supports (corner-shape:squircle){ .btn{ corner-shape:squircle; } }
+.btn-primary{ background:var(--accent); color:var(--fg-on-accent); }
+.btn-primary:hover{ background:var(--accent-hover); }
+.btn-primary:active{ background:var(--accent-active); }
+.btn-secondary{ background:transparent; border-color:var(--accent); color:var(--accent); }
+.btn-secondary:hover{ background:rgba(0,113,227,.06); }
+@media (prefers-color-scheme:dark){ .btn-secondary:hover{ background:rgba(41,151,255,.1); } }
+.btn-quiet{ background:transparent; color:var(--link); padding:11px 16px; }
+.btn-quiet:hover{ background:rgba(0,0,0,.04); }
+@media (prefers-color-scheme:dark){ .btn-quiet:hover{ background:rgba(255,255,255,.08); } }
+.btn:disabled{ opacity:.4; cursor:not-allowed; }
+.btn-row{ display:flex; gap:var(--space-3); flex-wrap:wrap; align-items:center; }
+
+/* ============================== 面板 ====================================== */
+/* Apple 原则：面板默认无边框无投影，靠背景分层 */
+.panel{ background:var(--panel-bg); border-radius:var(--panel-radius); padding:var(--card-pad); }
+.feature{ background:var(--feature-bg); border-radius:var(--feature-radius); padding:var(--feature-pad); border:1px solid var(--border-soft); }
+@supports (corner-shape:squircle){ .panel,.feature{ corner-shape:squircle; } }
+@media (prefers-color-scheme:dark){ .feature{ border-color:var(--ap-dark-sep); } }
+
+/* ---- 指标卡：无边框，靠 hairline 分隔 ---- */
+.kpi-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); border-top:1px solid var(--border); }
+.kpi{ padding:var(--space-5) var(--space-4) var(--space-5) 0; border-left:1px solid var(--border-soft); padding-left:var(--space-4); }
+.kpi:first-child{ border-left:none; padding-left:0; }
+.kpi dt{ font-size:var(--fs-caption1); color:var(--fg-3); letter-spacing:var(--tracking-caption); margin-bottom:6px; display:flex; align-items:center; gap:5px; }
+.kpi dt .ic{ width:13px; height:13px; stroke-width:2; }
+.kpi dd{ font-family:var(--font-mono); font-size:var(--fs-title4); font-weight:var(--fw-semibold); color:var(--fg); font-variant-numeric:var(--numeric); letter-spacing:-.02em; line-height:1.2; }
+.kpi dd .u{ font-size:var(--fs-footnote); color:var(--fg-3); font-weight:var(--fw-regular); margin-left:3px; }
+.kpi dd .up{ color:var(--quote-up); }
+.kpi dd .down{ color:var(--quote-down); }
+@media (max-width:640px){
+  .kpi-row{ grid-template-columns:1fr 1fr; }
+  .kpi{ padding:var(--space-4) var(--space-3) var(--space-4) 0; }
+  .kpi:nth-child(odd){ border-left:none; padding-left:0; }
+  .kpi:nth-child(n+3){ border-top:1px solid var(--border-soft); }
+}
+
+/* ============================== 数据表 ==================================== */
+.tbl-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.tbl{ width:100%; border-collapse:collapse; font-size:var(--table-cell-fs); font-variant-numeric:var(--numeric); }
+.tbl caption{ text-align:left; font-size:var(--fs-footnote); color:var(--fg-3); padding-bottom:var(--space-3); }
+.tbl th{
+  text-align:left; font-size:var(--table-head-fs); font-weight:var(--fw-semibold); color:var(--table-head-fg);
+  letter-spacing:var(--tracking-caption); padding:var(--space-2) var(--table-cell-pad);
+  border-bottom:1px solid var(--table-border); white-space:nowrap;
+}
+.tbl td{ padding:var(--table-cell-pad); border-bottom:1px solid var(--separator); vertical-align:top; }
+.tbl tbody tr:last-child td{ border-bottom:none; }
+.tbl .num{ text-align:right; font-family:var(--font-mono); font-variant-numeric:var(--numeric); white-space:nowrap; }
+.tbl th.num{ text-align:right; }
+.tbl .up{ color:var(--quote-up); }
+.tbl .down{ color:var(--quote-down); }
+.tbl .flat{ color:var(--quote-flat); }
+.tbl .strong{ font-weight:var(--fw-semibold); color:var(--fg); }
+
+/* ============================== 页脚 ====================================== */
+.foot{ margin-top:var(--space-16); background:var(--foot-bg); border-top:1px solid var(--foot-border); }
+.foot-in{ max-width:var(--container-wide); margin:0 auto; padding:var(--space-10) var(--gutter-tablet) var(--space-12); }
+.foot-top{ display:flex; gap:var(--space-8); flex-wrap:wrap; justify-content:space-between; margin-bottom:var(--space-8); }
+.foot-brand{ max-width:38ch; }
+.foot-brand p{ font-size:var(--foot-fs); line-height:var(--lh-footnote); color:var(--foot-fg); margin-top:var(--space-3); }
+.foot-cols{ display:flex; gap:var(--space-10); flex-wrap:wrap; }
+.foot-col h3{ font-size:var(--fs-caption1); color:var(--fg); font-weight:var(--fw-semibold); letter-spacing:var(--tracking-caption); margin-bottom:var(--space-3); }
+.foot-col li{ margin-bottom:var(--space-2); }
+.foot-col a{ font-size:var(--foot-fs); color:var(--foot-fg); display:inline-flex; align-items:center; gap:5px; transition:color var(--motion-fast) var(--ease-out); }
+.foot-col a:hover{ color:var(--link); }
+.foot-col a .ic{ width:12px; height:12px; stroke-width:2; opacity:.7; }
+.foot-legal{ border-top:1px solid var(--foot-border); padding-top:var(--space-5); font-size:var(--fs-caption1); line-height:var(--lh-footnote); color:var(--fg-3); }
+.foot-legal p + p{ margin-top:var(--space-2); }
+.foot-legal a{ color:var(--fg-2); border-bottom:1px solid var(--border); transition:color var(--motion-fast) var(--ease-out),border-color var(--motion-fast) var(--ease-out); }
+.foot-legal a:hover{ color:var(--link); border-color:var(--link); }
+
+/* ============================ 空态 / 边界态 =============================== */
+.empty{
+  border:1px dashed var(--border); border-radius:var(--radius-md); padding:var(--space-16) var(--space-6);
+  text-align:center; color:var(--fg-3); background:var(--surface);
+}
+@supports (corner-shape:squircle){ .empty{ corner-shape:squircle; } }
+.empty .ic-24{ margin:0 auto var(--space-4); color:var(--fg-3); opacity:.7; }
+.empty h3{ font-size:var(--fs-title4); color:var(--fg-2); margin-bottom:var(--space-2); letter-spacing:var(--tracking-title4); }
+.empty p{ font-size:var(--fs-subhead); max-width:44ch; margin:0 auto var(--space-5); line-height:var(--lh-subhead); }
+.state-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:var(--space-4); }
+.state-grid > .empty{ padding:var(--space-8) var(--space-5); display:flex; flex-direction:column; justify-content:center; }
+.state-grid .empty h3{ font-size:var(--fs-headline); margin-top:var(--space-3); }
+.state-grid .empty p{ font-size:var(--fs-footnote); margin-bottom:var(--space-4); }
+@media (max-width:640px){ .state-grid{ grid-template-columns:1fr; } }
+
+/* 骨架屏：盒高与真实条目一致，载入时零布局偏移 */
+.skel-stack{ display:flex; flex-direction:column; gap:10px; width:100%; max-width:280px; margin:0 auto var(--space-2); }
+.skel{ display:block; height:11px; border-radius:var(--radius-xs); background:var(--surface-alt); position:relative; overflow:hidden; }
+@media (prefers-color-scheme:dark){ .skel{ background:var(--ap-dark-2); } }
+.skel-w40{ width:40%; } .skel-w90{ width:90%; } .skel-w75{ width:75%; height:15px; } .skel-w60{ width:60%; }
+/* 骨架微光：呼吸式明度脉冲，零渐变（守住全站无 gradient 的硬约束） */
+.skel{ animation:skel-pulse 1.6s var(--ease-out-soft) infinite; }
+@keyframes skel-pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
+
+/* ============================ 归档列表 ==================================== */
+.archive-item{
+  display:grid; grid-template-columns:1fr auto; gap:var(--space-5); align-items:center;
+  padding:var(--space-5) 0; border-bottom:1px solid var(--separator);
+}
+.archive-item:last-child{ border-bottom:none; }
+.archive-item h3{ font-size:var(--fs-headline); line-height:var(--lh-headline); letter-spacing:var(--tracking-headline); margin-bottom:5px; display:flex; align-items:center; gap:var(--space-2); flex-wrap:wrap; }
+.archive-item p{ font-size:var(--fs-subhead); color:var(--fg-2); max-width:60ch; }
+.archive-item .meta{ display:inline-flex; align-items:center; gap:var(--space-2); font-size:var(--fs-caption1); color:var(--fg-3); margin-top:var(--space-2); flex-wrap:wrap; }
+.archive-item .go{ display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:var(--radius-pill); border:1px solid var(--border); color:var(--fg-3); transition:all var(--motion-base) var(--ease-out); flex:0 0 auto; }
+.archive-item:hover .go{ background:var(--accent); border-color:var(--accent); color:var(--fg-on-accent); }
+.archive-item:hover h3 a{ color:var(--link); }
+@media (max-width:640px){ .archive-item{ grid-template-columns:1fr; } .archive-item .go{ display:none; } }
+
+/* ============================ 方法论流水线 ================================ */
+.flow{ display:flex; gap:var(--space-2); flex-wrap:wrap; counter-reset:step; }
+.flow-step{
+  display:inline-flex; align-items:center; gap:7px; background:var(--surface-alt);
+  border:1px solid var(--border-soft); border-radius:var(--radius-sm); padding:9px 13px;
+  font-size:var(--fs-footnote); color:var(--fg-2); font-weight:var(--fw-medium);
+}
+@media (prefers-color-scheme:dark){ .flow-step{ background:var(--ap-dark-2); border-color:var(--ap-dark-sep); } }
+@supports (corner-shape:squircle){ .flow-step{ corner-shape:squircle; } }
+.flow-step .n{ font-family:var(--font-mono); font-size:10px; color:var(--fg-3); font-variant-numeric:var(--numeric); }
+.flow-step .ic{ width:14px; height:14px; color:var(--fg-3); stroke-width:2; }
+.flow-arrow{ display:inline-flex; align-items:center; color:var(--fg-3); align-self:center; }
+.flow-arrow .ic{ width:14px; height:14px; }
+
+/* ============================ 规则说明块 ================================== */
+.spec-list li{ display:flex; gap:var(--space-3); padding:var(--space-3) 0; border-bottom:1px solid var(--separator); font-size:var(--fs-subhead); color:var(--fg-2); line-height:var(--lh-subhead); }
+.spec-list li:last-child{ border-bottom:none; }
+.spec-list .ic{ width:16px; height:16px; flex:0 0 auto; margin-top:2px; }
+.spec-list .do .ic{ color:var(--success); }
+.spec-list .dont .ic{ color:var(--danger); }
+.spec-list b{ color:var(--fg); font-weight:var(--fw-semibold); }
+
+/* ============================ 色卡 ====================================== */
+.swatches{ display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr)); gap:var(--space-3); }
+.swatch{ border:1px solid var(--border-soft); border-radius:var(--radius-md); overflow:hidden; background:var(--surface); }
+@supports (corner-shape:squircle){ .swatch{ corner-shape:squircle; } }
+.swatch .fill{ height:64px; display:flex; align-items:flex-end; padding:var(--space-3); }
+.swatch .fill span{ font-size:var(--fs-caption2); font-family:var(--font-mono); letter-spacing:.04em; }
+.swatch .meta{ padding:var(--space-3); }
+.swatch .meta strong{ display:block; font-size:var(--fs-footnote); font-weight:var(--fw-semibold); color:var(--fg); margin-bottom:3px; }
+.swatch .meta code{ font-family:var(--font-mono); font-size:var(--fs-caption2); color:var(--fg-3); display:block; line-height:1.5; }
+.swatch .meta .ratio{ font-size:var(--fs-caption2); color:var(--fg-2); margin-top:5px; display:flex; align-items:center; gap:4px; }
+.swatch .meta .ratio .ic{ width:11px; height:11px; stroke-width:2.2; color:var(--success); }
+
+/* ============================ 排版演示 ==================================== */
+.type-row{ padding:var(--space-5) 0; border-bottom:1px solid var(--separator); display:grid; grid-template-columns:130px 1fr; gap:var(--space-5); align-items:baseline; }
+.type-row:last-child{ border-bottom:none; }
+.type-row .meta{ font-family:var(--font-mono); font-size:var(--fs-caption2); color:var(--fg-3); line-height:1.6; }
+.type-row .meta b{ color:var(--fg-2); font-weight:var(--fw-semibold); display:block; }
+@media (max-width:640px){ .type-row{ grid-template-columns:1fr; gap:var(--space-2); } }
+
+/* ============================ 响应式 ====================================== */
+@media (max-width:1024px){
+  .shell{ padding:0 var(--gutter-tablet); }
+  .band{ padding:var(--section-y-tablet) 0; }
+  .page-head{ padding:var(--space-10) 0 var(--space-8); }
+  .frame{ padding-top:var(--space-10); }
+}
+@media (max-width:640px){
+  html{ scroll-padding-top:calc(var(--nav-h) + var(--localnav-h) + 12px); }
+  .shell{ padding:0 var(--gutter-phone); }
+  .band{ padding:var(--section-y-phone) 0; }
+  .band-tight{ padding:var(--space-10) 0; }
+  .proto-in{ padding:8px var(--gutter-phone); gap:var(--space-2); }
+  .proto-links{ margin-left:0; width:100%; }
+  .page-head{ padding:var(--space-8) 0 var(--space-6); }
+  .page-head h1 .sub{ font-size:var(--fs-title4); }
+  .frame{ padding-top:var(--space-8); }
+  .issue{ margin-bottom:var(--space-10); }
+  .tl-gutter:unset;
+  .foot-in{ padding:var(--space-8) var(--gutter-phone) var(--space-10); }
+  .foot-top{ gap:var(--space-6); }
+  .foot-cols{ gap:var(--space-8); }
+  .swatches{ grid-template-columns:1fr 1fr; }
+  .kpi dd{ font-size:var(--fs-title3); }
+}
+@media (max-width:390px){
+  .swatches{ grid-template-columns:1fr; }
+  .archive-strip{ grid-template-columns:1fr; }
+  .archive-strip > div{ border-top:1px solid var(--border-soft) !important; }
+  .archive-strip > div:first-child{ border-top:none !important; }
+}
+
+/* 打印：Apple 官网同样提供干净打印样式 */
+@media print{
+  .nav,.localnav,.proto-bar,.btn-row,.archive-item .go{ display:none; }
+  body{ background:#fff; color:#000; }
+  .issue{ page-break-inside:avoid; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== SVG 图标符号库（全站唯一样式） ===================== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<defs>
+  <!-- Lucide 风格：viewBox 24 / stroke 1.75 / round cap-join / fill none -->
+  <symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></symbol>
+  <symbol id="i-archive" viewBox="0 0 24 24"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></symbol>
+  <symbol id="i-arrow-down" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+  <symbol id="i-arrow-up" viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></symbol>
+  <symbol id="i-bar-chart" viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+  <symbol id="i-chevrons-down" viewBox="0 0 24 24"><polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/></symbol>
+  <symbol id="i-chevrons-up" viewBox="0 0 24 24"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></symbol>
+  <symbol id="i-circle-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="12" x2="12.01" y2="12"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><polyline points="14 2 14 8 20 8"/></symbol>
+  <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></symbol>
+  <symbol id="i-git-branch" viewBox="0 0 24 24"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></symbol>
+  <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><polyline points="12 7 12 12 15 14"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="m6.08 9.5-3.5 1.6a1 1 0 0 0 0 1.81l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9a1 1 0 0 0 0-1.83L17.9 9.5"/><path d="m6.08 14.5-3.5 1.6a1 1 0 0 0 0 1.81l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9a1 1 0 0 0 0-1.83l-3.5-1.59"/></symbol>
+  <symbol id="i-line-chart" viewBox="0 0 24 24"><line x1="3" y1="3" x2="3" y2="21"/><line x1="3" y1="21" x2="21" y2="21"/><polyline points="7 16 11 10 15 13 20 6"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+  <symbol id="i-radio" viewBox="0 0 24 24"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2a6 6 0 0 1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8a6 6 0 0 1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/></symbol>
+  <symbol id="i-rss" viewBox="0 0 24 24"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></symbol>
+  <symbol id="i-scale" viewBox="0 0 24 24"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></symbol>
+  <symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></symbol>
+  <symbol id="i-sigma" viewBox="0 0 24 24"><path d="M18 7V5a1 1 0 0 0-1-1H6.5a.5.5 0 0 0-.4.8l4.5 6a2 2 0 0 1 0 2.4l-4.5 6a.5.5 0 0 0 .4.8H17a1 1 0 0 0 1-1v-2"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+  <symbol id="i-timer" viewBox="0 0 24 24"><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" y1="14" x2="15" y2="11"/><circle cx="12" cy="14" r="8"/></symbol>
+  <symbol id="i-trending-down" viewBox="0 0 24 24"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></symbol>
+  <symbol id="i-trending-up" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+</defs>
+</svg>
+
+<!-- ===================== 跳过导航（键盘可达） ============================= -->
+<a class="skip-link" href="#main-content">跳到主要内容</a>
+
+<!-- ========================== 原型评审导航条 ============================== -->
+<div class="proto-bar">
+  <div class="proto-in">
+    <span class="proto-tag"><svg class="ic" style="width:13px;height:13px"><use href="#i-activity"/></svg>设计原型</span>
+    <span class="proto-note">Apple 设计语言 · 零 JS · 深色模式跟随系统</span>
+    <span class="proto-sep" aria-hidden="true">|</span>
+    <nav class="proto-links" aria-label="原型页面导航">
+      <a href="#frame-home"><svg class="ic" style="width:12px;height:12px"><use href="#i-layers"/></svg>首页</a>
+      <a href="#frame-day"><svg class="ic" style="width:12px;height:12px"><use href="#i-calendar"/></svg>日期页</a>
+      <a href="#frame-archive"><svg class="ic" style="width:12px;height:12px"><use href="#i-archive"/></svg>归档页</a>
+      <a href="#frame-method"><svg class="ic" style="width:12px;height:12px"><use href="#i-book"/></svg>方法论页</a>
+      <a href="#frame-spec"><svg class="ic" style="width:12px;height:12px"><use href="#i-scale"/></svg>Token 校验</a>
+    </nav>
+  </div>
+</div>
+
+<!-- ============================== 全局导航 ================================= -->
+<nav class="nav" aria-label="全局导航">
+  <div class="nav-in">
+    <a class="nav-brand" href="#frame-home">
+      <svg class="ic mark" aria-hidden="true"><use href="#i-line-chart"/></svg>
+      每日市场脉搏
+    </a>
+    <div class="nav-links">
+      <a href="#frame-home" aria-current="page">首页</a>
+      <a href="#frame-archive">归档</a>
+      <a href="#frame-method" data-optional>方法论</a>
+      <a href="#frame-spec" data-optional>评级规则</a>
+      <a href="#frame-home"><svg class="ic" style="width:13px;height:13px" aria-hidden="true"><use href="#i-rss"/></svg><span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">RSS 订阅</span></a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================== 二级导航 ================================= -->
+<nav class="localnav" aria-label="栏目导航">
+  <div class="localnav-in">
+    <a href="#frame-home">全部归档</a>
+    <a href="#frame-day">本日详情</a>
+    <a href="#frame-archive">周报 · 月报</a>
+    <a href="#frame-method">方法论</a>
+    <span class="localnav-spacer"></span>
+    <span class="t-footnote" style="color:var(--fg-3);white-space:nowrap">最近更新 2026-10-14</span>
+  </div>
+</nav>
+
+
+<!-- ╔═══════════════════════════════════════════════════════════════════════╗ -->
+<!-- ║ FRAME 1 — 首页：日期分组时间线                ║ -->
+<!-- ╚═══════════════════════════════════════════════════════════════════════╝ -->
+<main id="frame-home" class="frame">
+<div class="shell" id="main-content">
+
+  <header class="page-head">
+    <p class="eyebrow t-footnote">
+      <svg class="ic" aria-hidden="true"><use href="#i-target"/></svg>
+      数据驱动的 A 股 / 基金每日研判档案
+    </p>
+    <h1 class="t-title1">每交易日的判断，<br>留一条可回溯的轨迹。</h1>
+    <p class="lede t-callout">
+      同一份数据必然得出同一结论。结论可复现、可审计 —— 这里存的不是行情，是判断本身。
+    </p>
+    <p class="lede-en t-subhead">
+      Same data always yields the same verdict. Verdicts are reproducible and auditable — this archive stores judgments, not quotes.
+    </p>
+  </header>
+
+  <!-- 真实归档数据条（替代空洞 Hero：展示实际内容而非口号） -->
+  <dl class="archive-strip" style="margin-bottom:var(--space-16)">
+    <div><dt>已归档交易日</dt><dd>3<span class="u">期</span></dd></div>
+    <div><dt>研判文档总数</dt><dd>12<span class="u">篇</span></dd></div>
+    <div><dt>最近一期 Σ 评级</dt><dd style="font-size:var(--fs-subhead);font-family:var(--font-text);display:flex;align-items:center;padding-top:4px"><span class="rating rating-defensive"><svg class="ic" aria-hidden="true"><use href="#i-arrow-down"/></svg><span class="arrow">▼</span>防守</span></dd></div>
+    <div><dt>最近一期 Σ 值</dt><dd>-0.339</dd></div>
+    <div><dt>数据源</dt><dd style="font-size:var(--fs-subhead);font-family:var(--font-text);padding-top:4px">腾讯自选股 MCP</dd></div>
+  </dl>
+
+  <section aria-labelledby="sec-timeline">
+    <div class="sec-head">
+      <h2 class="t-title2" id="sec-timeline">判断轨迹</h2>
+      <span class="spacer"></span>
+      <span class="aside"><svg class="ic" style="width:14px;height:14px" aria-hidden="true"><use href="#i-clock"/></svg>每交易时点调度 · 按调度时点排序</span>
+    </div>
+
+    <!-- ─────────── 2026-10-14（周三）防守 Σ -0.339 ─────────── -->
+    <article class="issue" aria-labelledby="d-1014">
+      <div class="issue-head">
+        <time class="issue-date" datetime="2026-10-14" id="d-1014">2026-10-14</time>
+        <span class="issue-dow">周三 · Wed</span>
+        <span class="spacer"></span>
+        <span class="issue-summary">
+          <span class="rating rating-lg rating-defensive"><svg class="ic" aria-hidden="true"><use href="#i-arrow-down"/></svg><span class="arrow">▼</span>防守</span>
+          <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>-0.339</span>
+        </span>
+      </div>
+
+      <ul class="tl">
+        <li class="tl-item">
+          <div class="tl-time">
+            <span class="tl-sched"><span class="dot"></span>09:28</span>
+            <span class="tl-run"><svg class="ic" aria-hidden="true"><use href="#i-timer"/></svg>生成 12:39</span>
+          </div>
+          <div class="tl-body">
+            <p class="tl-kicker"><svg class="ic" aria-hidden="true"><use href="#i-bar-chart"/></svg>股票助手</p>
+            <h3 class="tl-title"><a href="#frame-day">股票助手 · 2026-10-14（周三）盘中研判<svg class="ic go" aria-hidden="true"><use href="#i-arrow-right"/></svg></a></h3>
+            <p class="tl-sum">估值深度支撑：沪深300 PE <span class="quote">13.19</span>，60 日回撤 <span class="down">-11.14%</span>，S6 满格 <span class="quote">+1.000</span> —— 历史上该区域对应中期底部特征</p>
+          </div>
+          <div class="tl-meta">
+            <span class="rating rating-defensive"><svg class="ic" aria-hidden="true"><use href="#i-arrow-down"/></svg><span class="arrow">▼</span>防守</span>
+            <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>-0.339</span>
+            <span class="chip chip-intraday"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>盘中时点</span>
+          </div>
+        </li>
+
+        <li class="tl-item">
+          <div class="tl-time">
+            <span class="tl-sched"><span class="dot"></span>11:00</span>
+            <span class="tl-run"><svg class="ic" aria-hidden="true"><use href="#i-timer"/></svg>生成 11:16</span>
+          </div>
+          <div class="tl-body">
+            <p class="tl-kicker"><svg class="ic" aria-hidden="true"><use href="#i-database"/></svg>基金盘面</p>
+            <h3 class="tl-title"><a href="#frame-day">基金每日盘面分析与加权预估报告（11:00 午盘版）<svg class="ic go" aria-hidden="true"><use href="#i-arrow-right"/></svg></a></h3>
+            <p class="tl-sum">上证指数：<span class="quote">3,807.50</span> 点（<span class="up"><svg class="vt" aria-hidden="true"><use href="#i-arrow-up"/></svg>+0.17%</span>）</p>
+          </div>
+          <div class="tl-meta">
+            <span class="rating rating-defensive"><svg class="ic" aria-hidden="true"><use href="#i-arrow-down"/></svg><span class="arrow">▼</span>防守</span>
+            <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>-0.339</span>
+            <span class="chip chip-intraday"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>盘中时点</span>
+          </div>
+        </li>
+
+        <li class="tl-item">
+          <div class="tl-time">
+            <span class="tl-sched"><span class="dot"></span>14:30</span>
+            <span class="tl-run"><svg class="ic" aria-hidden="true"><use href="#i-timer"/></svg>生成 14:30</span>
+          </div>
+          <div class="tl-body">
+            <p class="tl-kicker"><svg class="ic" aria-hidden="true"><use href="#i-target"/></svg>基金操作指引</p>
+            <h3 class="tl-title"><span>基金每日操作指引（14:30）— daily-decision-engine v1.3（评级驱动 · 分层指令 · 零套话版）</span></h3>
+            <p class="tl-sum">根据 daily-decision-engine 核心算法计算，今日六维确定性信号综合评分</p>
+          </div>
+          <div class="tl-meta">
+            <span class="rating rating-defensive"><svg class="ic" aria-hidden="true"><use href="#i-arrow-down"/></svg><span class="arrow">▼</span>防守</span>
+            <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>-0.339</span>
+            <span class="chip chip-intraday"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>盘中时点</span>
+            <span class="chip chip-pending"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg>网页版待补齐</span>
+          </div>
+        </li>
+
+        <li class="tl-item">
+          <div class="tl-time">
+            <span class="tl-sched"><span class="dot"></span>15:05</span>
+            <span class="tl-run"><svg class="ic" aria-hidden="true"><use href="#i-timer"/></svg>生成 15:05</span>
+          </div>
+          <div class="tl-body">
+            <p class="tl-kicker"><svg class="ic" aria-hidden="true"><use href="#i-line-chart"/></svg>股票复盘</p>
+            <h3 class="tl-title"><span>2026-10-14 股票每日复盘研判报告（圆桌多视角与决策卡）</span></h3>
+            <p class="tl-sum">上证指数：<span class="quote">3,767.23</span>（<span class="down"><svg class="vt" aria-hidden="true"><use href="#i-arrow-down"/></svg>-0.88%</span>，跌破 3800 关口）</p>
+          </div>
+          <div class="tl-meta">
+            <span class="rating rating-defensive"><svg class="ic" aria-hidden="true"><use href="#i-arrow-down"/></svg><span class="arrow">▼</span>防守</span>
+            <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>-0.339</span>
+            <span class="chip chip-close"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg>收盘时点</span>
+            <span class="chip chip-pending"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg>网页版待补齐</span>
+          </div>
+        </li>
+
+        <li class="tl-item">
+          <div class="tl-time">
+            <span class="tl-sched"><span class="dot"></span>15:30</span>
+            <span class="tl-run"><svg class="ic" aria-hidden="true"><use href="#i-timer"/></svg>生成 15:30</span>
+          </div>
+          <div class="tl-body">
+            <p class="tl-kicker"><svg class="ic" aria-hidden="true"><use href="#i-inbox"/></svg>每日总复盘</p>
+            <h3 class="tl-title"><a href="#frame-day">基金股票每日复盘 - 2026 年 10 月 14 日<svg class="ic go" aria-hidden="true"><use href="#i-arrow-right"/></svg></a></h3>
+            <p class="tl-sum">当日全部研判的汇总归档与观点结算</p>
+          </div>
+          <div class="tl-meta">
+            <span class="rating rating-defensive"><svg class="ic" aria-hidden="true"><use href="#i-arrow-down"/></svg><span class="arrow">▼</span>防守</span>
+            <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>-0.339</span>
+            <span class="chip chip-close"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg>收盘时点</span>
+          </div>
+        </li>
+      </ul>
+    </article>
+
+    <!-- ─────────── 2026-10-13（周二）信号矛盾 Σ +0.000 ─────────── -->
+    <article class="issue" aria-labelledby="d-1013">
+      <div class="issue-head">
+        <time class="issue-date" datetime="2026-10-13" id="d-1013">2026-10-13</time>
+        <span class="issue-dow">周二 · Tue</span>
+        <span class="spacer"></span>
+        <span class="issue-summary">
+          <span class="rating rating-lg rating-conflict"><svg class="ic" aria-hidden="true"><use href="#i-shuffle"/></svg><span class="arrow">↔</span>信号矛盾</span>
+          <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>+0.000</span>
+        </span>
+      </div>
+
+      <ul class="tl">
+        <li class="tl-item">
+          <div class="tl-time">
+            <span class="tl-sched"><span class="dot"></span>09:28</span>
+            <span class="tl-run"><svg class="ic" aria-hidden="true"><use href="#i-timer"/></svg>生成 13:20</span>
+          </div>
+          <div class="tl-body">
+            <p class="tl-kicker"><svg class="ic" aria-hidden="true"><use href="#i-bar-chart"/></svg>股票助手</p>
+            <h3 class="tl-title"><a href="#frame-day">A 股持仓每日投研诊断与网格交易操作指南（2026-10-13 周二 午后补跑全景研判）<svg class="ic go" aria-hidden="true"><use href="#i-arrow-right"/></svg></a></h3>
+            <p class="tl-sum">上证指数 (sh000001)：<span class="quote">3,807.15</span> 点（<span class="up"><svg class="vt" aria-hidden="true"><use href="#i-arrow-up"/></svg>+0.26%</span>）｜ 竞价大幅低开 <span class="quote">3,760.80</span>（<span class="down">-0.96%</span>），盘中 V 型反转翻红，最高 <span class="quote">3,810.94</span>，承接力强劲</p>
+          </div>
+          <div class="tl-meta">
+            <span class="rating rating-conflict"><svg class="ic" aria-hidden="true"><use href="#i-shuffle"/></svg><span class="arrow">↔</span>信号矛盾</span>
+            <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>+0.000</span>
+            <span class="chip chip-intraday"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>盘中时点</span>
+          </div>
+        </li>
+
+        <li class="tl-item">
+          <div class="tl-time">
+            <span class="tl-sched"><span class="dot"></span>11:00</span>
+            <span class="tl-run"><svg class="ic" aria-hidden="true"><use href="#i-timer"/></svg>生成 13:14</span>
+          </div>
+          <div class="tl-body">
+            <p class="tl-kicker"><svg class="ic" aria-hidden="true"><use href="#i-database"/></svg>基金盘面</p>
+            <h3 class="tl-title"><a href="#frame-day">基金每日盘面分析与加权预估报告（11:00 午盘版）<svg class="ic go" aria-hidden="true"><use href="#i-arrow-right"/></svg></a></h3>
+            <p class="tl-sum">上证指数：<span class="quote">3,807.93</span> 点（<span class="up"><svg class="vt" aria-hidden="true"><use href="#i-arrow-up"/></svg>+0.28%</span>）</p>
+          </div>
+          <div class="tl-meta">
+            <span class="rating rating-conflict"><svg class="ic" aria-hidden="true"><use href="#i-shuffle"/></svg><span class="arrow">↔</span>信号矛盾</span>
+            <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>+0.000</span>
+            <span class="chip chip-intraday"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>盘中时点</span>
+          </div>
+        </li>
+
+        <li class="tl-item">
+          <div class="tl-time">
+            <span class="tl-sched"><span class="dot"></span>14:30</span>
+            <span class="tl-run"><svg class="ic" aria-hidden="true"><use href="#i-timer"/></svg>生成 14:34</span>
+          </div>
+          <div class="tl-body">
+            <p class="tl-kicker"><svg class="ic" aria-hidden="true"><use href="#i-target"/></svg>基金操作指引</p>
+            <h3 class="tl-title"><span>基金每日操作指引（14:30）— 真实记忆抓取、仓位加权估算与外盘企稳校验版</span></h3>
+            <p class="tl-sum">记忆文件动态解析，自动读取持仓金额与占比，计算总持仓 <span class="quote">63,322.65</span> 元</p>
+          </div>
+          <div class="tl-meta">
+            <span class="rating rating-conflict"><svg class="ic" aria-hidden="true"><use href="#i-shuffle"/></svg><span class="arrow">↔</span>信号矛盾</span>
+            <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>+0.000</span>
+            <span class="chip chip-intraday"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>盘中时点</span>
+            <span class="chip chip-pending"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg>网页版待补齐</span>
+          </div>
+        </li>
+
+        <li class="tl-item">
+          <div class="tl-time">
+            <span class="tl-sched"><span class="dot"></span>15:05</span>
+            <span class="tl-run"><svg class="ic" aria-hidden="true"><use href="#i-timer"/></svg>生成 15:05</span>
+          </div>
+          <div class="tl-body">
+            <p class="tl-kicker"><svg class="ic" aria-hidden="true"><use href="#i-line-chart"/></svg>股票复盘</p>
+            <h3 class="tl-title"><span>2026-10-13 A 股三维一体每日复盘与持仓诊断报告</span></h3>
+            <p class="tl-sum">上证指数：<span class="quote">3,800.86</span> <span class="up"><svg class="vt" aria-hidden="true"><use href="#i-arrow-up"/></svg>+0.10%</span>（<span class="quote">+3.62</span> 点，探底 3,741 点回升，守住 3,800 点整数关）</p>
+          </div>
+          <div class="tl-meta">
+            <span class="rating rating-conflict"><svg class="ic" aria-hidden="true"><use href="#i-shuffle"/></svg><span class="arrow">↔</span>信号矛盾</span>
+            <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>+0.000</span>
+            <span class="chip chip-close"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg>收盘时点</span>
+            <span class="chip chip-pending"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg>网页版待补齐</span>
+          </div>
+        </li>
+
+        <li class="tl-item">
+          <div class="tl-time">
+            <span class="tl-sched"><span class="dot"></span>15:30</span>
+            <span class="tl-run"><svg class="ic" aria-hidden="true"><use href="#i-timer"/></svg>生成 15:30</span>
+          </div>
+          <div class="tl-body">
+            <p class="tl-kicker"><svg class="ic" aria-hidden="true"><use href="#i-inbox"/></svg>每日总复盘</p>
+            <h3 class="tl-title"><a href="#frame-day">基金股票每日复盘 - 2026 年 10 月 13 日<svg class="ic go" aria-hidden="true"><use href="#i-arrow-right"/></svg></a></h3>
+            <p class="tl-sum">当日全部研判的汇总归档与观点结算</p>
+          </div>
+          <div class="tl-meta">
+            <span class="rating rating-conflict"><svg class="ic" aria-hidden="true"><use href="#i-shuffle"/></svg><span class="arrow">↔</span>信号矛盾</span>
+            <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>+0.000</span>
+            <span class="chip chip-close"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg>收盘时点</span>
+          </div>
+        </li>
+      </ul>
+    </article>
+
+    <!-- ─────────── 2026-10-12（周一）信号矛盾 Σ +0.000 ─────────── -->
+    <article class="issue" aria-labelledby="d-1012">
+      <div class="issue-head">
+        <time class="issue-date" datetime="2026-10-12" id="d-1012">2026-10-12</time>
+        <span class="issue-dow">周一 · Mon</span>
+        <span class="spacer"></span>
+        <span class="issue-summary">
+          <span class="rating rating-lg rating-conflict"><svg class="ic" aria-hidden="true"><use href="#i-shuffle"/></svg><span class="arrow">↔</span>信号矛盾</span>
+          <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>+0.000</span>
+        </span>
+      </div>
+
+      <ul class="tl">
+        <li class="tl-item">
+          <div class="tl-time">
+            <span class="tl-sched"><span class="dot"></span>11:00</span>
+            <span class="tl-run"><svg class="ic" aria-hidden="true"><use href="#i-timer"/></svg>生成 11:06</span>
+          </div>
+          <div class="tl-body">
+            <p class="tl-kicker"><svg class="ic" aria-hidden="true"><use href="#i-database"/></svg>基金盘面</p>
+            <h3 class="tl-title"><a href="#frame-day">基金每日盘面分析与加权预估报告（11:00 午盘版）<svg class="ic go" aria-hidden="true"><use href="#i-arrow-right"/></svg></a></h3>
+            <p class="tl-sum">上证指数：<span class="quote">3,808.04</span> 点（<span class="down"><svg class="vt" aria-hidden="true"><use href="#i-arrow-down"/></svg>-0.15%</span>）</p>
+          </div>
+          <div class="tl-meta">
+            <span class="rating rating-conflict"><svg class="ic" aria-hidden="true"><use href="#i-shuffle"/></svg><span class="arrow">↔</span>信号矛盾</span>
+            <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>+0.000</span>
+            <span class="chip chip-intraday"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>盘中时点</span>
+          </div>
+        </li>
+
+        <li class="tl-item">
+          <div class="tl-time">
+            <span class="tl-sched"><span class="dot"></span>14:30</span>
+            <span class="tl-run"><svg class="ic" aria-hidden="true"><use href="#i-timer"/></svg>生成 14:32</span>
+          </div>
+          <div class="tl-body">
+            <p class="tl-kicker"><svg class="ic" aria-hidden="true"><use href="#i-target"/></svg>基金操作指引</p>
+            <h3 class="tl-title"><span>基金每日操作指引（14:30）— 真实记忆抓取、仓位加权估算与外盘企稳校验版</span></h3>
+            <p class="tl-sum">记忆文件动态解析，自动读取持仓金额与占比，计算总持仓 <span class="quote">62,883.47</span> 元</p>
+          </div>
+          <div class="tl-meta">
+            <span class="rating rating-conflict"><svg class="ic" aria-hidden="true"><use href="#i-shuffle"/></svg><span class="arrow">↔</span>信号矛盾</span>
+            <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>+0.000</span>
+            <span class="chip chip-intraday"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>盘中时点</span>
+            <span class="chip chip-pending"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg>网页版待补齐</span>
+          </div>
+        </li>
+      </ul>
+    </article>
+  </section>
+</div>
+</main>
+
+
+<!-- ╔═══════════════════════════════════════════════════════════════════════╗ -->
+<!-- ║ FRAME 2 — 日期页：2026-10-14详情            ║ -->
+<!-- ╚═══════════════════════════════════════════════════════════════════════╝ -->
+<main id="frame-day" class="frame">
+<div class="band-alt">
+<div class="shell">
+
+  <nav class="crumb" aria-label="面包屑" style="padding-top:0;margin-bottom:var(--space-6)">
+    <a href="#frame-home"><svg class="ic" style="width:13px;height:13px" aria-hidden="true"><use href="#i-chevron-right"/></svg>全部归档</a>
+    <span class="sep" aria-hidden="true">/</span>
+    <span aria-current="page">2026-10-14</span>
+  </nav>
+
+  <header class="page-head" style="padding-top:0">
+    <p class="eyebrow t-footnote">
+      <svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg>
+      交易日 · 周三
+    </p>
+    <h1 class="t-title1 num">2026-10-14<span class="sub">周三 · Wed</span></h1>
+    <p class="lede t-callout">
+      当日 Σ 评级为<span style="white-space:nowrap"><span class="rating rating-defensive" style="vertical-align:-3px"><svg class="ic" aria-hidden="true"><use href="#i-arrow-down"/></svg><span class="arrow">▼</span>防守</span></span>（<span class="num">-0.339</span>），覆盖 <span class="num">5</span> 项任务产出，数据时点为收盘时点。
+    </p>
+    <p class="lede-en t-subhead">
+      Sigma rating <b>Defense</b> (-0.339), covering 5 task outputs, data stage Close.
+    </p>
+  </header>
+
+  <!-- 当日关键读数（真实数据，来自当日研判结论） -->
+  <dl class="kpi-row" style="margin-bottom:var(--space-12)">
+    <div class="kpi">
+      <dt><svg class="ic" aria-hidden="true"><use href="#i-target"/></svg>Σ 综合评分</dt>
+      <dd>-0.339</dd>
+    </div>
+    <div class="kpi">
+      <dt><svg class="ic" aria-hidden="true"><use href="#i-line-chart"/></svg>上证收盘</dt>
+      <dd>3,767.23<span class="down" style="font-size:var(--fs-footnote)">-0.88%</span></dd>
+    </div>
+    <div class="kpi">
+      <dt><svg class="ic" aria-hidden="true"><use href="#i-bar-chart"/></svg>沪深300 PE</dt>
+      <dd>13.19</dd>
+    </div>
+    <div class="kpi">
+      <dt><svg class="ic" aria-hidden="true"><use href="#i-trending-down"/></svg>60 日回撤</dt>
+      <dd class="down">-11.14<span class="u">%</span></dd>
+    </div>
+    <div class="kpi">
+      <dt><svg class="ic" aria-hidden="true"><use href="#i-inbox"/></svg>产出条目</dt>
+      <dd>5<span class="u">项</span></dd>
+    </div>
+  </dl>
+
+  <section aria-labelledby="sec-day-tl">
+    <div class="sec-head">
+      <h2 class="t-title3" id="sec-day-tl">当日产出时间线</h2>
+      <span class="spacer"></span>
+      <span class="aside"><svg class="ic" style="width:14px;height:14px" aria-hidden="true"><use href="#i-timer"/></svg>调度时点 → 实际生成时刻</span>
+    </div>
+
+    <ul class="tl">
+      <li class="tl-item">
+        <div class="tl-time">
+          <span class="tl-sched"><span class="dot"></span>09:28</span>
+          <span class="tl-run"><svg class="ic" aria-hidden="true"><use href="#i-timer"/></svg>生成 12:39</span>
+        </div>
+        <div class="tl-body">
+          <p class="tl-kicker"><svg class="ic" aria-hidden="true"><use href="#i-bar-chart"/></svg>股票助手</p>
+          <h3 class="tl-title"><a href="#frame-home">股票助手 · 2026-10-14（周三）盘中研判<svg class="ic go" aria-hidden="true"><use href="#i-arrow-right"/></svg></a></h3>
+          <p class="tl-sum">估值深度支撑：沪深300 PE <span class="quote">13.19</span>，60 日回撤 <span class="down">-11.14%</span>，S6 满格 <span class="quote">+1.000</span> —— 历史上该区域对应中期底部特征</p>
+        </div>
+        <div class="tl-meta">
+          <span class="rating rating-defensive"><svg class="ic" aria-hidden="true"><use href="#i-arrow-down"/></svg><span class="arrow">▼</span>防守</span>
+          <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>-0.339</span>
+          <span class="chip chip-intraday"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>盘中时点</span>
+        </div>
+      </li>
+
+      <li class="tl-item">
+        <div class="tl-time">
+          <span class="tl-sched"><span class="dot"></span>11:00</span>
+          <span class="tl-run"><svg class="ic" aria-hidden="true"><use href="#i-timer"/></svg>生成 11:16</span>
+        </div>
+        <div class="tl-body">
+          <p class="tl-kicker"><svg class="ic" aria-hidden="true"><use href="#i-database"/></svg>基金盘面</p>
+          <h3 class="tl-title"><a href="#frame-home">基金每日盘面分析与加权预估报告（11:00 午盘版）<svg class="ic go" aria-hidden="true"><use href="#i-arrow-right"/></svg></a></h3>
+          <p class="tl-sum">上证指数：<span class="quote">3,807.50</span> 点（<span class="up"><svg class="vt" aria-hidden="true"><use href="#i-arrow-up"/></svg>+0.17%</span>）</p>
+        </div>
+        <div class="tl-meta">
+          <span class="rating rating-defensive"><svg class="ic" aria-hidden="true"><use href="#i-arrow-down"/></svg><span class="arrow">▼</span>防守</span>
+          <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>-0.339</span>
+          <span class="chip chip-intraday"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>盘中时点</span>
+        </div>
+      </li>
+
+      <li class="tl-item">
+        <div class="tl-time">
+          <span class="tl-sched"><span class="dot"></span>14:30</span>
+          <span class="tl-run"><svg class="ic" aria-hidden="true"><use href="#i-timer"/></svg>生成 14:30</span>
+        </div>
+        <div class="tl-body">
+          <p class="tl-kicker"><svg class="ic" aria-hidden="true"><use href="#i-target"/></svg>基金操作指引</p>
+          <h3 class="tl-title"><span>基金每日操作指引（14:30）— daily-decision-engine v1.3（评级驱动 · 分层指令 · 零套话版）</span></h3>
+          <p class="tl-sum">根据 daily-decision-engine 核心算法计算，今日六维确定性信号综合评分</p>
+        </div>
+        <div class="tl-meta">
+          <span class="rating rating-defensive"><svg class="ic" aria-hidden="true"><use href="#i-arrow-down"/></svg><span class="arrow">▼</span>防守</span>
+          <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>-0.339</span>
+          <span class="chip chip-intraday"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg>盘中时点</span>
+          <span class="chip chip-pending"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg>网页版待补齐</span>
+        </div>
+      </li>
+
+      <li class="tl-item">
+        <div class="tl-time">
+          <span class="tl-sched"><span class="dot"></span>15:05</span>
+          <span class="tl-run"><svg class="ic" aria-hidden="true"><use href="#i-timer"/></svg>生成 15:05</span>
+        </div>
+        <div class="tl-body">
+          <p class="tl-kicker"><svg class="ic" aria-hidden="true"><use href="#i-line-chart"/></svg>股票复盘</p>
+          <h3 class="tl-title"><span>2026-10-14 股票每日复盘研判报告（圆桌多视角与决策卡）</span></h3>
+          <p class="tl-sum">上证指数：<span class="quote">3,767.23</span>（<span class="down"><svg class="vt" aria-hidden="true"><use href="#i-arrow-down"/></svg>-0.88%</span>，跌破 3,800 关口）</p>
+        </div>
+        <div class="tl-meta">
+          <span class="rating rating-defensive"><svg class="ic" aria-hidden="true"><use href="#i-arrow-down"/></svg><span class="arrow">▼</span>防守</span>
+          <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>-0.339</span>
+          <span class="chip chip-close"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg>收盘时点</span>
+          <span class="chip chip-pending"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg>网页版待补齐</span>
+        </div>
+      </li>
+
+      <li class="tl-item">
+        <div class="tl-time">
+          <span class="tl-sched"><span class="dot"></span>15:30</span>
+          <span class="tl-run"><svg class="ic" aria-hidden="true"><use href="#i-timer"/></svg>生成 15:30</span>
+        </div>
+        <div class="tl-body">
+          <p class="tl-kicker"><svg class="ic" aria-hidden="true"><use href="#i-inbox"/></svg>每日总复盘</p>
+          <h3 class="tl-title"><a href="#frame-home">基金股票每日复盘 - 2026 年 10 月 14 日<svg class="ic go" aria-hidden="true"><use href="#i-arrow-right"/></svg></a></h3>
+          <p class="tl-sum">当日全部研判的汇总归档与观点结算</p>
+        </div>
+        <div class="tl-meta">
+          <span class="rating rating-defensive"><svg class="ic" aria-hidden="true"><use href="#i-arrow-down"/></svg><span class="arrow">▼</span>防守</span>
+          <span class="tl-sigma"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg>-0.339</span>
+          <span class="chip chip-close"><svg class="ic" aria-hidden="true"><use href="#i-calendar"/></svg>收盘时点</span>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- 空态示范：本期无此分支，展示 5 态覆盖中的 Empty -->
+  <div style="margin-top:var(--space-12)">
+    <p class="t-caps" style="color:var(--fg-3);margin-bottom:var(--space-4)">状态覆盖示范 · 空态 / 加载态 / 错误态</p>
+    <div class="state-grid">
+
+      <!-- Empty -->
+      <div class="empty">
+        <svg class="ic ic-24" aria-hidden="true"><use href="#i-inbox"/></svg>
+        <h3>本日暂无早盘调度记录</h3>
+        <p>该交易日 09:28 前无任务产出。查看上一个交易日的完整轨迹，或订阅 RSS 在发布后即时获知。</p>
+        <div class="btn-row" style="justify-content:center">
+          <a class="btn btn-secondary" href="#frame-home"><svg class="ic ic-20" aria-hidden="true"><use href="#i-chevron-right"/></svg>查看 2026-10-13 轨迹</a>
+          <a class="btn btn-quiet" href="#frame-archive"><svg class="ic" aria-hidden="true"><use href="#i-rss"/></svg>订阅 RSS</a>
+        </div>
+      </div>
+
+      <!-- Loading：骨架屏保持原始盒模型，避免 CLS -->
+      <div class="empty" aria-busy="true" aria-label="正在载入2026-10-15 轨迹">
+        <div class="skel-stack" aria-hidden="true">
+          <span class="skel skel-w40"></span>
+          <span class="skel skel-w90"></span>
+          <span class="skel skel-w75"></span>
+          <span class="skel skel-w60"></span>
+        </div>
+        <h3>正在载入 2026-10-15 轨迹</h3>
+        <p>骨架屏与真实条目盒高一致，载入完成时布局不跳动（CLS ≈ 0）。</p>
+      </div>
+
+      <!-- Error：具体信息 + 重试，不暴露技术细节 -->
+      <div class="empty">
+        <svg class="ic ic-24" style="color:var(--danger)" aria-hidden="true"><use href="#i-alert"/></svg>
+        <h3>2026-10-15 数据采集未完成</h3>
+        <p>上游行情接口在 09:31 无响应，本日信号未参与计算 —— 空数据不做补零，避免生成虚假结论。</p>
+        <div class="btn-row" style="justify-content:center">
+          <button class="btn btn-secondary" type="button"><svg class="ic ic-20" aria-hidden="true"><use href="#i-history"/></svg>重新采集</button>
+          <a class="btn btn-quiet" href="#frame-method">查看采集口径</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</div>
+</main>
+
+
+<!-- ╔═══════════════════════════════════════════════════════════════════════╗ -->
+<!-- ║ FRAME 3 — 归档页：周报 / 月报                       ║ -->
+<!-- ╚═══════════════════════════════════════════════════════════════════════╝ -->
+<main id="frame-archive" class="frame">
+<div class="shell">
+
+  <nav class="crumb" aria-label="面包屑" style="padding-top:0;margin-bottom:var(--space-6)">
+    <a href="#frame-home"><svg class="ic" style="width:13px;height:13px" aria-hidden="true"><use href="#i-chevron-right"/></svg>全部归档</a>
+    <span class="sep" aria-hidden="true">/</span>
+    <span aria-current="page">周报 · 月报</span>
+  </nav>
+
+  <header class="page-head" style="padding-top:0">
+    <h1 class="t-title1">归档</h1>
+    <p class="lede t-callout">按周与月聚合的判断轨迹摘要。每一期都是当日逐条结论的汇总，不含事后追认。</p>
+  </header>
+
+  <section aria-labelledby="sec-weekly" style="margin-bottom:var(--space-16)">
+    <div class="sec-head">
+      <h2 class="t-title3" id="sec-weekly">周报</h2>
+      <span class="spacer"></span>
+      <span class="aside"><svg class="ic" style="width:14px;height:14px" aria-hidden="true"><use href="#i-layers"/></svg>1 期</span>
+    </div>
+    <div>
+      <article class="archive-item">
+        <div>
+          <h3>
+            <a href="#frame-archive">2026 第 42 周（10-12 至 10-14）</a>
+            <span class="rating rating-conflict"><svg class="ic" aria-hidden="true"><use href="#i-shuffle"/></svg><span class="arrow">↔</span>信号矛盾</span>
+          </h3>
+          <p>本周三个交易日评级轨迹由「信号矛盾」单向收敛至「防守」，Σ 值从 +0.000 落至 -0.339。周内上证指数自 3,808点 回落至 3,767 点，60 日回撤扩大至 -11.14%，估值分位仍处深度支撑区。</p>
+          <p class="meta">
+            <svg class="ic" style="width:12px;height:12px" aria-hidden="true"><use href="#i-calendar"/></svg>
+            <span class="num">2026-10-12</span> 至 <span class="num">2026-10-14</span>
+            <span aria-hidden="true">·</span>
+            <svg class="ic" style="width:12px;height:12px" aria-hidden="true"><use href="#i-file-text"/></svg>
+            <span class="num">12</span> 篇研判
+            <span aria-hidden="true">·</span>
+            <svg class="ic" style="width:12px;height:12px" aria-hidden="true"><use href="#i-sigma"/></svg>
+            <span class="num">-0.339</span>
+          </p>
+        </div>
+        <a class="go" href="#frame-archive" aria-label="查看 2026 第 42 周周报"><svg class="ic ic-20" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="sec-monthly" style="margin-bottom:var(--space-16)">
+    <div class="sec-head">
+      <h2 class="t-title3" id="sec-monthly">月报</h2>
+      <span class="spacer"></span>
+      <span class="aside"><svg class="ic" style="width:14px;height:14px" aria-hidden="true"><use href="#i-layers"/></svg>1 期</span>
+    </div>
+    <div>
+      <article class="archive-item">
+        <div>
+          <h3>
+            <a href="#frame-archive">2026 年 10 月</a>
+            <span class="rating rating-defensive"><svg class="ic" aria-hidden="true"><use href="#i-arrow-down"/></svg><span class="arrow">▼</span>防守</span>
+          </h3>
+          <p>本月仅 3 个交易日有归档记录，月末评级定格于「防守」。Σ 值分布：+0.000 × 2 期、-0.339 × 1 期。10 月 14 日上证指数跌破 3,800 整数关，为本月首个明确破位信号。</p>
+          <p class="meta">
+            <svg class="ic" style="width:12px;height:12px" aria-hidden="true"><use href="#i-calendar"/></svg>
+            <span class="num">2026-10-01</span> 至 <span class="num">2026-10-31</span>
+            <span aria-hidden="true">·</span>
+            <svg class="ic" style="width:12px;height:12px" aria-hidden="true"><use href="#i-bar-chart"/></svg>
+            <span class="num">3</span> 个交易日
+            <span aria-hidden="true">·</span>
+            <svg class="ic" style="width:12px;height:12px" aria-hidden="true"><use href="#i-file-text"/></svg>
+            <span class="num">12</span> 篇研判
+          </p>
+        </div>
+        <a class="go" href="#frame-archive" aria-label="查看 2026 年 10 月月报"><svg class="ic ic-20" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="sec-data">
+    <div class="sec-head">
+      <h2 class="t-title3" id="sec-data">评级轨迹总览</h2>
+      <span class="spacer"></span>
+      <span class="aside">全部数字等宽对齐，价格不跳动</span>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <caption>按交易日汇总的评级与关键读数，收盘时点口径</caption>
+        <thead>
+          <tr>
+            <th scope="col">交易日</th>
+            <th scope="col">Σ 评级</th>
+            <th scope="col" class="num">Σ 值</th>
+            <th scope="col" class="num">产出</th>
+            <th scope="col" class="num">上证收盘</th>
+            <th scope="col" class="num">日涨跌</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row" class="num" style="text-align:left;font-weight:var(--fw-semibold);color:var(--fg)">2026-10-14</th>
+            <td><span class="rating rating-defensive"><svg class="ic" aria-hidden="true"><use href="#i-arrow-down"/></svg><span class="arrow">▼</span>防守</span></td>
+            <td class="num strong">-0.339</td>
+            <td class="num">5</td>
+            <td class="num">3,767.23</td>
+            <td class="num down">-0.88%</td>
+          </tr>
+          <tr>
+            <th scope="row" class="num" style="text-align:left;font-weight:var(--fw-semibold);color:var(--fg)">2026-10-13</th>
+            <td><span class="rating rating-conflict"><svg class="ic" aria-hidden="true"><use href="#i-shuffle"/></svg><span class="arrow">↔</span>信号矛盾</span></td>
+            <td class="num strong">+0.000</td>
+            <td class="num">5</td>
+            <td class="num">3,800.86</td>
+            <td class="num up">+0.10%</td>
+          </tr>
+          <tr>
+            <th scope="row" class="num" style="text-align:left;font-weight:var(--fw-semibold);color:var(--fg)">2026-10-12</th>
+            <td><span class="rating rating-conflict"><svg class="ic" aria-hidden="true"><use href="#i-shuffle"/></svg><span class="arrow">↔</span>信号矛盾</span></td>
+            <td class="num strong">+0.000</td>
+            <td class="num">2</td>
+            <td class="num">—</td>
+            <td class="num flat">无收盘口径</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+</main>
+
+
+<!-- ╔═══════════════════════════════════════════════════════════════════════╗ -->
+<!-- ║ FRAME 4 — 方法论页框架                               ║ -->
+<!-- ╚═══════════════════════════════════════════════════════════════════════╝ -->
+<main id="frame-method" class="frame">
+<div class="band-alt">
+<div class="shell">
+
+  <nav class="crumb" aria-label="面包屑" style="padding-top:0;margin-bottom:var(--space-6)">
+    <a href="#frame-home"><svg class="ic" style="width:13px;height:13px" aria-hidden="true"><use href="#i-chevron-right"/></svg>全部归档</a>
+    <span class="sep" aria-hidden="true">/</span>
+    <span aria-current="page">方法论</span>
+  </nav>
+
+  <header class="page-head" style="padding-top:0">
+    <h1 class="t-title1">研判方法论</h1>
+    <p class="lede t-callout">结论不是观点，是计算结果。以下是 daily-decision-engine 从原始数据到五档 Σ 评级的完整链路。</p>
+    <p class="lede-en t-subhead">Verdicts are computed, not opinionated. This is the full pipeline from raw data to the five-tier Sigma rating.</p>
+  </header>
+
+  <section aria-labelledby="sec-pipeline" style="margin-bottom:var(--space-16)">
+    <div class="sec-head"><h2 class="t-title3" id="sec-pipeline">七步流水线</h2></div>
+    <div class="flow">
+      <span class="flow-step"><svg class="ic" aria-hidden="true"><use href="#i-database"/></svg><span class="n">01</span>采集</span>
+      <span class="flow-arrow" aria-hidden="true"><svg class="ic"><use href="#i-chevron-right"/></svg></span>
+      <span class="flow-step"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span class="n">02</span>硬校验</span>
+      <span class="flow-arrow" aria-hidden="true"><svg class="ic"><use href="#i-chevron-right"/></svg></span>
+      <span class="flow-step"><svg class="ic" aria-hidden="true"><use href="#i-target"/></svg><span class="n">03</span>信号评分</span>
+      <span class="flow-arrow" aria-hidden="true"><svg class="ic"><use href="#i-chevron-right"/></svg></span>
+      <span class="flow-step"><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg><span class="n">04</span>Σ 加权</span>
+      <span class="flow-arrow" aria-hidden="true"><svg class="ic"><use href="#i-chevron-right"/></svg></span>
+      <span class="flow-step"><svg class="ic" aria-hidden="true"><use href="#i-scale"/></svg><span class="n">05</span>档位映射</span>
+      <span class="flow-arrow" aria-hidden="true"><svg class="ic"><use href="#i-chevron-right"/></svg></span>
+      <span class="flow-step"><svg class="ic" aria-hidden="true"><use href="#i-git-branch"/></svg><span class="n">06</span>决策卡</span>
+      <span class="flow-arrow" aria-hidden="true"><svg class="ic"><use href="#i-chevron-right"/></svg></span>
+      <span class="flow-step"><svg class="ic" aria-hidden="true"><use href="#i-inbox"/></svg><span class="n">07</span>归档</span>
+    </div>
+  </section>
+
+  <section aria-labelledby="sec-signals" style="margin-bottom:var(--space-16)">
+    <div class="sec-head">
+      <h2 class="t-title3" id="sec-signals">六维确定性信号</h2>
+      <span class="spacer"></span>
+      <span class="aside">S1-S6 · 权重公开</span>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <caption>每维信号独立取值，缺失即降权而非补零，避免沉默逻辑错误</caption>
+        <thead>
+          <tr>
+            <th scope="col">信号</th>
+            <th scope="col">含义</th>
+            <th scope="col" class="num">取值范围</th>
+            <th scope="col" class="num">权重</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row" class="strong" style="text-align:left">S1</th><td>趋势方向</td><td class="num">-1.000 ~ +1.000</td><td class="num">0.25</td></tr>
+          <tr><th scope="row" class="strong" style="text-align:left">S2</th><td>动量强度</td><td class="num">-1.000 ~ +1.000</td><td class="num">0.20</td></tr>
+          <tr><th scope="row" class="strong" style="text-align:left">S3</th><td>估值分位</td><td class="num">0.000 ~ 1.000</td><td class="num">0.20</td></tr>
+          <tr><th scope="row" class="strong" style="text-align:left">S4</th><td>资金流向</td><td class="num">-1.000 ~ +1.000</td><td class="num">0.15</td></tr>
+          <tr><th scope="row" class="strong" style="text-align:left">S5</th><td>外部确认</td><td class="num">-1.000 ~ +1.000</td><td class="num">0.10</td></tr>
+          <tr><th scope="row" class="strong" style="text-align:left">S6</th><td>底部特征</td><td class="num">-1.000 ~ +1.000</td><td class="num">0.10</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="sec-scale">
+    <div class="sec-head">
+      <h2 class="t-title3" id="sec-scale">五档 Σ 评级</h2>
+      <span class="spacer"></span>
+      <span class="aside">每档配箭头冗余编码，色觉障碍下仍可辨</span>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <caption>颜色 + 图标 + 箭头 + 文字四重编码，任何单一维度失效不致误读</caption>
+        <thead>
+          <tr>
+            <th scope="col">评级</th>
+            <th scope="col" class="num">Σ 区间</th>
+            <th scope="col">操作基调</th>
+            <th scope="col">冗余编码</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="rating rating-offensive"><svg class="ic" aria-hidden="true"><use href="#i-trending-up"/></svg><span class="arrow">▲▲</span>进攻</span></td>
+            <td class="num">≥ +0.300</td><td>积极加仓</td>
+            <td><svg class="ic" style="display:inline;vertical-align:-2px;color:var(--rating-offensive-fg)" aria-hidden="true"><use href="#i-trending-up"/></svg> <span class="num">▲▲</span></td>
+          </tr>
+          <tr>
+            <td><span class="rating rating-balanced"><svg class="ic" aria-hidden="true"><use href="#i-arrow-up"/></svg><span class="arrow">▲</span>均衡</span></td>
+            <td class="num">+0.100 ~ +0.299</td><td>维持仓位</td>
+            <td><svg class="ic" style="display:inline;vertical-align:-2px;color:var(--rating-balanced-fg)" aria-hidden="true"><use href="#i-arrow-up"/></svg> <span class="num">▲</span></td>
+          </tr>
+          <tr>
+            <td><span class="rating rating-conflict"><svg class="ic" aria-hidden="true"><use href="#i-shuffle"/></svg><span class="arrow">↔</span>信号矛盾</span></td>
+            <td class="num">-0.099 ~ +0.099</td><td>不动作，等确认</td>
+            <td><svg class="ic" style="display:inline;vertical-align:-2px;color:var(--rating-conflict-fg)" aria-hidden="true"><use href="#i-shuffle"/></svg> <span class="num">↔</span></td>
+          </tr>
+          <tr>
+            <td><span class="rating rating-defensive"><svg class="ic" aria-hidden="true"><use href="#i-arrow-down"/></svg><span class="arrow">▼</span>防守</span></td>
+            <td class="num">-0.299 ~ -0.100</td><td>降低敞口</td>
+            <td><svg class="ic" style="display:inline;vertical-align:-2px;color:var(--rating-defensive-fg)" aria-hidden="true"><use href="#i-arrow-down"/></svg> <span class="num">▼</span></td>
+          </tr>
+          <tr>
+            <td><span class="rating rating-avoid"><svg class="ic" aria-hidden="true"><use href="#i-chevrons-down"/></svg><span class="arrow">▼▼</span>回避</span></td>
+            <td class="num">≤ -0.300</td><td>空仓等待</td>
+            <td><svg class="ic" style="display:inline;vertical-align:-2px;color:var(--rating-avoid-fg)" aria-hidden="true"><use href="#i-chevrons-down"/></svg> <span class="num">▼▼</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+</div>
+</main>
+
+
+<!-- ╔═══════════════════════════════════════════════════════════════════════╗ -->
+<!-- ║ FRAME 5 — Token 校验台（供评审核对对比度与色板）          ║ -->
+<!-- ╚═══════════════════════════════════════════════════════════════════════╝ -->
+<main id="frame-spec" class="frame">
+<div class="shell">
+
+  <header class="page-head" style="padding-top:0">
+    <span class="frame-label"><svg class="ic" style="width:12px;height:12px"><use href="#i-scale"/></svg>评审校验台 · 非站点页面</span>
+    <h1 class="t-title1">Design Token 校验</h1>
+    <p class="lede t-callout">核对本Spec 的关键约束：五档评级对比度达标、数字等宽、深色模式明度递进、squircle 渐进增强。</p>
+  </header>
+
+  <section aria-labelledby="spec-rating" style="margin-bottom:var(--space-16)">
+    <div class="sec-head">
+      <h2 class="t-title3" id="spec-rating">五档评级色 · 对比度校验</h2>
+      <span class="spacer"></span>
+      <span class="aside">全部 ≥ 4.5:1（AA 正文级）</span>
+    </div>
+    <div class="swatches">
+      <div class="swatch">
+        <div class="fill" style="background:var(--rt-offensive)"><span style="color:#fff">#B91C1C</span></div>
+        <div class="meta">
+          <strong>进攻 Offensive</strong>
+          <code>浅 #B91C1C</code><code>深 #F87171</code>
+          <p class="ratio"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>6.47 : 1 · AA 通过</p>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="fill" style="background:var(--rt-balanced)"><span style="color:#fff">#B45309</span></div>
+        <div class="meta">
+          <strong>均衡 Balanced</strong>
+          <code>浅 #B45309</code><code>深 #FBBF24</code>
+          <p class="ratio"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>5.02 : 1 · AA 通过</p>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="fill" style="background:var(--rt-conflict)"><span style="color:#fff">#475569</span></div>
+        <div class="meta">
+          <strong>信号矛盾 Conflict</strong>
+          <code>浅 #475569</code><code>深 #94A3B8</code>
+          <p class="ratio"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>7.58 : 1 · AA 通过</p>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="fill" style="background:var(--rt-defensive)"><span style="color:#fff">#15803D</span></div>
+        <div class="meta">
+          <strong>防守 Defensive</strong>
+          <code>浅 #15803D</code><code>深 #4ADE80</code>
+          <p class="ratio"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>5.01 : 1 · AA 通过</p>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="fill" style="background:var(--rt-avoid)"><span style="color:#fff">#166534</span></div>
+        <div class="meta">
+          <strong>回避 Avoid</strong>
+          <code>浅 #166534</code><code>深 #22C55E</code>
+          <p class="ratio"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>7.13 : 1 · AA 通过</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="spec-neutral" style="margin-bottom:var(--space-16)">
+    <div class="sec-head">
+      <h2 class="t-title3" id="spec-neutral">Apple 中性色 · 表面与文字</h2>
+      <span class="spacer"></span>
+      <span class="aside">深色模式靠明度递进分层，不用投影</span>
+    </div>
+    <div class="swatches">
+      <div class="swatch">
+        <div class="fill" style="background:var(--ap-canvas);border-bottom:1px solid var(--border)"><span style="color:var(--ap-ink)">#FFFFFF</span></div>
+        <div class="meta"><strong>画布 Canvas</strong><code>浅 #FFFFFF</code><p class="ratio"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>配#1D1D1F 正文</p></div>
+      </div>
+      <div class="swatch">
+        <div class="fill" style="background:var(--ap-surface-alt)"><span style="color:var(--ap-ink)">#F5F5F7</span></div>
+        <div class="meta"><strong>交替带 Surface Alt</strong><code>浅 #F5F5F7</code><code>深 #1C1C1E</code><p class="ratio"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>Apple 场景节奏</p></div>
+      </div>
+      <div class="swatch">
+        <div class="fill" style="background:var(--ap-ink)"><span style="color:var(--ap-canvas)">#1D1D1F</span></div>
+        <div class="meta"><strong>正文 Ink</strong><code>#1D1D1F · 16.83:1</code><p class="ratio"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>近黑而非纯黑</p></div>
+      </div>
+      <div class="swatch">
+        <div class="fill" style="background:var(--ap-hairline)"><span style="color:var(--ap-ink)">#D2D2D7</span></div>
+        <div class="meta"><strong>分隔线 Hairline</strong><code>浅 #D2D2D7</code><code>深 #38383A</code><p class="ratio"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>1px 实线</p></div>
+      </div>
+      <div class="swatch">
+        <div class="fill" style="background:var(--ap-blue)"><span style="color:#fff">#0071E3</span></div>
+        <div class="meta"><strong>强调色 Accent</strong><code>浅 #0071E3</code><code>深 #2997FF</code><p class="ratio"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg>每屏 ≤ 2 处</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="spec-type" style="margin-bottom:var(--space-16)">
+    <div class="sec-head">
+      <h2 class="t-title3" id="spec-type">字体阶梯</h2>
+      <span class="spacer"></span>
+      <span class="aside">tracking 已做 CJK 补偿</span>
+    </div>
+    <div>
+      <div class="type-row">
+        <p class="meta"><b>Display</b>56 / 60 · 700<br>tracking 0</p>
+        <p class="t-display">每交易日的判断</p>
+      </div>
+      <div class="type-row">
+        <p class="meta"><b>Title 1</b>34 / 41 · 700<br>-0.010em</p>
+        <p class="t-title1">研判方法论</p>
+      </div>
+      <div class="type-row">
+        <p class="meta"><b>Title 2</b>28 / 34 · 600<br>-0.012em</p>
+        <p class="t-title2">判断轨迹</p>
+      </div>
+      <div class="type-row">
+        <p class="meta"><b>Title 3</b>22 / 28 · 600<br>-0.014em</p>
+        <p class="t-title3">股票每日复盘研判报告</p>
+      </div>
+      <div class="type-row">
+        <p class="meta"><b>Title 4</b>20 / 25 · 600<br>-0.012em</p>
+        <p class="t-title4">基金每日盘面分析与加权预估</p>
+      </div>
+      <div class="type-row">
+        <p class="meta"><b>Headline</b>17 / 22 · 600<br>-0.010em</p>
+        <p class="t-headline">A 股持仓每日投研诊断与网格交易操作指南</p>
+      </div>
+      <div class="type-row">
+        <p class="meta"><b>Body</b>17 / 25 · 400<br>-0.010em</p>
+        <p class="t-body">同一份数据必然得出同一结论。结论可复现、可审计 —— 这里存的不是行情，是判断本身。</p>
+      </div>
+      <div class="type-row">
+        <p class="meta"><b>Callout</b>16 / 22 · 400<br>-0.006em</p>
+        <p class="t-callout">估值深度支撑：沪深300 PE 13.19，60 日回撤 -11.14%，S6 满格 +1.000。</p>
+      </div>
+      <div class="type-row">
+        <p class="meta"><b>Subhead</b>15 / 21 · 400<br>0</p>
+        <p class="t-subhead">数据驱动的 A 股 / 基金每日研判档案</p>
+      </div>
+      <div class="type-row">
+        <p class="meta"><b>Footnote</b>13 / 18 · 400<br>+0.010em</p>
+        <p class="t-footnote">调度 09:28 · 生成 12:39 · 盘中时点 · 股票助手</p>
+      </div>
+      <div class="type-row">
+        <p class="meta"><b>Caption 1</b>12 / 16 · 400<br>+0.020em</p>
+        <p class="t-caps">Tracking 上限 0.06em</p>
+      </div>
+      <div class="type-row">
+        <p class="meta"><b>等宽数字</b>tabular-nums<br>价格不跳动</p>
+        <p class="num t-title4">3,767.23 &nbsp;3,800.86 &nbsp;3,807.50</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="spec-rules">
+    <div class="sec-head"><h2 class="t-title3" id="spec-rules">设计守则</h2></div>
+    <div class="panel">
+      <ul class="spec-list">
+        <li class="do"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span><b>用字号与留白建层级</b>，不靠卡片堆叠。Apple 几乎不用投影，深度来自背景明度分层。</span></li>
+        <li class="do"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span><b>蓝色只给交互元素</b>：链接、按钮、焦点环、选中态。每屏可见不超过 2 处。</span></li>
+        <li class="do"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span><b>评级四重编码</b>：颜色 + SVG 图标 + 箭头 + 文字，色觉障碍与灰度打印下均可辨。</span></li>
+        <li class="do"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span><b>数字一律 tabular-nums</b>，价格与 Σ 值不随刷新跳动。</span></li>
+        <li class="do"><svg class="ic" aria-hidden="true"><use href="#i-check"/></svg><span><b>零JS 降级可用</b>：深色模式走 prefers-color-scheme，禁用 JS 后内容与结构完整。</span></li>
+        <li class="dont"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg><span><b>禁emoji 作功能图标</b>。全部图标来自锁定的 Lucide 描边 SVG，16/20/24 三档，禁止混用。</span></li>
+        <li class="dont"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg><span><b>禁紫粉渐变</b>。本站零 gradient token —— Apple 官网本身也没有渐变 token。</span></li>
+        <li class="dont"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg><span><b>禁弹跳缓动</b> cubic-bezier(0.68,-0.55,0.265,1.55)。只用减速曲线。</span></li>
+        <li class="dont"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg><span><b>禁彩色左边框卡片</b>与重复同尺寸卡片网格。分组靠 hairline 与背景分层。</span></li>
+        <li class="dont"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg><span><b>禁无信息量链接标签</b>。链接文案写报告标题本身，不写「阅读网页版 / Markdown」。</span></li>
+      </ul>
+    </div>
+  </section>
+</div>
+</main>
+
+
+<!-- ============================== 页脚 ====================================== -->
+<footer class="foot">
+  <div class="foot-in">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a class="nav-brand" href="#frame-home" style="margin-bottom:var(--space-2)">
+          <svg class="ic mark" aria-hidden="true"><use href="#i-line-chart"/></svg>
+          每日市场脉搏
+        </a>
+        <p class="t-footnote">每交易日的判断轨迹存档。结论由daily-decision-engine 确定性计算，同数据必得同结论。</p>
+      </div>
+      <nav class="foot-cols" aria-label="页脚导航">
+        <div class="foot-col">
+          <h3>归档</h3>
+          <ul>
+            <li><a href="#frame-home">全部归档</a></li>
+            <li><a href="#frame-day">本日详情</a></li>
+            <li><a href="#frame-archive">周报 · 月报</a></li>
+          </ul>
+        </div>
+        <div class="foot-col">
+          <h3>关于</h3>
+          <ul>
+            <li><a href="#frame-method">方法论</a></li>
+            <li><a href="#frame-spec">评级规则</a></li>
+            <li><a href="#frame-home"><svg class="ic" aria-hidden="true"><use href="#i-rss"/></svg>RSS 订阅</a></li>
+          </ul>
+        </div>
+        <div class="foot-col">
+          <h3>来源</h3>
+          <ul>
+            <li><a href="#frame-method"><svg class="ic" aria-hidden="true"><use href="#i-database"/></svg>腾讯自选股 MCP</a></li>
+            <li><a href="#frame-method"><svg class="ic" aria-hidden="true"><use href="#i-git-branch"/></svg>daily-decision-engine</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+    <div class="foot-legal">
+      <p>免责声明：本站内容基于公开数据与量化分析生成，仅供参考，不构成投资建议。市场有风险，投资需谨慎。</p>
+      <p>Disclaimer: Generated from public data and quantitative analysis. For reference only — not investment advice.</p>
+      <p style="margin-top:var(--space-3)">本站为设计原型：Token 来自 <span class="num">design-tokens.css</span>，图标为 Lucide 描边 SVG，零 emoji、零渐变、零 JS。</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

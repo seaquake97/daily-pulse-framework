@@ -1,0 +1,359 @@
+/* ============================================================================
+ * site_blocks.css — 业务组件层（时间线 / 徽章 / 芯片 / 表格 / 页脚 / 响应式）
+ *
+ * 与 site_components.css 同源同约束：零颜色字面量、零 gradient、零弹跳缓动，
+ * 一切取值走 design-tokens.css 的 var(--token)。按关注点拆两个文件是为了
+ * 满足「单文件 ≤300 行」硬规则，不是因为二者可独立运行。
+ * ========================================================================== */
+
+/* ============================== 时间线 ==================================== */
+/* Apple 做法：零卡片、零投影，靠 92px 刚性左槽 + hairline + 留白 */
+.issue{ margin-bottom:var(--space-16); }
+.issue:last-of-type{ margin-bottom:0; }
+.issue-head{
+  display:flex; align-items:baseline; gap:var(--space-3); flex-wrap:wrap;
+  padding-bottom:var(--space-3); margin-bottom:var(--space-2);
+  border-bottom:1px solid var(--border);
+}
+.issue-date{ font-size:var(--fs-title4); font-weight:var(--fw-semibold); color:var(--fg); }
+.issue-dow{ font-size:var(--fs-subhead); color:var(--fg-3); }
+.issue-head .spacer{ flex:1 1 auto; }
+.issue-summary{ display:inline-flex; align-items:center; gap:var(--space-2); flex-wrap:wrap; }
+
+.tl{ margin-top:var(--space-2); }
+.tl-item{
+  display:grid; grid-template-columns:var(--tl-gutter) 1fr auto; gap:var(--space-5);
+  padding:var(--tl-row-pad-y) 0; border-bottom:1px solid var(--tl-separator); align-items:start;
+}
+.tl-item:last-child{ border-bottom:none; }
+@media (max-width:900px){
+  .tl-item{ grid-template-columns:76px 1fr; gap:var(--space-4); }
+  .tl-meta{ grid-column:2; justify-self:start; }
+}
+@media (max-width:640px){
+  .tl-item{ grid-template-columns:1fr; gap:var(--space-3); padding:var(--space-5) 0; }
+  .tl-meta{ grid-column:1; }
+}
+
+.tl-time{ display:flex; flex-direction:column; gap:5px; padding-top:3px; }
+.tl-sched{ display:inline-flex; align-items:center; gap:7px; font-size:var(--fs-subhead); font-weight:var(--fw-semibold); color:var(--tl-time-fg); }
+.tl-sched .dot{ width:6px; height:6px; border-radius:var(--radius-pill); background:var(--tl-dot); flex:0 0 auto; }
+.tl-run{ display:inline-flex; align-items:center; gap:5px; font-size:var(--fs-caption2); color:var(--tl-run-fg); line-height:1.3; }
+.tl-run .ic{ width:12px; height:12px; stroke-width:2; }
+
+.tl-body{ min-width:0; }
+.tl-kicker{
+  display:flex; align-items:center; gap:6px; font-size:var(--fs-caption1);
+  font-weight:var(--fw-semibold); color:var(--tl-kicker-fg);
+  letter-spacing:var(--tracking-caption); margin-bottom:5px;
+}
+.tl-kicker .ic{ width:13px; height:13px; stroke-width:2; }
+.tl-title{
+  font-family:var(--font-display); font-size:var(--fs-title4); line-height:var(--lh-title4);
+  letter-spacing:var(--tracking-title4); font-weight:var(--fw-semibold);
+  color:var(--tl-title-fg); margin-bottom:7px;
+}
+/* 超长中文标题钳制两行，40+ 字标题不撑破布局 */
+.tl-title a,.tl-title span{ display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.tl-title a{ transition:color var(--motion-fast) var(--ease-out); }
+.tl-title a:hover{ color:var(--link); }
+.tl-title .go{ display:inline-flex; vertical-align:-1px; margin-left:5px; width:15px; height:15px; color:var(--link); transition:transform var(--motion-base) var(--ease-out); }
+.tl-title a:hover .go{ transform:translateX(3px); }
+.tl-sum{ font-size:var(--fs-callout); line-height:var(--lh-callout); color:var(--tl-summary-fg); max-width:var(--container-prose); }
+
+/* ---- 结论先行摘要（一致性契约 C-2 / DESIGN-SYSTEM-v2 D-3）：
+ * 三段固定结构，三档视觉权重 —— 段1 评级·Σ（最强）｜段2 标准动作｜段3 关键事实（最弱）。
+ * D-3 修订：conclusion 改回行内流（inline），不再用 flex。
+ * flex + wrap 会让中文长句在段内被强行折行、且 align-items:baseline 在混排
+ * 11/13/17px 时基线漂移；行内流让整段像一段话自然折行，分隔符随文字流动。
+ * 段间距交给分隔符的 inline margin承担，跨模式一致、无需深色覆写。 */
+.tl-sum .conclusion{ display:block; }
+.tl-sum .concl-head{ font-weight:var(--fw-semibold); color:var(--fg); }
+.tl-sum .concl-action{ color:var(--fg-2); }
+.tl-sum .concl-fact{ color:var(--fg-3); font-size:var(--fs-footnote); line-height:var(--lh-footnote); }
+/* 分隔符：1px 竖线在深色下靠 --border 只有 1.79:1，承担的是结构分隔职责、
+ * 不是装饰，几乎不可见。上一轮注释声称「叠加 --fg-3 + opacity 抬到可辨阈值」
+ * 但代码里并没有这段——注释与实现漂移，等于没修。
+ * 实测（WCAG 相对亮度，脚本实算）：--border #38383a 在本分隔符真正所处的
+ * 抬升面 #1c1c1e 上仅 1.45:1（比注释里说的 1.79:1 更低，因为 D-1 把 .issue
+ * 抬到 surface-alt 之后，分隔符已不在纯黑画布上）。
+ * 修法：叠一层 --fg-3（#86868b）opacity，把实际可见对比度抬到 3:1 以上，
+ * 跨模式一致（浅色下 --fg-3 opacity 同样只做轻微加重，不引入模式分叉）。
+ * 仍走既有 var()，不新增令牌、不硬编码色。 */
+.tl-sum .concl-sep{ display:inline-block; width:1px; height:.9em;
+  background:var(--fg-3); opacity:.5;
+  margin:0 .5em; transform:translateY(.1em); }
+.tl-sum .quote{ font-family:var(--font-mono); font-variant-numeric:var(--numeric); }
+.tl-sum .up{ color:var(--quote-up); font-weight:var(--fw-medium); }
+.tl-sum .down{ color:var(--quote-down); font-weight:var(--fw-medium); }
+.tl-sum .flat{ color:var(--quote-flat); }
+/* 行内 SVG 箭头，替代上游 emoji（红涨绿跌冗余编码） */
+.tl-sum .vt{ display:inline-flex; vertical-align:-2px; width:13px; height:13px; margin-right:2px; stroke-width:2.2; }
+.tl-sum .up .vt{ color:var(--quote-up); }
+.tl-sum .down .vt{ color:var(--quote-down); }
+.tl-sum .vt.flat{ color:var(--quote-flat); }
+.tl-sum .has-gap{ display:inline-flex; align-items:center; gap:5px; }
+
+.tl-meta{ display:flex; flex-direction:column; align-items:flex-end; gap:var(--space-2); padding-top:3px; }
+@media (max-width:640px){ .tl-meta{ flex-direction:row; align-items:center; flex-wrap:wrap; } }
+.tl-sigma{ display:inline-flex; align-items:center; gap:5px; font-size:var(--fs-caption1); color:var(--fg-3); }
+.tl-sigma .ic{ width:12px; height:12px; stroke-width:2; opacity:.75; }
+
+/* ---- 评级徽章：颜色 + SVG 图标 + 箭头 + 文字，四重编码 ---- */
+.rating{
+  display:inline-flex; align-items:center; gap:5px; white-space:nowrap;
+  font-size:var(--badge-fs); font-weight:var(--fw-semibold); letter-spacing:.01em;
+  padding:var(--badge-pad); border-radius:var(--badge-radius); line-height:1.35;
+  background:var(--rating-bg); color:var(--rating-fg); border:1px solid var(--rating-ring);
+  corner-shape:var(--corner-shape,squircle);
+}
+.rating .ic{ width:13px; height:13px; stroke-width:2.1; flex:0 0 auto; }
+.rating .arrow{ font-family:var(--font-mono); font-size:10px; letter-spacing:-.04em; opacity:.9; }
+.rating-lg{ font-size:var(--fs-subhead); padding:6px 14px; gap:7px; }
+.rating-lg .ic{ width:16px; height:16px; }
+.rating-offensive{ background:var(--rating-offensive-bg); color:var(--rating-offensive-fg); border-color:var(--rating-offensive-ring); }
+.rating-balanced{ background:var(--rating-balanced-bg); color:var(--rating-balanced-fg); border-color:var(--rating-balanced-ring); }
+.rating-conflict{ background:var(--rating-conflict-bg); color:var(--rating-conflict-fg); border-color:var(--rating-conflict-ring); }
+.rating-defensive{ background:var(--rating-defensive-bg); color:var(--rating-defensive-fg); border-color:var(--rating-defensive-ring); }
+.rating-avoid{ background:var(--rating-avoid-bg); color:var(--rating-avoid-fg); border-color:var(--rating-avoid-ring); }
+
+/* ---- 芯片：数据时点 / 任务归属 / 归档提示 ---- */
+.chip{
+  display:inline-flex; align-items:center; gap:5px; white-space:nowrap;
+  font-size:var(--chip-fs); color:var(--chip-fg); background:var(--chip-bg);
+  border:1px solid var(--chip-border); border-radius:var(--chip-radius);
+  padding:var(--chip-pad); line-height:1.4; corner-shape:var(--corner-shape,squircle);
+}
+.chip .ic{ width:12px; height:12px; stroke-width:2; }
+.chip-intraday{ color:var(--stage-intraday-fg); background:var(--stage-intraday-bg); border-color:var(--stage-intraday-ring); }
+.chip-close{ color:var(--stage-close-fg); background:var(--stage-close-bg); border-color:var(--stage-close-ring); }
+.chip-pending{ color:var(--fg-3); background:transparent; border-style:dashed; }
+
+/* ---- 数据质量标签：缺口 / 口径警告 ---- */
+.tag{
+  display:inline-flex; align-items:center; gap:5px; white-space:nowrap;
+  font-size:var(--fs-caption1); color:var(--fg-2); background:var(--surface-alt);
+  border:1px solid var(--border-soft); border-radius:var(--badge-radius);
+  padding:2px 9px; line-height:1.4; letter-spacing:var(--tracking-caption);
+}
+@media (prefers-color-scheme:dark){ .tag{ background:var(--ap-dark-2); border-color:var(--ap-dark-sep); } }
+.tag .ic{ width:12px; height:12px; stroke-width:2; }
+.tag.gap{ color:var(--fg-3); border-style:dashed; }
+.tag-warn{ color:var(--warn); border-color:var(--warn); background:transparent; }
+
+/* ---- D-1 深色：时间线表面抬升 --------------------------------------------
+ * 根因：深色下 --bg = --card-bg = 纯黑，--tl-separator = #2c2c2e 仅 1.51:1，
+ * 行与行、行与组全部糊成一片（evidence/dark-day-1440.png 实测）。
+ * 修法（DESIGN-SYSTEM-v2 D-1「画布 / 抬升面 / 分隔 / 前景」四级）：
+ *   抬升做在「日组」这一层，不做在每一行 —— 每行加卡片会把 Apple 的
+ *   零卡片 hairline 节奏打成卡片段（--card-bg 深色下刻意等于纯黑，
+ *   就是为了不做卡）。日组给 surface-alt 抬升面 + 内缩 padding，
+ *   行分隔线提到 --ap-dark-sep（1.79:1），层级立刻可读且仍是「一组一行」。
+ * 全部走既有 var()，不新增令牌、不硬编码色。 */
+@media (prefers-color-scheme:dark){
+  .issue{
+    background:var(--surface-alt);
+    border-radius:var(--panel-radius);
+    padding:var(--space-5) var(--space-5) var(--space-4);
+  }
+  .issue-head{ border-bottom-color:var(--ap-dark-sep); }
+  .tl-item{ border-bottom-color:var(--ap-dark-sep); }
+  .tl-time::after{ background:var(--ap-dark-sep); }
+  /* 抬升面内的长摘要降一档前景，避免 #a1a1a6 直接压 #1c1c1e 时与画布层同权 */
+  .tl-sum{ color:var(--fg-2); }
+}
+@media (prefers-color-scheme:dark) and (max-width:640px){
+  .issue{ padding:var(--space-4) var(--space-4) var(--space-3); }
+}
+
+/* ============================== 面板 ====================================== */
+.panel{ background:var(--panel-bg); border-radius:var(--panel-radius); padding:var(--card-pad); corner-shape:var(--corner-shape,squircle); }
+
+/* 指标卡：无边框，靠 hairline 分隔 */
+.kpi-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); border-top:1px solid var(--border); }
+.kpi{ padding:var(--space-5) 0 var(--space-5) var(--space-4); border-left:1px solid var(--border-soft); }
+.kpi:first-child{ border-left:none; padding-left:0; }
+.kpi dt{ font-size:var(--fs-caption1); color:var(--fg-3); letter-spacing:var(--tracking-caption); margin-bottom:6px; display:flex; align-items:center; gap:5px; }
+.kpi dt .ic{ width:13px; height:13px; stroke-width:2; }
+.kpi dd{ font-size:var(--fs-title4); font-weight:var(--fw-semibold); color:var(--fg); line-height:1.2; }
+.kpi dd .u{ font-size:var(--fs-footnote); color:var(--fg-3); font-weight:var(--fw-regular); margin-left:3px; }
+.kpi dd .up{ color:var(--quote-up); }
+.kpi dd .down{ color:var(--quote-down); }
+.kpi dd .flat{ color:var(--fg-3); font-family:var(--font-text); font-size:var(--fs-subhead); }
+@media (max-width:640px){
+  .kpi-row{ grid-template-columns:1fr 1fr; }
+  .kpi{ padding:var(--space-4) var(--space-3) var(--space-4) 0; }
+  .kpi:nth-child(odd){ border-left:none; padding-left:0; }
+  .kpi:nth-child(n+3){ border-top:1px solid var(--border-soft); }
+}
+
+/* ============================== 数据表 ==================================== */
+.tbl-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.tbl{ width:100%; border-collapse:collapse; font-size:var(--table-cell-fs); font-variant-numeric:var(--numeric); }
+.tbl caption{ text-align:left; font-size:var(--fs-footnote); color:var(--fg-3); padding-bottom:var(--space-3); }
+.tbl th{
+  text-align:left; font-size:var(--table-head-fs); font-weight:var(--fw-semibold);
+  color:var(--table-head-fg); letter-spacing:var(--tracking-caption);
+  padding:var(--space-2) var(--table-cell-pad); border-bottom:1px solid var(--table-border); white-space:nowrap;
+}
+.tbl td{ padding:var(--table-cell-pad); border-bottom:1px solid var(--separator); vertical-align:top; }
+.tbl tbody tr:last-child td{ border-bottom:none; }
+/* D-2 深色斑马纹（站点层）：detail-frame.css 那条以 .doc 为作用域，只覆盖详情页。
+ * 订阅页 / 周月归档页的表格在 .tbl-wrap 内但不在 .doc 里，必须在此补齐，
+ * 否则「同一条表格规则在详情页有斑马、在订阅页没有」本身就是不一致。
+ * 取值与理由见 DESIGN-SYSTEM-v2 D-2（Apple 官方深色 inset list 偶数行值）。 */
+@media (prefers-color-scheme:dark){
+  .tbl-wrap .tbl tbody tr:nth-child(even){ background:var(--surface-alt); }
+  .tbl-wrap .tbl th{ border-bottom-color:var(--ap-dark-sep); }
+}
+.tbl .num{ text-align:right; font-family:var(--font-mono); font-variant-numeric:var(--numeric); white-space:nowrap; }
+.tbl th.num{ text-align:right; }
+.tbl .up{ color:var(--quote-up); }
+.tbl .down{ color:var(--quote-down); }
+.tbl .flat{ color:var(--quote-flat); }
+.tbl .rowkey{ text-align:left; font-weight:var(--fw-semibold); color:var(--fg); }
+.tbl .rowkey-zh{ font-family:var(--font-text); font-weight:var(--fw-regular); color:var(--fg-3); margin-left:6px; }
+
+/* ============================== 归档列表 ================================== */
+.archive-item{
+  display:grid; grid-template-columns:1fr auto; gap:var(--space-5); align-items:center;
+  padding:var(--space-5) 0; border-bottom:1px solid var(--separator);
+}
+.archive-item:last-child{ border-bottom:none; }
+.archive-item h3{ font-size:var(--fs-headline); line-height:var(--lh-headline); letter-spacing:var(--tracking-headline); margin-bottom:5px; display:flex; align-items:center; gap:var(--space-2); flex-wrap:wrap; }
+.archive-item p{ font-size:var(--fs-subhead); color:var(--fg-2); max-width:60ch; }
+.archive-item .meta{ display:inline-flex; align-items:center; gap:var(--space-2); font-size:var(--fs-caption1); color:var(--fg-3); margin-top:var(--space-2); flex-wrap:wrap; }
+.archive-item .go{
+  display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px;
+  border-radius:var(--radius-pill); border:1px solid var(--border); color:var(--fg-3);
+  transition:background var(--motion-base) var(--ease-out),border-color var(--motion-base) var(--ease-out),color var(--motion-base) var(--ease-out);
+  flex:0 0 auto;
+}
+.archive-item:hover .go{ background:var(--accent); border-color:var(--accent); color:var(--fg-on-accent); }
+.archive-item:hover h3 a{ color:var(--link); }
+@media (max-width:640px){ .archive-item{ grid-template-columns:1fr; } .archive-item .go{ display:none; } }
+
+/* ============================== 空态 ====================================== */
+.empty{
+  border:1px dashed var(--border); border-radius:var(--radius-md);
+  padding:var(--space-16) var(--space-6); text-align:center; color:var(--fg-3);
+  background:var(--surface); corner-shape:var(--corner-shape,squircle);
+}
+.empty .ic-24{ margin:0 auto var(--space-4); color:var(--fg-3); opacity:.7; }
+.empty h3{ font-size:var(--fs-title4); color:var(--fg-2); margin-bottom:var(--space-2); letter-spacing:var(--tracking-title4); }
+.empty p{ font-size:var(--fs-subhead); max-width:44ch; margin:0 auto var(--space-5); line-height:var(--lh-subhead); }
+
+/* ============================== 订阅页 ==================================== */
+.sub-lede{ color:var(--fg-2); max-width:var(--container-prose); }
+/* 订阅地址：长 URL 必须 anywhere 断行，否则 390px 视口整页横滚（G-4） */
+.sub-url{
+  display:block; font-family:var(--font-mono); font-size:var(--fs-subhead);
+  color:var(--fg); background:var(--surface-alt); border:1px solid var(--border-soft);
+  border-radius:var(--radius-sm); padding:var(--space-4) var(--space-5);
+  margin:var(--space-4) 0 var(--space-3); overflow-wrap:anywhere; word-break:break-all;
+  corner-shape:var(--corner-shape,squircle);
+}
+@media (prefers-color-scheme:dark){ .sub-url{ background:var(--panel-bg); border-color:var(--ap-dark-sep); } }
+.sub-hint{ display:flex; align-items:flex-start; gap:6px; color:var(--fg-3); max-width:var(--container-prose); }
+.sub-hint .ic{ margin-top:3px; flex:0 0 auto; }
+/* AI 标识与主体说明（订阅页）——RSS 全文会推送到第三方阅读器，
+ * 标识必须随内容走，不能只存在于网站页脚 */
+.sub-legal{ display:flex; align-items:flex-start; gap:6px; color:var(--fg-2);
+  max-width:var(--container-prose); margin-top:var(--space-3);
+  padding-top:var(--space-3); border-top:1px solid var(--border-soft); }
+.sub-legal .ic{ margin-top:3px; flex:0 0 auto; color:var(--fg-3); }
+.sub-steps{ margin:0 0 0 22px; list-style:decimal; }
+.sub-steps li{ font-size:var(--fs-callout); line-height:var(--lh-callout); color:var(--fg-2); margin:var(--space-3) 0; max-width:60ch; }
+.sub-steps li b{ color:var(--fg); font-weight:var(--fw-semibold); }
+@media (max-width:640px){ .sub-url{ font-size:var(--fs-footnote); padding:var(--space-3) var(--space-4); } }
+
+/* ---- 当日结论速览（按时点分组）----
+ * 产品约束：五个任务的 Σ 落在竞价/盘中/收盘不同时点，横排会诱导跨时点
+ * 直接相比。按时点分组 = 同时点内可比 + 跨时点显式警示，两头都说到。 */
+.ov-group{ margin-bottom:var(--space-5); }
+.ov-stage{ display:flex; align-items:center; gap:var(--space-3); margin-bottom:var(--space-3); flex-wrap:wrap; }
+.ov-note{ font-size:var(--fs-caption1); color:var(--fg-3); }
+.ov-cells{ display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:var(--space-3); }
+.ov-cell{ border:1px solid var(--border-soft); border-radius:var(--radius-sm);
+  padding:var(--space-3) var(--space-4); background:var(--surface-alt);
+  corner-shape:var(--corner-shape,squircle); }
+@media (prefers-color-scheme:dark){ .ov-cell{ background:var(--panel-bg); border-color:var(--ap-dark-sep); } }
+.ov-name{ font-size:var(--fs-footnote); color:var(--fg-2); margin-bottom:6px; }
+.ov-badges{ display:flex; align-items:center; gap:var(--space-2); flex-wrap:wrap; }
+.ov-caution{ display:flex; align-items:flex-start; gap:6px; font-size:var(--fs-footnote);
+  line-height:var(--lh-footnote); color:var(--fg-3); margin-top:var(--space-4); }
+.ov-caution .ic{ margin-top:3px; flex:0 0 auto; }
+
+.btn-row{ display:flex; gap:var(--space-3); flex-wrap:wrap; align-items:center; }
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  font-family:var(--font-text); font-size:var(--fs-subhead); font-weight:var(--fw-medium);
+  letter-spacing:var(--tracking-subhead); line-height:1.2;
+  padding:11px 21px; border-radius:var(--radius-pill); border:1px solid transparent;
+  min-height:44px; cursor:pointer; corner-shape:var(--corner-shape,squircle);
+  transition:background var(--motion-fast) var(--ease-out),border-color var(--motion-fast) var(--ease-out),color var(--motion-fast) var(--ease-out);
+}
+.btn-primary{ background:var(--accent); color:var(--fg-on-accent); }
+.btn-primary:hover{ background:var(--accent-hover); }
+.btn-primary:active{ background:var(--accent-active); }
+.btn-secondary{ background:transparent; border-color:var(--accent); color:var(--accent); }
+.btn-secondary:hover{ background:var(--stage-intraday-bg); }
+.btn-quiet{ background:transparent; color:var(--link); padding:11px 16px; }
+.btn-quiet:hover{ background:var(--btn-quiet-bg-hover); }
+
+/* ============================== 页脚 ====================================== */
+.foot{ margin-top:var(--space-16); background:var(--foot-bg); border-top:1px solid var(--foot-border); }
+.foot-in{ max-width:var(--container-wide); margin:0 auto; padding:var(--space-10) var(--gutter-tablet) var(--space-12); }
+.foot-top{ display:flex; gap:var(--space-8); flex-wrap:wrap; justify-content:space-between; margin-bottom:var(--space-8); }
+.foot-brand{ max-width:38ch; }
+.foot-brand p{ font-size:var(--foot-fs); line-height:var(--lh-footnote); color:var(--foot-fg); margin-top:var(--space-3); }
+.foot-cols{ display:flex; gap:var(--space-10); flex-wrap:wrap; }
+/* 页脚栏目标题：h4（frame 注入晚于 sanitize，无标记 h3 会被降级致字节漂移） */
+.foot-col h4{ font-size:var(--fs-caption1); color:var(--fg); font-weight:var(--fw-semibold); letter-spacing:var(--tracking-caption); margin-bottom:var(--space-3); }
+.foot-col li{ margin-bottom:var(--space-2); }
+.foot-col a{ font-size:var(--foot-fs); color:var(--foot-fg); display:inline-flex; align-items:center; gap:5px; transition:color var(--motion-fast) var(--ease-out); }
+.foot-col a:hover{ color:var(--link); }
+.foot-col a .ic{ width:12px; height:12px; stroke-width:2; opacity:.7; }
+.foot-legal{ border-top:1px solid var(--foot-border); padding-top:var(--space-5); font-size:var(--fs-caption1); line-height:var(--lh-footnote); color:var(--fg-3); }
+.foot-legal p + p{ margin-top:var(--space-2); }
+/* AI 标识与发布主体说明（合规披露）：与正文同色系但加重，不折叠、不藏底部角落 */
+.foot-legal .foot-ai, .foot-legal .foot-pub{
+  display:flex; align-items:flex-start; gap:6px; color:var(--fg-2);
+  font-size:var(--fs-footnote); line-height:var(--lh-footnote);
+}
+.foot-legal .foot-ai{ padding-bottom:var(--space-2); }
+.foot-legal .foot-ai .ic, .foot-legal .foot-pub .ic{ margin-top:3px; flex:0 0 auto; color:var(--fg-3); }
+.foot-legal a{ color:var(--fg-2); border-bottom:1px solid var(--border); transition:color var(--motion-fast) var(--ease-out),border-color var(--motion-fast) var(--ease-out); }
+.foot-legal a:hover{ color:var(--link); border-color:var(--link); }
+
+/* ============================ 响应式 ====================================== */
+@media (max-width:1024px){
+  .shell{ padding:0 var(--gutter-tablet); }
+  .page-head{ padding:var(--space-10) 0 var(--space-8); }
+  .frame{ padding-top:var(--space-10); }
+}
+@media (max-width:640px){
+  .shell{ padding:0 var(--gutter-phone); }
+  .frame{ padding-top:var(--space-8); }
+  .page-head{ padding:var(--space-8) 0 var(--space-6); }
+  .page-head h1 .sub{ font-size:var(--fs-title4); }
+  .issue{ margin-bottom:var(--space-10); }
+  .foot-in{ padding:var(--space-8) var(--gutter-phone) var(--space-10); }
+  .foot-top{ gap:var(--space-6); }
+  .foot-cols{ gap:var(--space-8); }
+  .kpi dd{ font-size:var(--fs-title3); }
+  .tl-time{ flex-direction:row; align-items:center; gap:var(--space-3); flex-wrap:wrap; padding-top:0; }
+  .tl-time::after{ content:""; flex:1 1 auto; height:1px; background:var(--tl-separator); min-width:var(--space-6); }
+}
+
+/* 打印：Apple 官网同样提供干净打印样式。
+   色值走 var(--ap-white)/var(--ap-black) 而非 #fff/#000 字面量：token_map 会把
+   #fff/#000 映射成 var(--surface)/var(--fg)，frame 注入块再消毒时 map_css 会改
+   写这三个声明（打印要的是恒白/恒黑，不是随主题变的 surface），字节也不再稳定。
+   --ap-* 是 LAYER 0 原语（design-tokens.css 唯一定义处，深色块不覆盖），等价且稳定。 */
+@media print{
+  .nav,.foot-cols .go,.btn-row,.skip-link{ display:none; }
+  body{ background:var(--ap-white); color:var(--ap-black); }
+  .issue{ page-break-inside:avoid; }
+  .foot{ background:var(--ap-white); }
+}

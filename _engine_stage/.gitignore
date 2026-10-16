@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.DS_Store
+holdings.json
+holdings-memory.md
+market_data.json
+*_kline*.json
+_stage/
+archive/

@@ -1,0 +1,223 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.invalid/daily-pulse-framework/config/schema.json",
+  "$comment": "$id 用 .invalid 保留域名：schema 身份标识不应绑定具体 GitHub 组织或用户，换 owner 时无需改本文件。",
+  "title": "daily-pulse-framework holdings config",
+  "description": "持仓配置契约 v1。三段结构与 daily-decision-engine/parse_holdings.py 的 MEMORY.md 三表一一对应，保证迁移与回退无损。仅 required 字段为用户必填；snapshot.* 为可选快照，由管线刷新，不参与信号计算。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "profile", "holdings"],
+  "properties": {
+    "version": {
+      "description": "配置契约版本。major 变更 = 破坏性，需迁移脚本；minor 变更 = 向后兼容新增字段。",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "base_currency"],
+      "properties": {
+        "owner": {
+          "description": "配置归属人标识，仅用于产物署名与 git 提交追踪，不参与任何计算。",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "base_currency": {
+          "description": "计价币种。当前 A 股/基金场景恒为 CNY；预留 HKD/USD 扩展位。",
+          "type": "string",
+          "enum": ["CNY"]
+        },
+        "disclaimer_profile": {
+          "description": "免责声明档位。investing = 完整三层免责（研判站默认）；personal = 个人自用存档。",
+          "type": "string",
+          "enum": ["investing", "personal"],
+          "default": "investing"
+        }
+      }
+    },
+    "market_data": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "description": "行情数据源标识。westock-mcp 为唯一允许值（框架铁律：数据只走 MCP）。",
+          "type": "string",
+          "enum": ["westock-mcp"]
+        },
+        "allow_cross_source": {
+          "description": "是否允许第二来源交叉验证（新浪/东财等仅可标注为交叉源）。",
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "holdings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stocks", "grid", "funds"],
+      "properties": {
+        "stocks": {
+          "description": "股票持仓段。对应 MEMORY.md『股票持仓』表。至少 1 条，否则视为未初始化配置。",
+          "type": "array",
+          "minItems": 0,
+          "items": { "$ref": "#/definitions/stock" }
+        },
+        "grid": {
+          "description": "网格参数段。对应 MEMORY.md『网格交易参数』表。非网格标的用 enabled:false 表达，保留底仓信息。",
+          "type": "array",
+          "minItems": 0,
+          "items": { "$ref": "#/definitions/grid" }
+        },
+        "funds": {
+          "description": "基金持仓段。对应 MEMORY.md『基金持仓』表。实物/积存金用 asset_class: gold 表达（对应解析器 GOLD 伪代码）。",
+          "type": "array",
+          "minItems": 0,
+          "items": { "$ref": "#/definitions/fund" }
+        }
+      }
+    },
+    "snapshot": {
+      "description": "可选快照段。由管线在每次取数后回写，用于站点展示与对账。缺失时按 null 处理，绝不参与信号评分——禁止把快照当事实源。",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "description": "快照日期 YYYY-MM-DD。",
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 200
+        }
+      }
+    }
+  },
+  "definitions": {
+    "code6": {
+      "description": "6 位证券代码，不带市场前缀。解析器按前缀规则（60/68/9/50-58→sh，00/30/15/16/56→sz，4/8→bj）补全。",
+      "type": "string",
+      "pattern": "^(sh|sz|bj)?\\d{6}$"
+    },
+    "stock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "name", "shares", "cost"],
+      "properties": {
+        "code": { "$ref": "#/definitions/code6" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "shares": {
+          "description": "持仓份额（股/份）。禁止写死——这是本配置的核心价值。",
+          "type": "integer",
+          "minimum": 0
+        },
+        "available": {
+          "description": "可用份额。缺省等于 shares（无 T+1 冻结时）。",
+          "type": "integer",
+          "minimum": 0
+        },
+        "cost": {
+          "description": "持仓成本价（元）。允许 0 表示成本未知，此时不得参与盈亏计算。",
+          "type": "number",
+          "minimum": 0
+        },
+        "note": {
+          "description": "策略备注（对应 MEMORY.md『状态/方向』列）。会进入研判上下文，措辞需遵守中性词禁令。",
+          "type": "string",
+          "maxLength": 120
+        }
+      }
+    },
+    "grid": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "name", "enabled"],
+      "properties": {
+        "code": { "$ref": "#/definitions/code6" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "enabled": {
+          "description": "是否运行网格。false = 仅底仓长线持有，此时 range/step 可全为 null。",
+          "type": "boolean"
+        },
+        "base_price": {
+          "description": "基准价（元）。网格中枢，引擎据此算上下轨触发价。",
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "range_low": {
+          "description": "价格区间下沿（元）。必须 < range_high。",
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "range_high": {
+          "description": "价格区间上沿（元）。",
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "step_pct": {
+          "description": "网格步长（%），如 2.5 表示 2.5%。引擎禁止硬编码，按标的配置。",
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 50
+        },
+        "per_trade": {
+          "description": "单笔委托数量（股/份）。",
+          "type": "integer",
+          "exclusiveMinimum": 0
+        },
+        "min_position": {
+          "description": "最小底仓（股/份）。触及即停卖。",
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_position": {
+          "description": "最大顶仓（股/份）。",
+          "type": "integer",
+          "minimum": 0
+        },
+        "guide": {
+          "description": "操作指引原文（对应 MEMORY.md『当前状态与操作指引』列）。",
+          "type": "string",
+          "maxLength": 200
+        }
+      }
+    },
+    "fund": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "asset_class"],
+      "properties": {
+        "code": {
+          "description": "6 位基金代码。asset_class=gold 时可省略（解析器填 GOLD）。",
+          "type": "string",
+          "pattern": "^(\\d{6}|GOLD)$"
+        },
+        "name": { "type": "string", "minLength": 1, "maxLength": 48 },
+        "asset_class": {
+          "description": "资产类别。fund=场外基金；gold=实物/积存金（非基金，解析器映射为 GOLD 伪代码，统计时单列）。",
+          "type": "string",
+          "enum": ["fund", "gold"]
+        },
+        "amount": {
+          "description": "持有金额（元）。统计口径：fund 计入 fund_amount，gold 计入 gold_amount，二者不相加。",
+          "type": "number",
+          "minimum": 0
+        },
+        "plan": {
+          "description": "定投方式。用于站点展示与操作指引生成。",
+          "type": "string",
+          "enum": ["regular", "smart", "smart_take_profit", "holding", "none"],
+          "default": "none"
+        },
+        "note": {
+          "description": "备注（对应 MEMORY.md『备注』列）。",
+          "type": "string",
+          "maxLength": 120
+        }
+      }
+    }
+  }
+}

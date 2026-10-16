@@ -1,0 +1,183 @@
+响应式断点矩阵实测 2026-10-16 20:17:34
+宽度档位: [320, 360, 390, 414, 640, 720, 768, 834, 980, 1024, 1152, 1280, 1440, 1920, 2149, 2560]
+页面数: 12  组合数: 176
+------------------------------------------------------------------------------
+home                 320px  sw=320   cw=320   ok
+home                 360px  sw=360   cw=360   ok
+home                 390px  sw=390   cw=390   ok
+home                 414px  sw=414   cw=414   ok
+home                 640px  sw=640   cw=640   ok
+home                 720px  sw=720   cw=720   ok
+home                 768px  sw=768   cw=768   ok
+home                 834px  sw=834   cw=834   ok
+home                 980px  sw=980   cw=980   ok
+home                1024px  sw=1024  cw=1024  ok
+home                1152px  sw=1152  cw=1152  ok
+home                1280px  sw=1280  cw=1280  ok
+home                1440px  sw=1440  cw=1440  ok
+home                1920px  sw=1920  cw=1920  ok
+home                2149px  sw=2149  cw=2149  ok
+home                2560px  sw=2560  cw=2560  ok
+day                  320px  sw=320   cw=320   ok
+day                  360px  sw=360   cw=360   ok
+day                  390px  sw=390   cw=390   ok
+day                  414px  sw=414   cw=414   ok
+day                  640px  sw=640   cw=640   ok
+day                  720px  sw=720   cw=720   ok
+day                  768px  sw=768   cw=768   ok
+day                  834px  sw=834   cw=834   ok
+day                  980px  sw=980   cw=980   ok
+day                 1024px  sw=1024  cw=1024  ok
+day                 1152px  sw=1152  cw=1152  ok
+day                 1280px  sw=1280  cw=1280  ok
+day                 1440px  sw=1440  cw=1440  ok
+day                 1920px  sw=1920  cw=1920  ok
+day                 2149px  sw=2149  cw=2149  ok
+day                 2560px  sw=2560  cw=2560  ok
+weekly               320px  sw=320   cw=320   ok  bad=table.tbl@478,caption.@478,thead.@478,tr.@478,th.num@338,th.num@387,th.@478,tbody.@478
+weekly               360px  sw=360   cw=360   ok  bad=table.tbl@478,caption.@478,thead.@478,tr.@478,th.num@387,th.@478,tbody.@478,tr.@478
+weekly               390px  sw=390   cw=390   ok  bad=table.tbl@478,caption.@478,thead.@478,tr.@478,th.@478,tbody.@478,tr.@478,td.num@478
+weekly               414px  sw=414   cw=414   ok  bad=table.tbl@478,caption.@478,thead.@478,tr.@478,th.@478,tbody.@478,tr.@478,td.num@478
+weekly               640px  sw=640   cw=640   ok
+weekly               720px  sw=720   cw=720   ok
+weekly               768px  sw=768   cw=768   ok
+weekly               834px  sw=834   cw=834   ok
+weekly               980px  sw=980   cw=980   ok
+weekly              1024px  sw=1024  cw=1024  ok
+weekly              1152px  sw=1152  cw=1152  ok
+weekly              1280px  sw=1280  cw=1280  ok
+weekly              1440px  sw=1440  cw=1440  ok
+weekly              1920px  sw=1920  cw=1920  ok
+weekly              2149px  sw=2149  cw=2149  ok
+weekly              2560px  sw=2560  cw=2560  ok
+monthly              320px  sw=320   cw=320   ok  bad=table.tbl@478,caption.@478,thead.@478,tr.@478,th.num@338,th.num@387,th.@478,tbody.@478
+monthly              360px  sw=360   cw=360   ok  bad=table.tbl@478,caption.@478,thead.@478,tr.@478,th.num@387,th.@478,tbody.@478,tr.@478
+monthly              390px  sw=390   cw=390   ok  bad=table.tbl@478,caption.@478,thead.@478,tr.@478,th.@478,tbody.@478,tr.@478,td.num@478
+monthly              414px  sw=414   cw=414   ok  bad=table.tbl@478,caption.@478,thead.@478,tr.@478,th.@478,tbody.@478,tr.@478,td.num@478
+monthly              640px  sw=640   cw=640   ok
+monthly              720px  sw=720   cw=720   ok
+monthly              768px  sw=768   cw=768   ok
+monthly              834px  sw=834   cw=834   ok
+monthly              980px  sw=980   cw=980   ok
+monthly             1024px  sw=1024  cw=1024  ok
+monthly             1152px  sw=1152  cw=1152  ok
+monthly             1280px  sw=1280  cw=1280  ok
+monthly             1440px  sw=1440  cw=1440  ok
+monthly             1920px  sw=1920  cw=1920  ok
+monthly             2149px  sw=2149  cw=2149  ok
+monthly             2560px  sw=2560  cw=2560  ok
+method               320px  sw=320   cw=320   ok  bad=table.tbl@664,caption.@664,thead.@664,tr.@664,th.@372,th.@664,tbody.@664,tr.@664
+method               360px  sw=360   cw=360   ok  bad=table.tbl@664,caption.@664,thead.@664,tr.@664,th.@372,th.@664,tbody.@664,tr.@664
+method               390px  sw=390   cw=390   ok  bad=table.tbl@664,caption.@664,thead.@664,tr.@664,th.@664,tbody.@664,tr.@664,td.num@664
+method               414px  sw=414   cw=414   ok  bad=table.tbl@664,caption.@664,thead.@664,tr.@664,th.@664,tbody.@664,tr.@664,td.num@664
+method               640px  sw=640   cw=640   ok  bad=table.tbl@664,caption.@664,thead.@664,tr.@664,th.@664,tbody.@664,tr.@664,td.num@664
+method               720px  sw=720   cw=720   ok
+method               768px  sw=768   cw=768   ok
+method               834px  sw=834   cw=834   ok
+method               980px  sw=980   cw=980   ok
+method              1024px  sw=1024  cw=1024  ok
+method              1152px  sw=1152  cw=1152  ok
+method              1280px  sw=1280  cw=1280  ok
+method              1440px  sw=1440  cw=1440  ok
+method              1920px  sw=1920  cw=1920  ok
+method              2149px  sw=2149  cw=2149  ok
+method              2560px  sw=2560  cw=2560  ok
+subscribe            320px  sw=320   cw=320   ok
+subscribe            360px  sw=360   cw=360   ok
+subscribe            390px  sw=390   cw=390   ok
+subscribe            414px  sw=414   cw=414   ok
+subscribe            640px  sw=640   cw=640   ok
+subscribe            720px  sw=720   cw=720   ok
+subscribe            768px  sw=768   cw=768   ok
+subscribe            834px  sw=834   cw=834   ok
+subscribe            980px  sw=980   cw=980   ok
+subscribe           1024px  sw=1024  cw=1024  ok
+subscribe           1152px  sw=1152  cw=1152  ok
+subscribe           1280px  sw=1280  cw=1280  ok
+subscribe           1440px  sw=1440  cw=1440  ok
+subscribe           1920px  sw=1920  cw=1920  ok
+subscribe           2149px  sw=2149  cw=2149  ok
+subscribe           2560px  sw=2560  cw=2560  ok
+d-stock-assistant    320px  sw=320   cw=320   ok  bad=table.tbl@438,thead.@438,tr.@438,th.@438,tbody.@438,tr.@438,td.@438,tr.@438
+d-stock-assistant    360px  sw=360   cw=360   ok  bad=table.tbl@438,thead.@438,tr.@438,th.@438,tbody.@438,tr.@438,td.@438,tr.@438
+d-stock-assistant    390px  sw=390   cw=390   ok  bad=table.tbl@438,thead.@438,tr.@438,th.@438,tbody.@438,tr.@438,td.@438,tr.@438
+d-stock-assistant    414px  sw=414   cw=414   ok  bad=table.tbl@438,thead.@438,tr.@438,th.@438,tbody.@438,tr.@438,td.@438,tr.@438
+d-stock-assistant    640px  sw=640   cw=640   ok  bad=table.tbl@678,thead.@678,tr.@678,th.@678,tbody.@678,tr.@678,td.@678,b.@651
+d-stock-assistant    720px  sw=720   cw=720   ok
+d-stock-assistant    768px  sw=768   cw=768   ok
+d-stock-assistant    834px  sw=834   cw=834   ok
+d-stock-assistant    980px  sw=980   cw=980   ok
+d-stock-assistant   1024px  sw=1024  cw=1024  ok
+d-stock-assistant   1152px  sw=1152  cw=1152  ok
+d-stock-assistant   1280px  sw=1280  cw=1280  ok
+d-stock-assistant   1440px  sw=1440  cw=1440  ok
+d-stock-assistant   1920px  sw=1920  cw=1920  ok
+d-stock-assistant   2149px  sw=2149  cw=2149  ok
+d-stock-assistant   2560px  sw=2560  cw=2560  ok
+d-fund-market        320px  sw=320   cw=320   ok  bad=table.w-full@512,thead.bg-slate-50@512,tr.@512,th.p-3@414,th.p-3@512,tbody.divide-y@512,tr.hover:bg-slate-50/80@512,td.p-3@414
+d-fund-market        360px  sw=360   cw=360   ok  bad=table.w-full@512,thead.bg-slate-50@512,tr.@512,th.p-3@414,th.p-3@512,tbody.divide-y@512,tr.hover:bg-slate-50/80@512,td.p-3@414
+d-fund-market        390px  sw=390   cw=390   ok  bad=table.w-full@512,thead.bg-slate-50@512,tr.@512,th.p-3@414,th.p-3@512,tbody.divide-y@512,tr.hover:bg-slate-50/80@512,td.p-3@414
+d-fund-market        414px  sw=414   cw=414   ok  bad=table.w-full@512,thead.bg-slate-50@512,tr.@512,th.p-3@512,tbody.divide-y@512,tr.hover:bg-slate-50/80@512,td.p-3@512,span.inline-flex@496
+d-fund-market        640px  sw=640   cw=640   ok  bad=table.w-full@764,thead.bg-slate-50@764,tr.@764,th.p-3@687,th.p-3@764,tbody.divide-y@764,tr.hover:bg-slate-50/80@764,td.p-3@687
+d-fund-market        720px  sw=720   cw=720   ok  bad=table.w-full@764,thead.bg-slate-50@764,tr.@764,th.p-3@764,tbody.divide-y@764,tr.hover:bg-slate-50/80@764,td.p-3@764,span.px-1.5@729
+d-fund-market        768px  sw=768   cw=768   ok  bad=table.w-full@788,thead.bg-slate-50@788,tr.@788,th.p-3@788,tbody.divide-y@788,tr.hover:bg-slate-50/80@788,td.p-3@788,tr.hover:bg-slate-50/80@788
+d-fund-market        834px  sw=834   cw=834   ok
+d-fund-market        980px  sw=980   cw=980   ok
+d-fund-market       1024px  sw=1024  cw=1024  ok
+d-fund-market       1152px  sw=1152  cw=1152  ok
+d-fund-market       1280px  sw=1280  cw=1280  ok
+d-fund-market       1440px  sw=1440  cw=1440  ok
+d-fund-market       1920px  sw=1920  cw=1920  ok
+d-fund-market       2149px  sw=2149  cw=2149  ok
+d-fund-market       2560px  sw=2560  cw=2560  ok
+d-fund-guide         320px  sw=320   cw=320   ok  bad=table.tbl@474,thead.@474,tr.@474,th.@340,th.@474,tbody.@474,tr.@474,td.@340
+d-fund-guide         360px  sw=360   cw=360   ok  bad=table.tbl@474,thead.@474,tr.@474,th.@474,tbody.@474,tr.@474,td.@474,tr.@474
+d-fund-guide         390px  sw=390   cw=390   ok  bad=table.tbl@474,thead.@474,tr.@474,th.@474,tbody.@474,tr.@474,td.@474,tr.@474
+d-fund-guide         414px  sw=414   cw=414   ok  bad=table.tbl@474,thead.@474,tr.@474,th.@474,tbody.@474,tr.@474,td.@474,tr.@474
+d-fund-guide         640px  sw=640   cw=640   ok  bad=table.tbl@689,thead.@689,tr.@689,th.@689,tbody.@689,tr.@689,td.@689,tr.@689
+d-fund-guide         720px  sw=720   cw=720   ok  bad=table.tbl@730,thead.@730,tr.@730,th.@730,tbody.@730,tr.@730,td.@730,tr.@730
+d-fund-guide         768px  sw=768   cw=768   ok  bad=code.@777
+d-fund-guide         834px  sw=834   cw=834   ok
+d-fund-guide         980px  sw=980   cw=980   ok
+d-fund-guide        1024px  sw=1024  cw=1024  ok
+d-fund-guide        1152px  sw=1152  cw=1152  ok
+d-fund-guide        1280px  sw=1280  cw=1280  ok
+d-fund-guide        1440px  sw=1440  cw=1440  ok
+d-fund-guide        1920px  sw=1920  cw=1920  ok
+d-fund-guide        2149px  sw=2149  cw=2149  ok
+d-fund-guide        2560px  sw=2560  cw=2560  ok
+[skip] d-stock-review: 文件缺失 _stage/docs/daily/2026-10-16/stock-review.html
+d-daily-review       320px  sw=320   cw=320   ok  bad=table.tbl@363,tbody.@362,tr.@362,th.@362,tr.@362,td.@362,tr.@362,td.@362
+d-daily-review       360px  sw=360   cw=360   ok  bad=table.tbl@363,tbody.@362,tr.@362,th.@362,tr.@362,td.@362,tr.@362,td.@362
+d-daily-review       390px  sw=390   cw=390   ok  bad=table.tbl@470,tbody.@469,tr.@469,th.@469,tr.@469,td.@469,tr.@469,td.@469
+d-daily-review       414px  sw=414   cw=414   ok  bad=table.tbl@470,tbody.@469,tr.@469,th.@469,tr.@469,td.@469,tr.@469,td.@469
+d-daily-review       640px  sw=640   cw=640   ok
+d-daily-review       720px  sw=720   cw=720   ok
+d-daily-review       768px  sw=768   cw=768   ok
+d-daily-review       834px  sw=834   cw=834   ok
+d-daily-review       980px  sw=980   cw=980   ok
+d-daily-review      1024px  sw=1024  cw=1024  ok
+d-daily-review      1152px  sw=1152  cw=1152  ok
+d-daily-review      1280px  sw=1280  cw=1280  ok
+d-daily-review      1440px  sw=1440  cw=1440  ok
+d-daily-review      1920px  sw=1920  cw=1920  ok
+d-daily-review      2149px  sw=2149  cw=2149  ok
+d-daily-review      2560px  sw=2560  cw=2560  ok
+d-old-fund-guide     320px  sw=320   cw=320   ok  bad=table.tbl@450,thead.@450,tr.@450,th.@326,th.@450,tbody.@450,tr.@450,td.@326
+d-old-fund-guide     360px  sw=360   cw=360   ok  bad=table.tbl@450,thead.@450,tr.@450,th.@450,tbody.@450,tr.@450,td.@450,tr.@450
+d-old-fund-guide     390px  sw=390   cw=390   ok  bad=table.tbl@450,thead.@450,tr.@450,th.@450,tbody.@450,tr.@450,td.@450,tr.@450
+d-old-fund-guide     414px  sw=414   cw=414   ok  bad=table.tbl@450,thead.@450,tr.@450,th.@450,tbody.@450,tr.@450,td.@450,tr.@450
+d-old-fund-guide     640px  sw=640   cw=640   ok  bad=table.tbl@954,thead.@954,tr.@954,th.@678,th.@780,th.@954,tbody.@954,tr.@954
+d-old-fund-guide     720px  sw=720   cw=720   ok  bad=table.tbl@954,thead.@954,tr.@954,th.@780,th.@954,tbody.@954,tr.@954,td.@780
+d-old-fund-guide     768px  sw=768   cw=768   ok  bad=table.tbl@978,thead.@978,tr.@978,th.@804,th.@978,tbody.@978,tr.@978,td.@804
+d-old-fund-guide     834px  sw=834   cw=834   ok  bad=table.tbl@1011,thead.@1011,tr.@1011,th.@837,th.@1011,tbody.@1011,tr.@1011,td.@837
+d-old-fund-guide     980px  sw=980   cw=980   ok  bad=table.tbl@1036,thead.@1036,tr.@1036,th.@1036,tbody.@1036,tr.@1036,td.@1036,code.@1001
+d-old-fund-guide    1024px  sw=1024  cw=1024  ok  bad=table.tbl@1058,thead.@1058,tr.@1058,th.@1058,tbody.@1058,tr.@1058,td.@1058,b.@1033
+d-old-fund-guide    1152px  sw=1152  cw=1152  ok
+d-old-fund-guide    1280px  sw=1280  cw=1280  ok
+d-old-fund-guide    1440px  sw=1440  cw=1440  ok
+d-old-fund-guide    1920px  sw=1920  cw=1920  ok
+d-old-fund-guide    2149px  sw=2149  cw=2149  ok
+d-old-fund-guide    2560px  sw=2560  cw=2560  ok
+------------------------------------------------------------------------------
+横向滚动组合数: 0 / 176

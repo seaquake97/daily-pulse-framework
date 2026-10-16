@@ -1,0 +1,16 @@
+# 持仓配置绝不能进公开仓
+holdings.yaml
+holdings.*.yaml
+!holdings.example.yaml
+
+# 产物
+*.json
+!config/schema.json
+_stage/
+dist/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/

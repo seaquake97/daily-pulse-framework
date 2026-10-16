@@ -1,0 +1,122 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "market_data.json",
+  "description": "daily-decision-engine 标准市场数据包。所有字段由 MCP 实时采集写入，禁止写死。",
+  "type": "object",
+  "required": ["date", "indices", "total_amount_yi", "market_breadth", "holdings", "verdict"],
+  "properties": {
+    "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "indices": {
+      "type": "object",
+      "required": ["sh000001", "sz399001", "sz399006", "sh000300", "sh000688", "bj899050"],
+      "additionalProperties": {
+        "type": "object",
+        "required": ["price", "change_percent", "amount", "time"],
+        "properties": {
+          "price": { "type": "number" },
+          "change_percent": { "type": "number" },
+          "amount": { "type": "number" },
+          "time": { "type": "string" },
+          "pe_ratio": { "type": "number" },
+          "volume_ratio": { "type": "number" },
+          "chg_5d": { "type": "number" },
+          "chg_10d": { "type": "number" },
+          "chg_20d": { "type": "number" },
+          "chg_60d": { "type": "number" },
+          "chg_ytd": { "type": "number" }
+        }
+      }
+    },
+    "total_amount_yi": { "type": "number", "description": "两市+北交所成交额（亿元）= sh000001+sz399001+bj899050 的 amount/1e8" },
+    "market_breadth": {
+      "type": "object",
+      "required": ["up", "down", "flat", "limit_up", "limit_down"],
+      "properties": {
+        "up": { "type": "integer" },
+        "down": { "type": "integer" },
+        "flat": { "type": "integer" },
+        "limit_up": { "type": "integer" },
+        "limit_down": { "type": "integer" },
+        "total_amount": { "type": "number", "description": "changedist 原始成交额（元），用于交叉验证" }
+      }
+    },
+    "foreign": {
+      "type": "object",
+      "description": "外盘（MCP 覆盖范围内采集，缺失的指数标注数据缺口，禁止代理冒充）",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "price": { "type": "number" },
+          "change_percent": { "type": "number" },
+          "gap": { "type": "boolean", "description": "true=数据缺口" }
+        }
+      }
+    },
+    "holdings": {
+      "type": "object",
+      "description": "持仓行情，key 为 sh/sz 前缀代码",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["name", "price", "change_percent"],
+        "properties": {
+          "name": { "type": "string" },
+          "price": { "type": "number" },
+          "change_percent": { "type": "number" },
+          "amount": { "type": "number" }
+        }
+      }
+    },
+    "sector_flows": {
+      "type": "object",
+      "properties": {
+        "top_inflow": { "type": "number", "description": "主力净流入TOP1板块金额（亿元）" },
+        "top_outflow": { "type": "number", "description": "主力净流出TOP1板块金额（亿元，正数）" },
+        "inflow_name": { "type": "string" },
+        "outflow_name": { "type": "string" }
+      }
+    },
+    "sector_ranking": {
+      "type": "object",
+      "description": "行业涨跌排名（data_sector ranking 采集，供渲染器板块图使用）",
+      "properties": {
+        "gainers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sector": { "type": "string" },
+              "name": { "type": "string" },
+              "chg_pct": { "type": "number" }
+            }
+          }
+        },
+        "losers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "sector": { "type": "string" },
+              "name": { "type": "string" },
+              "chg_pct": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
+    "fund_estimates": {
+      "type": "object",
+      "description": "基金估值（仅官方估值源可用时填写；为0/缺失时省略并标注数据缺口，禁止用指数涨跌冒充）",
+      "additionalProperties": { "type": "number" }
+    },
+    "verdict": {
+      "type": "object",
+      "required": ["rating", "sigma"],
+      "properties": {
+        "rating": { "enum": ["进攻", "均衡", "防守", "回避", "信号矛盾"] },
+        "sigma": { "type": "number" },
+        "signals": { "type": "object" },
+        "degraded": { "type": "array" }
+      }
+    }
+  }
+}

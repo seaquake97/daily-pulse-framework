@@ -1,0 +1,412 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "meta": {
+    "name": "Daily Market Pulse — Apple Design Language Tokens",
+    "version": "1.0.0",
+    "generated": "2026-10-14",
+    "designer": "颜好看",
+    "reference": "apple.com 2025-2026 design language, measured",
+    "gridModule": "980px",
+    "baseUnit": "4px",
+    "iconSet": {
+      "family": "Lucide",
+      "lock": "single-library-no-mixing",
+      "viewBox": "0 0 24 24",
+      "strokeWidth": 1.75,
+      "strokeLinecap": "round",
+      "strokeLinejoin": "round",
+      "fill": "none",
+      "sizes": [16, 20, 24],
+      "prohibition": "emoji as functional icon is forbidden"
+    },
+    "constraints": {
+      "noEmoji": true,
+      "noPurplePinkGradient": true,
+      "noBounceEasing": true,
+      "noGradientTokens": true,
+      "numericTabular": true,
+      "darkMode": "prefers-color-scheme + data-theme hook",
+      "minBodyContrast": 4.5
+    }
+  },
+
+  "primitive": {
+    "color": {
+      "apWhite":      { "value": "#ffffff", "type": "color" },
+      "apCanvas":     { "value": "#ffffff", "type": "color" },
+      "apSurfaceAlt": { "value": "#f5f5f7", "type": "color", "note": "Apple alternating band, not pure white" },
+      "apSurfaceNav": { "value": "#fafafc", "type": "color" },
+      "apInk":        { "value": "#1d1d1f", "type": "color", "note": "near-black; Apple never uses #000 for text" },
+      "apInkSecond":  { "value": "#515154", "type": "color" },
+      "apInkThird":   { "value": "#6e6e73", "type": "color" },
+      "apInkMuted":   { "value": "#86868b", "type": "color" },
+      "apHairline":   { "value": "#d2d2d7", "type": "color" },
+      "apHairlineSoft": { "value": "#e8e8ed", "type": "color" },
+      "apOverlay":    { "value": "rgba(210,210,215,0.64)", "type": "color" },
+      "apBlue":       { "value": "#0071e3", "type": "color" },
+      "apBlueHover":  { "value": "#0077ed", "type": "color" },
+      "apBlueLink":   { "value": "#0066cc", "type": "color" },
+      "apBlueLinkDk": { "value": "#2997ff", "type": "color" },
+      "apBluePress":  { "value": "#006edb", "type": "color" },
+      "apBlack":      { "value": "#000000", "type": "color" },
+      "apDark1":      { "value": "#1c1c1e", "type": "color" },
+      "apDark2":      { "value": "#2c2c2e", "type": "color" },
+      "apDark3":      { "value": "#3a3a3c", "type": "color" },
+      "apDarkSep":    { "value": "#38383a", "type": "color" },
+      "apDarkInk":    { "value": "#f5f5f7", "type": "color" },
+      "apDarkInk2":   { "value": "#a1a1a6", "type": "color" },
+      "apDarkInk3":   { "value": "#86868b", "type": "color" },
+      "apDarkNav":    { "value": "#161617", "type": "color" },
+      "apGreen":      { "value": "#008009", "type": "color" },
+      "apRed":        { "value": "#e30000", "type": "color" }
+    },
+
+    "ratingLight": {
+      "offensive": { "value": "#b91c1c", "type": "color", "contrastOnWhite": 6.47 },
+      "balanced":  { "value": "#b45309", "type": "color", "contrastOnWhite": 5.02 },
+      "conflict":  { "value": "#475569", "type": "color", "contrastOnWhite": 7.58, "note": "neutral slate, deliberately avoids red/green" },
+      "defensive": { "value": "#15803d", "type": "color", "contrastOnWhite": 5.01 },
+      "avoid":     { "value": "#166534", "type": "color", "contrastOnWhite": 7.13 }
+    },
+
+    "ratingDark": {
+      "offensive": { "value": "#f87171", "type": "color", "contrastOnDark1": 6.15 },
+      "balanced":  { "value": "#fbbf24", "type": "color", "contrastOnDark1": 10.2 },
+      "conflict":  { "value": "#94a3b8", "type": "color", "contrastOnDark1": 6.63 },
+      "defensive": { "value": "#4ade80", "type": "color", "contrastOnDark1": 9.76 },
+      "avoid":     { "value": "#22c55e", "type": "color", "contrastOnDark1": 7.47 }
+    }
+  },
+
+  "semantic": {
+    "light": {
+      "color": {
+        "bg":            { "value": "{primitive.color.apCanvas}", "type": "color" },
+        "surface":       { "value": "{primitive.color.apCanvas}", "type": "color" },
+        "surfaceAlt":    { "value": "{primitive.color.apSurfaceAlt}", "type": "color" },
+        "surfaceNav":    { "value": "{primitive.color.apSurfaceNav}", "type": "color" },
+        "surfaceSunken": { "value": "{primitive.color.apSurfaceAlt}", "type": "color" },
+        "surfaceInverse": { "value": "{primitive.color.apInk}", "type": "color", "contrast": 16.83, "note": "dark block for upstream cover/hero; pairs with fgOnInverse" },
+        "fgOnInverse":   { "value": "{primitive.color.apDarkInk}", "type": "color", "contrast": 16.83, "note": "text on surfaceInverse" },
+        "fg":            { "value": "{primitive.color.apInk}", "type": "color", "contrast": 16.83 },
+        "fg2":           { "value": "{primitive.color.apInkSecond}", "type": "color", "contrast": 7.91 },
+        "fg3":           { "value": "{primitive.color.apInkThird}", "type": "color", "contrast": 5.07 },
+        "fgMuted":       { "value": "{primitive.color.apInkMuted}", "type": "color", "contrast": 3.62, "usage": "large text >=17px or non-essential only" },
+        "fgOnAccent":    { "value": "{primitive.color.apWhite}", "type": "color" },
+        "border":        { "value": "{primitive.color.apHairline}", "type": "color" },
+        "borderSoft":    { "value": "{primitive.color.apHairlineSoft}", "type": "color" },
+        "separator":     { "value": "{primitive.color.apHairlineSoft}", "type": "color" },
+        "accent":        { "value": "{primitive.color.apBlue}", "type": "color" },
+        "accentHover":   { "value": "{primitive.color.apBlueHover}", "type": "color" },
+        "accentActive":  { "value": "{primitive.color.apBluePress}", "type": "color" },
+        "link":          { "value": "{primitive.color.apBlueLink}", "type": "color", "contrast": 5.57 },
+        "linkHover":     { "value": "{primitive.color.apBlue}", "type": "color" },
+        "success":       { "value": "{primitive.color.apGreen}", "type": "color" },
+        "warn":          { "value": "{primitive.color.rtBalanced}", "type": "color" },
+        "danger":        { "value": "{primitive.color.apRed}", "type": "color" },
+        "info":          { "value": "{primitive.color.apBlueLink}", "type": "color" },
+        "quoteUp":       { "value": "{primitive.ratingLight.offensive}", "type": "color", "note": "China convention: red = up" },
+        "quoteDown":     { "value": "{primitive.ratingLight.defensive}", "type": "color", "note": "China convention: green = down" },
+        "quoteFlat":     { "value": "{primitive.color.apInkThird}", "type": "color" }
+      }
+    },
+
+    "dark": {
+      "color": {
+        "bg":            { "value": "{primitive.color.apBlack}", "type": "color" },
+        "surface":       { "value": "{primitive.color.apBlack}", "type": "color" },
+        "surfaceAlt":    { "value": "{primitive.color.apDark1}", "type": "color" },
+        "surfaceNav":    { "value": "{primitive.color.apDarkNav}", "type": "color" },
+        "surfaceSunken": { "value": "{primitive.color.apDark1}", "type": "color" },
+        "surfaceInverse": { "value": "{primitive.color.apDark2}", "type": "color", "contrast": 12.6, "note": "elevated dark block (lighter than canvas), not an inversion" },
+        "fgOnInverse":   { "value": "{primitive.color.apDarkInk}", "type": "color", "contrast": 12.6 },
+        "fg":            { "value": "{primitive.color.apDarkInk}", "type": "color", "contrast": 19.24 },
+        "fg2":           { "value": "{primitive.color.apDarkInk2}", "type": "color", "contrast": 8.16 },
+        "fg3":           { "value": "{primitive.color.apDarkInk3}", "type": "color", "contrast": 5.8 },
+        "fgMuted":       { "value": "#6e6e73", "type": "color", "usage": "decorative / placeholder only" },
+        "fgOnAccent":    { "value": "#000000", "type": "color" },
+        "border":        { "value": "{primitive.color.apDarkSep}", "type": "color" },
+        "borderSoft":    { "value": "{primitive.color.apDarkSep}", "type": "color" },
+        "separator":     { "value": "{primitive.color.apDarkSep}", "type": "color" },
+        "accent":        { "value": "#2997ff", "type": "color" },
+        "accentHover":   { "value": "#47a8ff", "type": "color" },
+        "accentActive":  { "value": "#1a8cff", "type": "color" },
+        "link":          { "value": "{primitive.color.apBlueLinkDk}", "type": "color" },
+        "linkHover":     { "value": "#5eb3ff", "type": "color" },
+        "success":       { "value": "#30d158", "type": "color" },
+        "warn":          { "value": "{primitive.ratingDark.balanced}", "type": "color" },
+        "danger":        { "value": "#ff453a", "type": "color" },
+        "info":          { "value": "{primitive.color.apBlueLinkDk}", "type": "color" },
+        "quoteUp":       { "value": "{primitive.ratingDark.offensive}", "type": "color" },
+        "quoteDown":     { "value": "{primitive.ratingDark.defensive}", "type": "color" },
+        "quoteFlat":     { "value": "{primitive.color.apDarkInk2}", "type": "color" }
+      }
+    }
+  },
+
+  "typography": {
+    "family": {
+      "display": { "value": "\"SF Pro Display\", -apple-system, BlinkMacSystemFont, \"PingFang SC\", \"Hiragino Sans GB\", \"Noto Sans SC\", \"Microsoft YaHei\", \"Helvetica Neue\", sans-serif", "type": "fontFamily" },
+      "text":    { "value": "\"SF Pro Text\", -apple-system, BlinkMacSystemFont, \"PingFang SC\", \"Hiragino Sans GB\", \"Noto Sans SC\", \"Microsoft YaHei\", \"Helvetica Neue\", sans-serif", "type": "fontFamily" },
+      "mono":    { "value": "\"SF Mono\", ui-monospace, SFMono-Regular, Menlo, Monaco, \"Cascadia Mono\", \"Roboto Mono\", monospace", "type": "fontFamily" }
+    },
+    "size": {
+      "display":  { "value": "3.5rem",    "type": "dimension", "px": 56 },
+      "title1":   { "value": "2.125rem",  "type": "dimension", "px": 34 },
+      "title2":   { "value": "1.75rem",   "type": "dimension", "px": 28 },
+      "title3":   { "value": "1.375rem",  "type": "dimension", "px": 22 },
+      "title4":   { "value": "1.25rem",   "type": "dimension", "px": 20 },
+      "headline": { "value": "1.0625rem", "type": "dimension", "px": 17 },
+      "body":     { "value": "1.0625rem", "type": "dimension", "px": 17 },
+      "callout":  { "value": "1rem",      "type": "dimension", "px": 16 },
+      "subhead":  { "value": "0.9375rem", "type": "dimension", "px": 15 },
+      "footnote": { "value": "0.8125rem", "type": "dimension", "px": 13 },
+      "caption1": { "value": "0.75rem",   "type": "dimension", "px": 12 },
+      "caption2": { "value": "0.6875rem", "type": "dimension", "px": 11 }
+    },
+    "lineHeight": {
+      "display":  { "value": "1.07",  "type": "number", "px": 60 },
+      "title1":   { "value": "1.206", "type": "number", "px": 41 },
+      "title2":   { "value": "1.214", "type": "number", "px": 34 },
+      "title3":   { "value": "1.273", "type": "number", "px": 28 },
+      "title4":   { "value": "1.25",  "type": "number", "px": 25 },
+      "headline": { "value": "1.294", "type": "number", "px": 22 },
+      "body":     { "value": "1.47",  "type": "number", "px": 25 },
+      "callout":  { "value": "1.35",  "type": "number" },
+      "subhead":  { "value": "1.4",   "type": "number" },
+      "footnote": { "value": "1.385", "type": "number", "px": 18 },
+      "caption":  { "value": "1.333", "type": "number" }
+    },
+    "tracking": {
+      "_comment": "CJK-safe values in use. Apple Latin measured values kept for the EN edition. Full-width Han glyphs occupy a full em box; applying Latin negative tracking directly causes glyph collision, so CJK values are compensated to roughly 40%.",
+      "cjk": {
+        "display":  { "value": "0",        "type": "dimension" },
+        "title1":   { "value": "-0.010em", "type": "dimension" },
+        "title2":   { "value": "-0.012em", "type": "dimension" },
+        "title3":   { "value": "-0.014em", "type": "dimension" },
+        "title4":   { "value": "-0.012em", "type": "dimension" },
+        "headline": { "value": "-0.010em", "type": "dimension" },
+        "body":     { "value": "-0.010em", "type": "dimension" },
+        "callout":  { "value": "-0.006em", "type": "dimension" },
+        "subhead":  { "value": "0",        "type": "dimension" },
+        "footnote": { "value": "0.01em",   "type": "dimension" },
+        "caption":  { "value": "0.02em",   "type": "dimension" },
+        "caps":     { "value": "0.06em",   "type": "dimension", "note": "ALL CAPS mandatory minimum" }
+      },
+      "latin": {
+        "56": { "value": "-0.005em", "type": "dimension" },
+        "34": { "value": "-0.022em", "type": "dimension" },
+        "28": { "value": "-0.029em", "type": "dimension" },
+        "22": { "value": "-0.032em", "type": "dimension" },
+        "20": { "value": "-0.030em", "type": "dimension" },
+        "17": { "value": "-0.025em", "type": "dimension" },
+        "16": { "value": "-0.020em", "type": "dimension" },
+        "13": { "value": "0.002em",  "type": "dimension" },
+        "12": { "value": "0.010em",  "type": "dimension" }
+      }
+    },
+    "weight": {
+      "regular":  { "value": "400", "type": "fontWeight" },
+      "medium":   { "value": "500", "type": "fontWeight", "note": "nav, emphasized body" },
+      "semibold": { "value": "600", "type": "fontWeight", "note": "all sub-headings; Apple binary in practice" },
+      "bold":     { "value": "700", "type": "fontWeight", "note": "page title only" }
+    },
+    "numeric": {
+      "feature": { "value": "\"tnum\" 1, \"lnum\" 1", "type": "fontFeatureSettings", "note": "all prices, sigma values, timestamps must not jitter" }
+    }
+  },
+
+  "space": {
+    "1":  { "value": "4px",   "type": "dimension" },
+    "2":  { "value": "8px",   "type": "dimension" },
+    "3":  { "value": "12px",  "type": "dimension" },
+    "4":  { "value": "16px",  "type": "dimension" },
+    "5":  { "value": "20px",  "type": "dimension" },
+    "6":  { "value": "24px",  "type": "dimension" },
+    "8":  { "value": "32px",  "type": "dimension" },
+    "10": { "value": "40px",  "type": "dimension" },
+    "12": { "value": "48px",  "type": "dimension" },
+    "16": { "value": "64px",  "type": "dimension" },
+    "20": { "value": "80px",  "type": "dimension" },
+    "24": { "value": "96px",  "type": "dimension" },
+    "32": { "value": "128px", "type": "dimension" }
+  },
+
+  "radius": {
+    "xs":   { "value": "4px",   "type": "dimension", "usage": "badge, tag" },
+    "sm":   { "value": "8px",   "type": "dimension", "usage": "chip, input" },
+    "md":   { "value": "12px",  "type": "dimension", "usage": "card, timeline group" },
+    "lg":   { "value": "18px",  "type": "dimension", "usage": "large content panel" },
+    "xl":   { "value": "28px",  "type": "dimension", "usage": "feature panel" },
+    "pill": { "value": "980px", "type": "dimension", "usage": "Apple signature button; equals grid module" }
+  },
+
+  "shape": {
+    "cornerShape": {
+      "value": "squircle",
+      "type": "cornerShape",
+      "note": "superellipse(2), the iOS continuous-corner look. Progressive enhancement inside @supports (corner-shape: squircle). Chrome/Edge 139+ only; Safari and Firefox fall back to standard border-radius with no visual penalty.",
+      "browserSupport": "Chrome 139+, Edge 139+; Safari not yet; Firefox not yet"
+    }
+  },
+
+  "shadow": {
+    "flat":     { "value": "none", "type": "boxShadow", "note": "Apple default; depth comes from background layering" },
+    "hairline": { "value": "inset 0 0 0 0.5px {semantic.light.color.border}", "type": "boxShadow" },
+    "overlay":  { "value": "0 8px 28px rgba(0,0,0,0.12)", "type": "boxShadow", "usage": "transient overlays only" },
+    "overlayDark": { "value": "0 8px 28px rgba(0,0,0,0.55)", "type": "boxShadow", "note": "black shadows are invisible on near-black; raised surfaces rely on luminance steps" }
+  },
+
+  "layout": {
+    "containerMax":    { "value": "980px",  "type": "dimension", "note": "Apple grid module" },
+    "containerWide":   { "value": "1180px", "type": "dimension" },
+    "containerProse":  { "value": "680px",  "type": "dimension", "note": "34-38 Chinese chars per line" },
+    "containerNarrow": { "value": "760px",  "type": "dimension" },
+    "gutterDesktop":   { "value": "32px", "type": "dimension" },
+    "gutterTablet":    { "value": "24px", "type": "dimension" },
+    "gutterPhone":     { "value": "20px", "type": "dimension" },
+    "sectionYDesktop": { "value": "80px", "type": "dimension" },
+    "sectionYTablet":  { "value": "48px", "type": "dimension" },
+    "sectionYPhone":   { "value": "32px", "type": "dimension" },
+    "columns":         { "value": "12", "type": "number" },
+    "columnGap":       { "value": "24px", "type": "dimension" },
+    "navHeight":       { "value": "44px", "type": "dimension", "note": "Apple measured global nav" },
+    "localNavHeight":  { "value": "52px", "type": "dimension" },
+    "breakpoints": {
+      "xs": { "value": "390px",  "type": "dimension" },
+      "sm": { "value": "640px",  "type": "dimension" },
+      "md": { "value": "768px",  "type": "dimension" },
+      "lg": { "value": "1024px", "type": "dimension" },
+      "xl": { "value": "1280px", "type": "dimension" }
+    }
+  },
+
+  "motion": {
+    "ease": {
+      "out":      { "value": "cubic-bezier(0.215, 0.61, 0.355, 1)", "type": "cubicBezier", "note": "Apple signature decelerate" },
+      "standard": { "value": "cubic-bezier(0.4, 0, 0.2, 1)", "type": "cubicBezier" },
+      "outSoft":  { "value": "cubic-bezier(0.25, 0.1, 0.25, 1)", "type": "cubicBezier" }
+    },
+    "duration": {
+      "instant": { "value": "80ms",  "type": "duration", "usage": "press feedback" },
+      "fast":    { "value": "150ms", "type": "duration", "usage": "state confirm, hover colour" },
+      "base":    { "value": "200ms", "type": "duration", "usage": "local expand, dropdown" },
+      "slow":    { "value": "300ms", "type": "duration", "usage": "cross-view transition" },
+      "slower":  { "value": "400ms", "type": "duration", "usage": "complex choreography ceiling" }
+    },
+    "reducedMotion": {
+      "value": "all durations collapse to 0.01ms under prefers-reduced-motion: reduce",
+      "type": "motionPreference"
+    }
+  },
+
+  "focus": {
+    "ring":      { "value": "0 0 0 2px {semantic.light.color.accent}", "type": "boxShadow" },
+    "width":     { "value": "2px", "type": "dimension" },
+    "offset":    { "value": "2px", "type": "dimension" },
+    "selector":  { "value": ":focus-visible", "type": "selector", "note": "keyboard reachable, never remove focus ring" },
+    "touchTarget": { "value": "44px", "type": "dimension", "note": "WCAG 2.5.5 minimum" }
+  },
+
+  "zIndex": {
+    "base":     { "value": "0",    "type": "number" },
+    "sticky":   { "value": "100",  "type": "number" },
+    "nav":      { "value": "1100", "type": "number" },
+    "dropdown": { "value": "1200", "type": "number" },
+    "modal":    { "value": "1300", "type": "number" },
+    "toast":    { "value": "1400", "type": "number" }
+  },
+
+  "component": {
+    "button": {
+      "primary": {
+        "bg":        { "value": "{semantic.light.color.accent}", "type": "color" },
+        "bgHover":   { "value": "{primitive.color.apBlueHover}", "type": "color" },
+        "bgActive":  { "value": "{primitive.color.apBluePress}", "type": "color" },
+        "fg":        { "value": "#ffffff", "type": "color" },
+        "radius":    { "value": "{radius.pill}", "type": "dimension" },
+        "padding":   { "value": "11px 21px", "type": "dimension" },
+        "fontSize":  { "value": "{typography.size.body}", "type": "dimension" },
+        "states":    { "value": ["default", "hover", "active", "focus-visible", "disabled"], "type": "array" }
+      },
+      "secondary": {
+        "bg":      { "value": "transparent", "type": "color" },
+        "border":  { "value": "{primitive.color.apBlue}", "type": "dimension" },
+        "fg":      { "value": "{primitive.color.apBlue}", "type": "color" }
+      },
+      "quiet": {
+        "bg":      { "value": "transparent", "type": "color" },
+        "bgHover": { "value": "rgba(0,0,0,0.04)", "type": "color" },
+        "fg":      { "value": "{semantic.light.color.link}", "type": "color" }
+      }
+    },
+
+    "nav": {
+      "height":   { "value": "{layout.navHeight}", "type": "dimension" },
+      "bg":       { "value": "rgba(250,250,252,0.72)", "type": "color" },
+      "backdrop": { "value": "saturate(180%) blur(20px)", "type": "backdropFilter" },
+      "fg":       { "value": "{semantic.light.color.fg2}", "type": "color" },
+      "fontSize": { "value": "{typography.size.subhead}", "type": "dimension" },
+      "activeUnderline": { "value": "{primitive.color.apInk}", "type": "color" },
+      "border":   { "value": "{primitive.color.apHairline}", "type": "color" }
+    },
+
+    "timeline": {
+      "gutter":    { "value": "92px", "type": "dimension" },
+      "rowPadY":   { "value": "24px", "type": "dimension" },
+      "rowGap":    { "value": "20px", "type": "dimension" },
+      "separator": { "value": "{primitive.color.apHairlineSoft}", "type": "color" },
+      "dotSize":   { "value": "6px", "type": "dimension" },
+      "cardShadow": { "value": "none", "type": "boxShadow", "note": "no cards; hairline + whitespace only" },
+      "fields":    { "value": ["scheduledTime", "runTime", "taskName", "reportTitle", "summary", "ratingBadge", "sigma", "dataStage"], "type": "array" }
+    },
+
+    "ratingBadge": {
+      "offensive": {
+        "label": "进攻", "arrow": "▲▲", "icon": "trending-up",
+        "bg": { "value": "{primitive.ratingLight.offensive}", "type": "color" },
+        "fg": { "value": "#ffffff", "type": "color" },
+        "redundancy": "double-up arrow plus icon; never colour alone"
+      },
+      "balanced":  { "label": "均衡", "arrow": "▲",  "icon": "arrow-up",    "bg": { "value": "{primitive.ratingLight.balanced}", "type": "color" },  "fg": { "value": "#ffffff", "type": "color" } },
+      "conflict":  { "label": "信号矛盾", "arrow": "↔", "icon": "shuffle",   "bg": { "value": "{primitive.ratingLight.conflict}", "type": "color" },  "fg": { "value": "#ffffff", "type": "color" }, "note": "neutral slate avoids red/green confusion" },
+      "defensive": { "label": "防守", "arrow": "▼",  "icon": "arrow-down",  "bg": { "value": "{primitive.ratingLight.defensive}", "type": "color" }, "fg": { "value": "#ffffff", "type": "color" } },
+      "avoid":     { "label": "回避", "arrow": "▼▼", "icon": "chevrons-down","bg": { "value": "{primitive.ratingLight.avoid}", "type": "color" },     "fg": { "value": "#ffffff", "type": "color" } },
+      "radius":    { "value": "{radius.xs}", "type": "dimension" },
+      "padding":   { "value": "3px 10px", "type": "dimension" },
+      "fontSize":  { "value": "{typography.size.caption1}", "type": "dimension" }
+    },
+
+    "dataStage": {
+      "intraday": { "label": "盘中时点", "labelEn": "Intraday", "fg": { "value": "#0066cc", "type": "color" }, "bg": { "value": "rgba(0,102,204,0.08)", "type": "color" } },
+      "close":    { "label": "收盘时点", "labelEn": "Close",    "fg": { "value": "{semantic.light.color.fg2}", "type": "color" } }
+    },
+
+    "table": {
+      "border":      { "value": "{primitive.color.apHairline}", "type": "color" },
+      "headFg":      { "value": "{semantic.light.color.fg3}", "type": "color" },
+      "cellPad":     { "value": "12px 16px", "type": "dimension" },
+      "cellFont":    { "value": "{typography.size.subhead}", "type": "dimension" },
+      "headFont":    { "value": "{typography.size.caption1}", "type": "dimension" },
+      "numAlign":    { "value": "right", "type": "textAlign" },
+      "zebra":       { "value": "none", "type": "string", "note": "Apple tables never use zebra striping" },
+      "verticalRule": { "value": "none", "type": "string" }
+    },
+
+    "footer": {
+      "bg":     { "value": "{primitive.color.apSurfaceAlt}", "type": "color" },
+      "fg":     { "value": "{semantic.light.color.fg2}", "type": "color" },
+      "fontSize": { "value": "{typography.size.footnote}", "type": "dimension" },
+      "border": { "value": "{primitive.color.apHairline}", "type": "color" }
+    }
+  },
+
+  "states": {
+    "_comment": "Every stateful component must cover these. Missing any is a blocking defect.",
+    "loading": { "value": "skeleton or progress indicator; preserves layout box to avoid CLS", "type": "spec" },
+    "empty":   { "value": "guidance copy plus a real action; dashed hairline block, no illustration filler", "type": "spec" },
+    "error":   { "value": "specific message plus retry action; never expose technical detail verbatim", "type": "spec" },
+    "populated": { "value": "normal rendering", "type": "spec" },
+    "edge":    { "value": "long titles clamp to two lines; 40+ character Chinese titles wrap without overflow; zero-result state distinct from error", "type": "spec" }
+  }
+}

@@ -1,0 +1,349 @@
+{
+  "date": "2026-10-16",
+  "owner": "seaquake97",
+  "repo": "daily-market-pulse",
+  "branch": "main",
+  "message": "daily: 2026-10-16 (均衡 Σ+0.180)",
+  "files": [
+    {
+      "path": "docs/daily/2026-10-12/entries.json",
+      "bytes": 1446,
+      "sha256_16": "d00bbe0f9a77f34a"
+    },
+    {
+      "path": "docs/daily/2026-10-12/fund-guide.html",
+      "bytes": 117522,
+      "sha256_16": "07f32f86ff83d690"
+    },
+    {
+      "path": "docs/daily/2026-10-12/fund-guide.md",
+      "bytes": 11023,
+      "sha256_16": "1cc2609fad59cf84"
+    },
+    {
+      "path": "docs/daily/2026-10-12/fund-market.html",
+      "bytes": 112933,
+      "sha256_16": "e808aaf3fda67e19"
+    },
+    {
+      "path": "docs/daily/2026-10-12/fund-market.md",
+      "bytes": 7074,
+      "sha256_16": "fdd1136ed0e15d4c"
+    },
+    {
+      "path": "docs/daily/2026-10-12/index.html",
+      "bytes": 81233,
+      "sha256_16": "648488d5c053faee"
+    },
+    {
+      "path": "docs/daily/2026-10-12/meta.json",
+      "bytes": 561,
+      "sha256_16": "c61aa6ad9f8309c7"
+    },
+    {
+      "path": "docs/daily/2026-10-13/daily-review.html",
+      "bytes": 157366,
+      "sha256_16": "55dee9476642eaa9"
+    },
+    {
+      "path": "docs/daily/2026-10-13/entries.json",
+      "bytes": 3504,
+      "sha256_16": "88cb8be00a82f833"
+    },
+    {
+      "path": "docs/daily/2026-10-13/fund-guide.html",
+      "bytes": 117677,
+      "sha256_16": "1740550dfee1ef20"
+    },
+    {
+      "path": "docs/daily/2026-10-13/fund-guide.md",
+      "bytes": 11156,
+      "sha256_16": "19865c2000e0de76"
+    },
+    {
+      "path": "docs/daily/2026-10-13/fund-market.html",
+      "bytes": 114594,
+      "sha256_16": "047f3f7ffebab8b3"
+    },
+    {
+      "path": "docs/daily/2026-10-13/fund-market.md",
+      "bytes": 8208,
+      "sha256_16": "5160f95dfbe9950f"
+    },
+    {
+      "path": "docs/daily/2026-10-13/index.html",
+      "bytes": 88156,
+      "sha256_16": "d194654196ce6b78"
+    },
+    {
+      "path": "docs/daily/2026-10-13/meta.json",
+      "bytes": 662,
+      "sha256_16": "7d58d90cf70da4eb"
+    },
+    {
+      "path": "docs/daily/2026-10-13/stock-assistant.html",
+      "bytes": 114334,
+      "sha256_16": "57381e9d9b435efd"
+    },
+    {
+      "path": "docs/daily/2026-10-13/stock-assistant.md",
+      "bytes": 9426,
+      "sha256_16": "c38267ebee2aa13e"
+    },
+    {
+      "path": "docs/daily/2026-10-13/stock-review.html",
+      "bytes": 115655,
+      "sha256_16": "3b76e1b8359e9a64"
+    },
+    {
+      "path": "docs/daily/2026-10-13/stock-review.md",
+      "bytes": 9934,
+      "sha256_16": "31b17d0efe9cfc94"
+    },
+    {
+      "path": "docs/daily/2026-10-14/daily-review.html",
+      "bytes": 155653,
+      "sha256_16": "18ac4ed4f13d7a0e"
+    },
+    {
+      "path": "docs/daily/2026-10-14/entries.json",
+      "bytes": 3414,
+      "sha256_16": "f6ed4563807336c4"
+    },
+    {
+      "path": "docs/daily/2026-10-14/fund-guide.html",
+      "bytes": 122139,
+      "sha256_16": "641bee50d897c27f"
+    },
+    {
+      "path": "docs/daily/2026-10-14/fund-guide.md",
+      "bytes": 15820,
+      "sha256_16": "b3dddc718e592c37"
+    },
+    {
+      "path": "docs/daily/2026-10-14/fund-market.html",
+      "bytes": 114649,
+      "sha256_16": "853e5227d9e896bb"
+    },
+    {
+      "path": "docs/daily/2026-10-14/fund-market.md",
+      "bytes": 8269,
+      "sha256_16": "ccd722b554e893b5"
+    },
+    {
+      "path": "docs/daily/2026-10-14/index.html",
+      "bytes": 88238,
+      "sha256_16": "bf62130ca4122efc"
+    },
+    {
+      "path": "docs/daily/2026-10-14/meta.json",
+      "bytes": 551,
+      "sha256_16": "dc734413276743c9"
+    },
+    {
+      "path": "docs/daily/2026-10-14/stock-assistant.html",
+      "bytes": 109021,
+      "sha256_16": "55372fcc0d2670ad"
+    },
+    {
+      "path": "docs/daily/2026-10-14/stock-assistant.md",
+      "bytes": 5478,
+      "sha256_16": "0725ff0c62feea88"
+    },
+    {
+      "path": "docs/daily/2026-10-14/stock-review.html",
+      "bytes": 115776,
+      "sha256_16": "dbcd06963a2f5f82"
+    },
+    {
+      "path": "docs/daily/2026-10-14/stock-review.md",
+      "bytes": 11097,
+      "sha256_16": "8bbe6cecfd29c31b"
+    },
+    {
+      "path": "docs/daily/2026-10-15/daily-review.html",
+      "bytes": 157175,
+      "sha256_16": "3e5d3681d6ff7326"
+    },
+    {
+      "path": "docs/daily/2026-10-15/entries.json",
+      "bytes": 3548,
+      "sha256_16": "d674166cdbe56a7a"
+    },
+    {
+      "path": "docs/daily/2026-10-15/fund-guide.html",
+      "bytes": 119901,
+      "sha256_16": "4e0ee2930a18945c"
+    },
+    {
+      "path": "docs/daily/2026-10-15/fund-guide.md",
+      "bytes": 14374,
+      "sha256_16": "95026abe40b5fc13"
+    },
+    {
+      "path": "docs/daily/2026-10-15/fund-market.html",
+      "bytes": 114598,
+      "sha256_16": "ae69105d88d6e9bf"
+    },
+    {
+      "path": "docs/daily/2026-10-15/fund-market.md",
+      "bytes": 8241,
+      "sha256_16": "73664eb663393600"
+    },
+    {
+      "path": "docs/daily/2026-10-15/index.html",
+      "bytes": 88319,
+      "sha256_16": "38d3502cd53f84a5"
+    },
+    {
+      "path": "docs/daily/2026-10-15/meta.json",
+      "bytes": 562,
+      "sha256_16": "7969c30dc856544e"
+    },
+    {
+      "path": "docs/daily/2026-10-15/stock-assistant.html",
+      "bytes": 114263,
+      "sha256_16": "4eaa4350bfba7597"
+    },
+    {
+      "path": "docs/daily/2026-10-15/stock-assistant.md",
+      "bytes": 10179,
+      "sha256_16": "9caf5afef1fd96e5"
+    },
+    {
+      "path": "docs/daily/2026-10-15/stock-review.html",
+      "bytes": 119640,
+      "sha256_16": "0e63d5cdd39ab8b5"
+    },
+    {
+      "path": "docs/daily/2026-10-15/stock-review.md",
+      "bytes": 14120,
+      "sha256_16": "02333c1812892b23"
+    },
+    {
+      "path": "docs/daily/2026-10-16/daily-review.html",
+      "bytes": 158860,
+      "sha256_16": "d773bea1126eba56"
+    },
+    {
+      "path": "docs/daily/2026-10-16/entries.json",
+      "bytes": 2933,
+      "sha256_16": "1caacaf4fee4ca2e"
+    },
+    {
+      "path": "docs/daily/2026-10-16/fund-guide.html",
+      "bytes": 122708,
+      "sha256_16": "4c8f8cc1760f5d16"
+    },
+    {
+      "path": "docs/daily/2026-10-16/fund-guide.md",
+      "bytes": 15375,
+      "sha256_16": "01873228ad4d4f9f"
+    },
+    {
+      "path": "docs/daily/2026-10-16/fund-market.html",
+      "bytes": 174980,
+      "sha256_16": "c04f8884aaa5de72"
+    },
+    {
+      "path": "docs/daily/2026-10-16/fund-market.md",
+      "bytes": 8335,
+      "sha256_16": "877e3a42b3fecc48"
+    },
+    {
+      "path": "docs/daily/2026-10-16/index.html",
+      "bytes": 86023,
+      "sha256_16": "863816a4381fb5bb"
+    },
+    {
+      "path": "docs/daily/2026-10-16/meta.json",
+      "bytes": 542,
+      "sha256_16": "e70820cfa77a4f47"
+    },
+    {
+      "path": "docs/daily/2026-10-16/stock-assistant.html",
+      "bytes": 119325,
+      "sha256_16": "1cb1c7efe8f5e233"
+    },
+    {
+      "path": "docs/daily/2026-10-16/stock-assistant.md",
+      "bytes": 10297,
+      "sha256_16": "ab34a05cdcca6394"
+    },
+    {
+      "path": "docs/index.html",
+      "bytes": 115891,
+      "sha256_16": "4af2e3d5da3296dd"
+    },
+    {
+      "path": "docs/weekly/2026-W42/index.html",
+      "bytes": 116841,
+      "sha256_16": "c6673e8d09882029"
+    },
+    {
+      "path": "docs/monthly/2026-10/index.html",
+      "bytes": 116837,
+      "sha256_16": "9248d76944d8963b"
+    },
+    {
+      "path": "docs/feed.xml",
+      "bytes": 3009,
+      "sha256_16": "625c91ca533f4cbb"
+    },
+    {
+      "path": "docs/rss.xml",
+      "bytes": 3009,
+      "sha256_16": "625c91ca533f4cbb"
+    },
+    {
+      "path": "docs/api/feed.json",
+      "bytes": 15286,
+      "sha256_16": "17ee041651f46269"
+    },
+    {
+      "path": "docs/subscribe/index.html",
+      "bytes": 77408,
+      "sha256_16": "b14360cfdd13c38d"
+    },
+    {
+      "path": "docs/sitemap.xml",
+      "bytes": 979,
+      "sha256_16": "815dbc1eb19202a6"
+    },
+    {
+      "path": "docs/methodology/index.html",
+      "bytes": 77285,
+      "sha256_16": "bbefa52ab4745242"
+    }
+  ],
+  "push_channel": "local git + fine-grained PAT（scripts/push_repo.py；令牌存 ~/.config/gh-ip/token，不入命令行/remote URL/.git/config）",
+  "sanitize": {
+    "applied": true,
+    "report_path": "evidence/sanitize-report.json",
+    "files_changed": 4,
+    "manual_review": 0,
+    "stale_forced": 0
+  },
+  "render": {
+    "count": 1,
+    "slugs": [
+      "fund-guide"
+    ]
+  },
+  "push_command": [
+    "python3",
+    "/Users/lianghaizhen/WorkBuddy/2026-10-14-10-29-45/github-ip-plan/scripts/push_repo.py",
+    "--stage",
+    "/Users/lianghaizhen/WorkBuddy/2026-10-14-10-29-45/github-ip-plan/_stage",
+    "--owner",
+    "seaquake97",
+    "--repo",
+    "daily-market-pulse",
+    "--branch",
+    "main",
+    "--message",
+    "daily: 2026-10-16 (均衡 Σ+0.180)"
+  ],
+  "pushed": false,
+  "created_at": "2026-10-16T20:52:15"
+}

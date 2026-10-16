@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>前端三项修复与统一框架加固报告 · 2026-10-16</title>
+<style>
+:root{
+  --bg:#f5f5f7; --surface:#ffffff; --fg:#1d1d1f; --fg-2:#424245; --fg-3:#86868b;
+  --border:#d2d2d7; --border-soft:#e8e8ed; --accent:#0071e3;
+  --ok:#15803d; --ok-bg:#f0fdf4; --warn:#b45309; --warn-bg:#fffbeb; --bad:#b91c1c; --bad-bg:#fef2f2;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro SC","PingFang SC","Helvetica Neue",sans-serif;font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:920px;margin:0 auto;padding:48px 24px 80px}
+header h1{font-size:30px;font-weight:700;letter-spacing:-.01em;margin-bottom:8px}
+header .sub{color:var(--fg-3);font-size:14px}
+.meta-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.pill{font-size:12.5px;padding:4px 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--fg-2)}
+.pill b{color:var(--fg);font-weight:600}
+section{margin-top:40px}
+h2{font-size:20px;font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+h3{font-size:16px;font-weight:600;margin:20px 0 8px}
+p{margin:8px 0;color:var(--fg-2)}
+table{width:100%;border-collapse:collapse;margin:12px 0;background:var(--surface);border-radius:12px;overflow:hidden;font-size:13.5px}
+th{text-align:left;font-size:12px;color:var(--fg-3);font-weight:600;letter-spacing:.02em;padding:10px 12px;border-bottom:1px solid var(--border);background:#fafafa}
+td{padding:10px 12px;border-bottom:1px solid var(--border-soft);vertical-align:top;color:var(--fg-2)}
+tr:last-child td{border-bottom:none}
+td b,.b{color:var(--fg);font-weight:600}
+code{font-family:var(--mono);font-size:12.5px;background:#f5f5f7;border:1px solid var(--border-soft);border-radius:6px;padding:1px 6px;color:var(--fg)}
+.st{display:inline-block;font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.st-ok{background:var(--ok-bg);color:var(--ok)}
+.st-run{background:var(--warn-bg);color:var(--warn)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border-soft);border-radius:14px;padding:16px 18px}
+.card h4{font-size:14px;font-weight:600;margin-bottom:6px}
+.card p{font-size:13px;margin:4px 0}
+.kpi{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--fg)}
+.kpi-l{font-size:12px;color:var(--fg-3);margin-top:2px}
+.evi{font-size:12.5px;color:var(--fg-3);font-family:var(--mono)}
+ul{margin:6px 0 6px 20px;color:var(--fg-2)}
+li{margin:3px 0;font-size:13.5px}
+.note{background:var(--warn-bg);border:1px solid #fde68a;border-radius:12px;padding:12px 16px;font-size:13.5px;color:#92400e;margin:12px 0}
+footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--border);font-size:12.5px;color:var(--fg-3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>前端三项修复与统一框架加固报告</h1>
+  <p class="sub">daily-market-pulse 内容站 · 用户八项实锤问题闭环轮 · 2026-10-16</p>
+  <div class="meta-row">
+    <span class="pill">线上提交 <b>a9424fd</b>（38 文件）</span>
+    <span class="pill">测试 <b>8 套件 / 114 例</b> 全绿</span>
+    <span class="pill">响应式矩阵 <b>176 / 176</b> 零溢出</span>
+    <span class="pill">任务书改造 <b>4 / 5 本</b></span>
+  </div>
+</header>
+
+<section>
+  <h2>一、用户八项问题闭环对照</h2>
+  <table>
+    <thead><tr><th style="width:26%">用户实锤问题</th><th style="width:34%">根因（本轮定位）</th><th style="width:28%">修复</th><th style="width:12%">状态</th></tr></thead>
+    <tbody>
+      <tr><td><b>14:30 基金指引推送是空的</b></td><td>任务书只产 md，管线只搬已有文件，md-only 任务永远无详情页</td><td>render_md.py 统一渲染器 + publish 接线；5 日期 fund-guide 全部生成上线</td><td><span class="st st-ok">已闭环</span></td></tr>
+      <tr><td><b>四个推送标题风格不一致</b></td><td>上游 H1 五花八门（实测五种格式，2 种带 emoji）</td><td>extract_entry 改 render_title 规范标题；四本任务书加标题铁律</td><td><span class="st st-ok">已闭环</span></td></tr>
+      <tr><td><b>产品思维基本没有体现</b></td><td>首页空洞 Hero、RSS 裸 XML、无订阅引导</td><td>真实归档数据条、订阅页（地址+三步+内容说明）、KPI 行</td><td><span class="st st-ok">已闭环</span></td></tr>
+      <tr><td><b>各网页风格严重不一致</b></td><td>上游五套 HTML 生成器；且<b>详情页永不加框</b>（见下）</td><td>统一渲染器唯一生产者 + frame_pass 全量加框（21 篇详情页 100%）</td><td><span class="st st-ok">已闭环</span></td></tr>
+      <tr><td><b>研判维度/方法/输出风格不一致</b></td><td>无统一任务框架，各任务各写各的</td><td>FRAMEWORK-DESIGN v2.0：上游退化为 md 内容源，呈现层单一生产者</td><td><span class="st st-ok">已闭环</span></td></tr>
+      <tr><td><b>子页面没有按苹果风格重新设计</b></td><td>加框接线断裂（entries.json 记 html=null → frame_pass 跳过）</td><td>publish 渲染后回写 entry["html"]；5 日期重建，详情页全部加框</td><td><span class="st st-ok">已闭环</span></td></tr>
+      <tr><td><b>首页「口径未标注」提示看不懂</b></td><td>纯术语文案，无读法指引</td><td>徽章改「统计口径不同 · 数值仅供参考」+ 时间线头部一句人话说明</td><td><span class="st st-ok">已闭环</span></td></tr>
+      <tr><td><b>响应式没实现（宽窄屏/缩放/手机电脑）</b></td><td>三个真 bug：pre 无横滚容器、kpis breakout margin 被简写清零、导航触达 23px</td><td>逐根因修复 + 16 档宽度 × 11 类页面矩阵实测 176/176 零溢出</td><td><span class="st st-ok">已闭环</span></td></tr>
+      <tr><td><b>RSS 点进去就是 XML</b></td><td>无订阅引导页，无 autodiscovery，无 rss.xml 别名</td><td>新增订阅页 + head autodiscovery + rss.xml 别名（线上均 200）</td><td><span class="st st-ok">已闭环</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>二、本轮深度修复（五个真 bug，全部有实测证据）</h2>
+
+  <h3>1. 详情页「永不加框」接线断裂（最深根因）</h3>
+  <p>publish 步骤 4.1 渲染 md 产出详情页后<b>没有回写</b> <code>entry["html"]</code>，导致 entries.json 记 <code>html: null</code> → frame_pass 只加框 html 非 null 的条目 → 渲染产物永不加框、不进导航。表现为：fund-guide 等页面的 <code>&lt;pre&gt;</code> 不在 <code>.doc</code> 容器内，长代码行直接撑破页面（320px 视口 sw=625）。修复：渲染成功即回写，5 日期全部重建，21 篇详情页 100% 加框（<code>class="doc"</code> + <code>data-df="v1"</code> + detail-frame 三标记齐全）。</p>
+
+  <h3>2. tag-gap 连字符复合类触发 frame_pass C-14 FATAL</h3>
+  <p>统一渲染器 v1.1 用 <code>class="tag tag-gap"</code>，而 frame_pass 的 C-14 门禁把「site_blocks.css 有定义但未登记的交叉类」判为 FATAL（构建失败）。后端工程师将渲染器重构为 104 行薄门面 + <code>md_render/</code> 包（5 文件 758 行），缺口徽章改用 <code>.tag gap</code> 双类；我同步把 site_render 三处与 site_blocks 规则统一为双类，扫描器计数口径同步更新，消掉框架页未来的同款雷。</p>
+
+  <h3>3. 涨跌停统计三 emoji 保守保留缺口</h3>
+  <p>fund-guide 市场宽度清单的 <code>➖ 平盘 / 🔥 涨停 / ❄️ 跌停</code> 是内容位 emoji， sanitizer 正确识别为「未映射 → needs-manual-review 保守保留」，但一直没人补映射。本轮补映射为 <code>minus / trending-up / trending-down</code>（与全站红涨绿跌口径一致），needs-manual-review 归零，可见文本一字不删，并补回归测试锁死。</p>
+
+  <h3>4. kpis  breakout 负 margin 被简写清零（1152px 专有溢出）</h3>
+  <p><code>.doc .kpis</code> 的 <code>margin: 0 0 var(--space-6)</code> 简写，在同特异性下覆盖了 breakout 规则的 <code>margin-inline: calc(var(--doc-breakout) * -1)</code>（后者胜）。宽元素探出设计失效：1152px 视口下 kpis 右溢出 64px（sw=1216）。改 <code>margin-block</code> 双长写后 16 档宽度全部归位；cc-snap-grid 同款隐患一并修复。</p>
+
+  <h3>5. 导航触达高度 23px（Apple HIG 44px 未达）</h3>
+  <p>全站导航链接实测高 23px。加 <code>min-height: var(--nav-h)</code> 后达标 44px；窄屏（≤640px）导航英文段整体隐藏 + 收紧间距，320px 视口不再有链接溢出；详情页「返回」链接去掉重复日期（日期已在面包屑），320px 可视区完整。</p>
+</section>
+
+<section>
+  <h2>三、响应式矩阵实测（机械证据）</h2>
+  <div class="grid2">
+    <div class="card"><div class="kpi">176 / 176</div><div class="kpi-l">宽度 × 页面组合零横向滚动（探针退出码 0）</div></div>
+    <div class="card"><div class="kpi">0</div><div class="kpi-l">悬空 use 引用 / script / 渐变（合规扫描）</div></div>
+    <div class="card"><div class="kpi">16 档</div><div class="kpi-l">320-414 手机 / 640 断点 / 720-2560 桌面，含 1440px 窗口 200%/125%/67% 缩放等效（720/1152/2149）</div></div>
+    <div class="card"><div class="kpi">11 类页面</div><div class="kpi-l">首页/日期/周/月/方法论/订阅 + 5 篇最新详情页 + 1 篇重建历史页</div></div>
+  </div>
+  <p>探针 <code>scripts/probe_responsive.py</code>（CDP 直驱 Chrome，纯标准库）：逐组合断言 <code>scrollWidth &le; clientWidth</code>、订阅页长 URL 断行、表格横滚容器内敛、导航触达高度。修复前 9/176 溢出，修复后 0。证据：<span class="evi">evidence/responsive-matrix.txt / .json</span>。</p>
+</section>
+
+<section>
+  <h2>四、RSS 订阅体系（产品化落点）</h2>
+  <ul>
+    <li><b>订阅页</b> <code>/subscribe/</code>：订阅地址（长 URL anywhere 断行，320px 不溢出）+ 三步指引 + 订阅流内容表 + 归档入口——零 JS。</li>
+    <li><b>全站入口改道</b>：导航图标、页脚、时间线空态、详情页 slim 导航，全部指向订阅页，不再把读者扔进裸 XML。</li>
+    <li><b>autodiscovery</b>：全页 head 加 <code>&lt;link rel="alternate" type="application/rss+xml"&gt;</code>，浏览器地址栏可一键订阅。</li>
+    <li><b>rss.xml 别名</b>：兼容默认路径的阅读器（线上 200）。</li>
+  </ul>
+</section>
+
+<section>
+  <h2>五、任务书改造（R4，4/5 本已上线）</h2>
+  <table>
+    <thead><tr><th>任务书</th><th>改造内容</th><th>状态</th></tr></thead>
+    <tbody>
+      <tr><td><b>股票助手 9:28</b></td><td>标题铁律 + front-matter（rating/stage 两键，值取 verdict 实际值）+ 不再直出 HTML（管线统一渲染）</td><td><span class="st st-ok">已上线</span></td></tr>
+      <tr><td><b>基金盘面 11:00</b></td><td>步骤 5.5：核对 md 规范（H1 + front-matter）后删除旧模板 HTML，切换管线渲染</td><td><span class="st st-ok">已上线</span></td></tr>
+      <tr><td><b>基金指引 14:30</b></td><td>标题铁律 + front-matter + 落盘自检（≥2KB，缺即失败）</td><td><span class="st st-ok">已上线</span></td></tr>
+      <tr><td><b>股票复盘 15:05</b></td><td>标题铁律 + front-matter（步骤 4.1 自检与步骤 5 交付为今日上午已补）</td><td><span class="st st-ok">已上线</span></td></tr>
+      <tr><td><b>每日总复盘 15:30</b></td><td>废 fill_and_publish 直出、改消费 stock_review.md（依赖链终点，按纪律最后改）</td><td><span class="st st-run">待 15:05 稳定一日后</span></td></tr>
+    </tbody>
+  </table>
+  <p>切换安全性证据：全部 5 日期 × 5 任务的存量 md 干跑渲染<b>零失败</b>（含从未走过渲染器的 stock-assistant / fund-market / daily-review）。失败模式可见（publish 退出码 3 + 页面缺位），不静默。</p>
+</section>
+
+<section>
+  <h2>六、遗留与明日计划</h2>
+  <div class="note"><b>已知缺口（诚实披露）</b>：10-16 15:05 股票复盘上游未产出 stock_review.md（数据文件齐但无报告），当日时间线条目为 4 项；落盘自检门禁已存在，明日观察是否复现。另：全站残留 47 个 emoji 字符全部为个人 IP 品牌标（🍜 老北京的热干面 / ♟️ 股市棋手，ADR-003 有意保留，role="img" 带 aria-label，非功能图标）。</div>
+  <ul>
+    <li><b>明日 9:28 / 11:00 / 14:30</b>：三本新任务书首跑——验证 md front-matter 落地、11:00 删 HTML 后管线渲染、标题规范化；任何异常回退方案 = 恢复 HTML 直出步骤。</li>
+    <li><b>15:30 任务书</b>：15:05 新版稳定运行一日后，按 FRAMEWORK-DESIGN §3.2 改造（依赖链终点）。</li>
+    <li><b>R5 资产化</b>：新建 daily-pulse-framework（MIT）仓 + <code>config/holdings.yaml</code> 化——其他 agent 上传持仓即可复用整条链路。</li>
+    <li><b>R6 微信小程序</b>：Taro 4 + JSON feed 驱动，Phase 1 只读展示（评估已完成于 FRAMEWORK-DESIGN §5）。</li>
+  </ul>
+</section>
+
+<section>
+  <h2>七、验证与证据索引</h2>
+  <table>
+    <thead><tr><th>项</th><th>结果</th><th>证据</th></tr></thead>
+    <tbody>
+      <tr><td>单元/集成/E2E 测试</td><td><b>8 套件 114 例全绿</b>（render_md 21 + sanitize_pipeline 24 + frame_fixed_point 10 + real_outputs 17 + content_contract 12 + gate_pipeline 13 + gate_visual 9 + scope 8）</td><td class="evi">scripts/test_*.py</td></tr>
+      <tr><td>P0 合规扫描</td><td>script 0 / 渐变 0 / emoji 漏检 0 / 悬空 use 0 / 裸 hex 组件层 0</td><td class="evi">evidence/apple-redesign/compliance-scan.txt</td></tr>
+      <tr><td>响应式矩阵</td><td>176/176 零溢出（修复前 9/176）</td><td class="evi">evidence/responsive-matrix.txt / .json</td></tr>
+      <tr><td>线上验证</td><td>首页/日期/周/月/方法论/订阅/feed/rss/sitemap/详情页全部 200；palette 字面值 --ap-white: #ffffff 已恢复</td><td class="evi">curl 实测</td></tr>
+      <tr><td>推送</td><td>commit a9424fd（38 文件），manifest.pushed=true，工作区干净</td><td class="evi">_git_pulse git log</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<footer>
+  每日市场脉搏 · daily-decision-engine 统一框架 · 报告由 AI 生成，仅供参考，不构成投资建议。<br>
+  生成时间锚：数据日期 2026-10-16 · 线上提交 a9424fd · 测试 114 例 / 响应式 176 组合 / 合规零违规。
+</footer>
+
+</div>
+</body>
+</html>

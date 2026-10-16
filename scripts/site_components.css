@@ -1,0 +1,162 @@
+/* ============================================================================
+ * site_components.css — 站点组件层（布局与组件形态）
+ *
+ * 铁律（APPLE-DESIGN-SPEC §11）：
+ *   1. 本文件不定义任何颜色 / 字号 / 间距字面量，一律 var(--token) 引用；
+ *   2. 零 gradient —— 深度来自背景明度分层，卡片 box-shadow: none；
+ *   3. 零弹跳缓动 —— 只用 Token 里的减速曲线；
+ *   4. 零彩色左边框卡片 —— 分组靠 hairline 与背景分层；
+ *   5. tracking 一律走 --tracking-*（CJK 安全值），禁止手写 -0.028em。
+ * Token 层由 site_theme.inject_tokens() 在其之前注入。
+ * ========================================================================== */
+/* ============================== RESET ==================================== */
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+html{ -webkit-text-size-adjust:100%; scroll-padding-top:calc(var(--nav-h) + var(--localnav-h) + 16px); }
+body{
+  font-family:var(--font-text); background:var(--bg); color:var(--fg);
+  font-size:var(--fs-body); line-height:var(--lh-body); letter-spacing:var(--tracking-body);
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  font-feature-settings:var(--numeric-feature); overflow-x:hidden;
+}
+a{ color:inherit; text-decoration:none; }
+ul{ list-style:none; }
+img,svg{ display:block; max-width:100%; }
+time{ font-variant-numeric:var(--numeric); }
+
+/* 视觉隐藏但保留给读屏的文本（RSS 链接的「RSS 订阅」四字） */
+.sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+
+/* 键盘可达：统一焦点环，绝不移除 */
+:focus-visible{ outline:var(--focus-ring-width) solid var(--focus-ring-color); outline-offset:var(--focus-ring-offset); border-radius:var(--radius-xs); }
+a:focus-visible{ outline-offset:3px; }
+
+.skip-link{
+  position:absolute; left:var(--space-3); top:var(--space-2); z-index:calc(var(--z-toast) + 1);
+  background:var(--accent); color:var(--fg-on-accent); font-size:var(--fs-footnote);
+  font-weight:var(--fw-medium); padding:10px 18px; border-radius:var(--radius-pill);
+  min-height:44px; display:inline-flex; align-items:center;
+  transform:translateY(-160%); transition:transform var(--motion-base) var(--ease-out);
+}
+.skip-link:focus{ transform:translateY(0); }
+@media (prefers-color-scheme:dark){ .skip-link{ color:var(--ap-black); } }
+
+/* ============================ 排版基元 ==================================== */
+.t-title1{ font-family:var(--font-display); font-size:var(--fs-title1); line-height:var(--lh-title1); letter-spacing:var(--tracking-title1); font-weight:var(--fw-bold); }
+.t-title2{ font-family:var(--font-display); font-size:var(--fs-title2); line-height:var(--lh-title2); letter-spacing:var(--tracking-title2); font-weight:var(--fw-semibold); }
+.t-title3{ font-family:var(--font-display); font-size:var(--fs-title3); line-height:var(--lh-title3); letter-spacing:var(--tracking-title3); font-weight:var(--fw-semibold); }
+.t-title4{ font-family:var(--font-display); font-size:var(--fs-title4); line-height:var(--lh-title4); letter-spacing:var(--tracking-title4); font-weight:var(--fw-semibold); }
+.t-body{ font-size:var(--fs-body); line-height:var(--lh-body); letter-spacing:var(--tracking-body); }
+.t-callout{ font-size:var(--fs-callout); line-height:var(--lh-callout); letter-spacing:var(--tracking-callout); }
+.t-subhead{ font-size:var(--fs-subhead); line-height:var(--lh-subhead); letter-spacing:var(--tracking-subhead); }
+.t-footnote{ font-size:var(--fs-footnote); line-height:var(--lh-footnote); letter-spacing:var(--tracking-footnote); }
+.t-caps{ text-transform:uppercase; letter-spacing:var(--tracking-caps); font-size:var(--fs-caption1); font-weight:var(--fw-semibold); }
+/* 数字一律等宽，价格与 Σ 值刷新不跳动 */
+.num,.issue-date,.tl-sched,.tl-sigma,.kpi dd{
+  font-family:var(--font-mono); font-variant-numeric:var(--numeric);
+  font-feature-settings:var(--numeric-feature); letter-spacing:-.02em;
+}
+
+/* ============================== 图标 ====================================== */
+.ic{ width:var(--icon-size-inline); height:var(--icon-size-inline); flex:0 0 auto;
+  stroke:currentColor; stroke-width:var(--icon-stroke); stroke-linecap:round;
+  stroke-linejoin:round; fill:none; }
+.ic-20{ width:var(--icon-size-btn); height:var(--icon-size-btn); }
+.ic-24{ width:var(--icon-size-stand); height:var(--icon-size-stand); }
+/* 连续圆角渐进增强：corner-shape 的 CSS 属性名是 squircle，语义即 superellipse(2)，
+   与 border-radius 协作（仅在 border-radius 非零时生效）。Safari/Firefox 自然回落。 */
+@supports (corner-shape: superellipse(2)){ :root{ --corner-shape:superellipse(2); } }
+@supports (corner-shape: squircle){ :root{ --corner-shape:squircle; } }
+
+/* ============================== 导航 ====================================== */
+.nav{
+  position:sticky; top:0; z-index:var(--z-nav); background:var(--nav-bg);
+  -webkit-backdrop-filter:var(--nav-blur); backdrop-filter:var(--nav-blur);
+  border-bottom:1px solid var(--nav-border);
+}
+.nav-in{
+  max-width:var(--container-wide); margin:0 auto; padding:0 var(--gutter-tablet);
+  height:var(--nav-h); display:flex; align-items:center; gap:var(--space-6);
+}
+.nav-brand{
+  font-family:var(--font-display); font-size:var(--fs-subhead); font-weight:var(--fw-semibold);
+  letter-spacing:var(--tracking-subhead); color:var(--fg); white-space:nowrap;
+  display:inline-flex; align-items:center; gap:7px; flex-shrink:0;
+}
+.nav-brand .mark{ width:18px; height:18px; color:var(--accent); }
+.nav-links{ display:flex; align-items:center; gap:var(--space-5); margin-left:auto; overflow-x:auto; scrollbar-width:none; }
+.nav-links::-webkit-scrollbar{ display:none; }
+.nav-links a{
+  font-size:var(--fs-footnote); color:var(--nav-fg); white-space:nowrap; padding:2px 0;
+  position:relative; display:inline-flex; align-items:center; gap:5px;
+  min-height:var(--nav-h);   /* Apple HIG：44px 最小触达高（探针实测 23px 返工） */
+  transition:color var(--motion-fast) var(--ease-out);
+}
+.nav-links a:hover{ color:var(--nav-fg-hover); }
+.nav-links a[aria-current="page"]{ color:var(--nav-fg-active); font-weight:var(--fw-medium); }
+.nav-links a[aria-current="page"]::after{
+  content:""; position:absolute; left:0; right:0; bottom:-1px;
+  height:var(--localnav-active-underline); background:var(--nav-underline);
+}
+@media (max-width:640px){
+  .nav-links a[data-optional]{ display:none; }
+  /* 窄屏：英文段整体隐藏 + 收紧间距，导航在 320px 也不溢出（探针实测返工） */
+  .nav-links .nav-en{ display:none; }
+  .nav-links{ gap:var(--space-4); }
+  .nav-in{ gap:var(--space-4); }
+}
+
+/* ============================== 容器 ====================================== */
+.shell{ max-width:var(--container-max); margin:0 auto; padding:0 var(--gutter-tablet); }
+.shell-narrow{ max-width:var(--container-narrow); }
+.shell-prose{ max-width:var(--container-prose); }
+.frame{ padding-top:var(--space-12); }
+.frame + .frame{ border-top:1px solid var(--border-soft); }
+.band-alt{ background:var(--surface-alt); }
+
+/* ============================== 面包屑 ==================================== */
+.crumb{ font-size:var(--fs-footnote); color:var(--crumb-fg); padding:var(--space-6) 0 0;
+  display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.crumb a{ display:inline-flex; align-items:center; gap:5px; transition:color var(--motion-fast) var(--ease-out); }
+.crumb a:hover{ color:var(--crumb-fg-hover); }
+.crumb .sep{ color:var(--border); }
+
+/* ============================== 页头 ====================================== */
+.page-head{ padding:var(--space-12) 0 var(--space-10); }
+.page-head .eyebrow{ display:flex; align-items:center; gap:var(--space-2); color:var(--fg-3); margin-bottom:var(--space-3); flex-wrap:wrap; }
+.page-head h1{ margin-bottom:var(--space-3); }
+.page-head h1 .sub{
+  display:block; font-family:var(--font-display); font-size:var(--fs-title3);
+  line-height:var(--lh-title3); letter-spacing:var(--tracking-title3);
+  font-weight:var(--fw-semibold); color:var(--fg-3); margin-top:var(--space-2);
+}
+.page-head .lede{ color:var(--fg-2); max-width:var(--container-prose); }
+.page-head .lede-en{ color:var(--fg-3); font-size:var(--fs-subhead); margin-top:var(--space-2); max-width:var(--container-prose); }
+.page-head .meta{ margin-top:var(--space-6); display:flex; align-items:center; gap:var(--space-2); flex-wrap:wrap; font-size:var(--fs-footnote); color:var(--fg-3); }
+
+/* 归档数据条：真实内容，不是口号 */
+.archive-strip{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+}
+.archive-strip > div{ padding:var(--space-5) var(--space-4); border-left:1px solid var(--border-soft); }
+.archive-strip > div:first-child{ border-left:none; padding-left:0; }
+.archive-strip dt{ font-size:var(--fs-caption1); color:var(--fg-3); letter-spacing:var(--tracking-caption); margin-bottom:6px; }
+.archive-strip dd{ font-family:var(--font-mono); font-size:var(--fs-title4); font-weight:var(--fw-semibold); color:var(--fg); font-variant-numeric:var(--numeric); letter-spacing:-.02em; }
+.archive-strip dd .u{ font-size:var(--fs-footnote); color:var(--fg-3); font-weight:var(--fw-regular); margin-left:3px; }
+.archive-strip dd .txt{ font-family:var(--font-text); font-size:var(--fs-subhead); font-weight:var(--fw-regular); padding-top:4px; }
+@media (max-width:640px){
+  .archive-strip{ grid-template-columns:1fr 1fr; }
+  .archive-strip > div{ padding:var(--space-4) 0; border-left:none; border-top:1px solid var(--border-soft); }
+  .archive-strip > div:nth-child(-n+2){ border-top:none; }
+  .archive-strip > div:nth-child(odd){ padding-right:var(--space-3); }
+}
+
+/* ============================== 区块标题 ================================== */
+.sec-head{ display:flex; align-items:baseline; gap:var(--space-4); flex-wrap:wrap; margin-bottom:var(--space-8); }
+.sec-head h2{ flex-shrink:0; }
+.sec-head .spacer{ flex:1 1 auto; }
+.sec-head .aside{ font-size:var(--fs-footnote); color:var(--fg-3); display:inline-flex; align-items:center; gap:6px; }
+/* 区块说明行：徽章体系的读法锚点——口径徽章说「是什么」，这句说「怎么读」 */
+.sec-note{ display:flex; align-items:flex-start; gap:6px; color:var(--fg-3);
+  max-width:var(--container-prose); margin-top:calc(-1 * var(--space-5)); margin-bottom:var(--space-7); }
+.sec-note .ic{ margin-top:3px; flex:0 0 auto; }

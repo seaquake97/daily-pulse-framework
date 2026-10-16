@@ -1,0 +1,189 @@
+# =============================================================================
+# holdings.example.yaml — daily-pulse-framework 持仓配置示例
+#
+# 用法：
+#   cp holdings.example.yaml holdings.yaml   # 然后只改下面三段
+#   python3 scripts/validate_config.py --config holdings.yaml
+#
+# 设计契约（三条硬规则，改前必读）：
+#
+#   1. 本文件是「事实源」。持仓、网格参数、基金——禁止写进任何脚本、提示词、
+#      定时任务配置。引擎只从本文件读。
+#   2. 只有 required 字段是必填。snapshot 段是可选缓存，管线每次取数后回写，
+#      缺失按 null 处理，且绝不参与信号评分（快照是产物，不是事实）。
+#   3. 本文件不要提交到公开仓。放本地或私有仓，或用 .gitignore 排除。
+#      框架仓只提交 holdings.example.yaml。
+#
+# 与 MEMORY.md 的关系（迁移期可双向共存）：
+#   - 旧路径：MEMORY.md 三表 → parse_holdings.py 按列位置解析
+#   - 新路径：本文件 → validate_config.py → holdings.json
+#   parse_holdings.py 行为不变（回退通道仍然可用），详见 ARCH-R5-FRAMEWORK.md §4
+# =============================================================================
+
+# 契约版本。major 变更需要跑迁移脚本；不要手改这个数字。
+version: 1
+
+profile:
+  # 配置归属人。仅用于产物署名与 git 提交追踪，不参与任何计算。
+  owner: "your-name"
+  base_currency: CNY
+  # investing = 完整三层免责声明（对外发布研判内容必用）
+  # personal  = 个人自用存档，页脚仅一行风险提示
+  disclaimer_profile: investing
+
+market_data:
+  # 框架铁律：行情只走 MCP，禁止 HTTP 爬虫替代。
+  source: westock-mcp
+  # 第二来源仅可作交叉验证，且必须在产物中标注「交叉源」。
+  allow_cross_source: false
+
+# =============================================================================
+# 第一段：股票持仓
+# 对应 MEMORY.md「股票持仓」表。列映射（MEMORY → 本文件）：
+#   标的→name  代码→code  持仓→shares  可用→available
+#   成本→cost  现价→（不填，取数实时来）  市值/盈亏额/盈亏率/当日盈亏
+#   →（全部属于 snapshot，引擎每次运行重算）
+# 当日盈亏与状态描述不进配置——它们是每日变量，写进配置只会制造脏数据。
+# =============================================================================
+holdings:
+  stocks:
+    - code: "600919"
+      name: "示例银行"
+      shares: 100
+      available: 100
+      cost: 1.696
+      note: "高位止盈后留底仓收息"
+
+    - code: "003816"
+      name: "示例核电"
+      shares: 100
+      available: 100
+      cost: 1.511
+      note: "留底仓观望"
+
+    - code: "000001"
+      name: "示例科技"
+      shares: 500
+      available: 400          # 有 T+1 冻结时可用 < 持仓
+      cost: 18.323
+      note: "特高压龙头，浮盈持有"
+
+    # ETF 同段填写，代码走 6 位基金代码（如 563230），解析器按前缀规则补市场。
+    - code: "563230"
+      name: "示例ETF"
+      shares: 20000
+      available: 19000
+      cost: 1.385
+      note: "低吸加仓，成本摊薄至1.385"
+
+  # ---------------------------------------------------------------------------
+  # 第二段：网格交易参数
+  # 对应 MEMORY.md「网格交易参数」表。列映射：
+  #   标的→name  证券代码→code  基准价→base_price
+  #   价格区间「18.50 - 24.50」→range_low + range_high（拆两列，不保留字符串）
+  #   网格步长→step_pct（2.5% → 2.5，数值不带 % 号）
+  #   单笔数量→per_trade  最小底仓→min_position  最大顶仓→max_position
+  #   委托档位→（不填，纯券商 UI 概念，与计算无关）
+  #   当前状态与操作指引→guide
+  #
+  # 非网格标的用 enabled: false 表达，保留底仓上下限。
+  # 这一点很重要：MEMORY.md 里江苏银行/中国广核/上海金三行就是 enabled:false 的形态
+  # （区间/步长均为「-」），不要因为不跑网格就把它们删掉——底仓信息要留档。
+  # ---------------------------------------------------------------------------
+  grid:
+    - code: "600312"
+      name: "示例电气"
+      enabled: true
+      base_price: 20.40
+      range_low: 18.50
+      range_high: 24.50
+      step_pct: 2.5
+      per_trade: 100
+      min_position: 300
+      max_position: 1000
+      guide: "持仓500股，可用400股，21.00以上分批高抛做T"
+
+    - code: "000791"
+      name: "示例能源"
+      enabled: true
+      base_price: 7.05
+      range_low: 6.50
+      range_high: 8.50
+      step_pct: 2.5
+      per_trade: 500
+      min_position: 1000
+      max_position: 3500
+      guide: "冲高7.25-7.40高抛500股"
+
+    - code: "159611"
+      name: "示例电力ETF"
+      enabled: true
+      base_price: 1.045
+      range_low: 0.980
+      range_high: 1.150
+      step_pct: 1.5
+      per_trade: 500
+      min_position: 2000
+      max_position: 5000
+      guide: "1.020-1.025挂买，1.065挂卖"
+
+    # 底仓长线持有：enabled: false，区间与步长留 null，但底仓上下限仍要填。
+    - code: "600919"
+      name: "示例银行"
+      enabled: false
+      min_position: 100
+      max_position: 1000
+      guide: "仅剩100股底仓，非网格，长线收息"
+
+  # ---------------------------------------------------------------------------
+  # 第三段：基金持仓
+  # 对应 MEMORY.md「基金持仓」表。列映射：
+  #   标的→name  代码→code  金额→amount
+  #   持有收益/昨日收益/占纯基金比→（不填，属于 snapshot）
+  #   交易/定投在途→plan（枚举化，见 schema）+ guide
+  #   备注→note
+  #
+  # plan 枚举（对应 schema definitions.fund.properties.plan）：
+  #   regular          普通定投
+  #   smart            智慧定投
+  #   smart_take_profit 智慧止盈定投
+  #   holding          定投持仓（无在途）
+  #   none             无计划
+  #
+  # 黄金/实物贵金属：asset_class: gold，code 可省略（解析器填 GOLD）。
+  # 统计口径上 gold 单列 gold_amount，不并入 fund_amount——这与 MEMORY.md
+  # 里「纯基金 59,415.24 + 黄金 3,907.41」的原始口径一致，不要合并。
+  # ---------------------------------------------------------------------------
+  funds:
+    - code: "000979"
+      name: "示例沪港深精选A"
+      asset_class: fund
+      amount: 15080.21
+      plan: smart
+      note: "智慧定投"
+
+    - code: "017641"
+      name: "示例标普500指数A"
+      asset_class: fund
+      amount: 5562.90
+      plan: regular
+      note: "QDII"
+
+    - code: "007466"
+      name: "示例红利低波联接C"
+      asset_class: fund
+      amount: 4000.16
+      plan: holding
+
+    - asset_class: gold
+      name: "黄金（实物/积存金）"
+      amount: 3907.41
+      note: "宏观防御，不参与定投计算"
+
+# =============================================================================
+# 可选：快照段。管线每次取数后回写，仅供站点展示与人工对账。
+# 严禁把这里的数字当事实源——它每天都会过期。
+# =============================================================================
+snapshot:
+  as_of: "2026-01-01"
+  note: "示例快照，首次运行时会被覆盖"

@@ -1,0 +1,706 @@
+/* ============================================================================
+ * detail-frame.css — 上游详情页阅读框架 · 扩展层（v1.0 · 2026-10-15）
+ *
+ * 适用对象：daily/<date>/stock-assistant.html · fund-market.html ·
+ *           daily-review.html 等上游任务自产 HTML（经 sanitizer 净化后）。
+ * 注入方式：由 frame_pass.py 在 </head> 前内联，顺序为
+ *           design-tokens.css → site_components.css → site_blocks.css → 本文件。
+ *           本文件必须最后注入 —— 与上游 <style> 同等特异性时靠级联次序胜出。
+ *
+ * 铁律（与 APPLE-DESIGN-SPEC §11 同源）：
+ *   1. 本文件不定义任何颜色/字号/间距字面量，一律 var(--token)；
+ *      唯一允许的字面量是 #fff / #000（本文件未使用）。
+ *   2. 零 gradient、零弹跳缓动、零彩色左边框（侧条纹）。
+ *   3. 反色表面一律走 --surface-inverse / --fg-on-inverse，
+ *      禁止把 --fg 当背景用（fg-on-fg 不可见文本事故的防线）。
+ *   4. 上游类名再皮肤白名单见 §4 —— 只收数据语义块，装饰块接受方差，
+ *      新类名入列需改版本号，禁止通配符大扫除。
+ * ========================================================================== */
+
+
+/* ============================================================================
+ * §0 阅读度量与断点（容器宽度裁定）
+ *
+ * 裁定：正文 680px（--container-prose，中文 34-38 字/行）；
+ * 数据宽元素（表格 / KPI 看板 / 静态图 / 双栏证据）向两侧探出，
+ * 桌面最大到 980px（--container-max），≤900px 收回不探出（表格内部横滚）。
+ * ========================================================================== */
+
+:root {
+  --doc-measure:  var(--container-prose);
+  --doc-breakout: var(--space-12);                          /* 48px 探出量 */
+}
+@media (min-width: 1081px) {
+  :root { --doc-breakout: calc((var(--container-max) - var(--container-prose)) / 2); }
+}
+@media (max-width: 900px) {
+  :root { --doc-breakout: 0px; }
+}
+
+/* 详情页无二级导航，sticky 锚点偏移只加一级导航高度 */
+html { scroll-padding-top: calc(var(--nav-h) + var(--space-4)); }
+
+/* .doc = 阅读容器。宽度用 min() 一步到位，不叠 max-width + padding */
+.doc {
+  width: min(calc(100% - 2 * var(--gutter-phone)), var(--doc-measure));
+  margin-inline: auto;
+  padding-block: 0 var(--space-16);
+}
+
+/* 数据宽元素探出：宽度随断点伸缩，负 margin 居中探出。
+ * 注意：裸 <table> 不入列 —— frame_pass 保证 100% 包进 .tbl-wrap，
+ * 若表格同时在列会与内层 table 的负 margin 双重叠加（见 spec 实现约束 C-7）。 */
+.doc :is(.tbl-wrap, .viz-static, .kpis, .kpi-row, .two, .grid-2, .cc-snap-grid) {
+  width: min(calc(var(--doc-measure) + var(--doc-breakout) * 2),
+             calc(100% + var(--doc-breakout) * 2));
+  margin-inline: calc(var(--doc-breakout) * -1);
+}
+.doc .tbl-wrap { margin-block: var(--space-5); }
+.doc table { width: 100%; }
+
+/* ---- D-2 深色表格斑马纹 ----------------------------------------------------
+ * 浅色 --table-zebra = none 是刻意的（Apple 表格从不斑马纹，靠 hairline 分行）。
+ * 深色必须开：#000 画布上 --separator(#2c2c2e) 只有 1.51:1，跨 5 列宽表时
+ * 读者无法把「第 3 行的数字」和「第 3 列表头」对上（evidence/dark-detail-1440.png
+ * 底部 15:00 干预指令表实测）。
+ * 取值 = --surface-alt(#1c1c1e)，即四级表面契约里的「抬升面」第一级，
+ * 也正是 Apple 自家深色模式 inset list / 表格偶数行的官方取值，不是自造色。
+ * 浅色继续 none —— 两套模式规则不同是有理由的，不是漏改。 */
+@media (prefers-color-scheme:dark){
+  .doc :is(.tbl, table) tbody tr:nth-child(even){
+    background: var(--surface-alt);
+  }
+  .doc :is(.tbl, table) th{
+    border-bottom-color: var(--ap-dark-sep);
+  }
+  .doc :is(.tbl, table) td{
+    border-bottom-color: var(--ap-dark-sep-soft);
+  }
+}
+
+/* 上游页面级容器让位：.wrap(720/860/1100) / Tailwind .max-w-* 一律交还 .doc 裁定 */
+.doc :is(.wrap, .container, .max-w-6xl, .max-w-5xl, .max-w-4xl, .max-w-3xl) {
+  max-width: none;
+  width: auto;
+  margin-inline: 0;
+  padding-inline: 0;
+}
+
+/* body 级 Tailwind 工具类回补（fund-market 实测：body 带
+ * `p-3 sm:p-6 md:p-8 max-w-6xl mx-auto space-y-6`）。A-6 给 <body> 加的
+ * data-df 属性把特异性抬到 (0,1,1)，稳赢工具类 (0,1,0)。
+ * 注意 space-y-* 的特异性是 (0,3,0)（`:not([hidden])~:not([hidden])` 双伪类），
+ * CSS 打不过 —— 必须由 frame_pass 按类名过滤摘除（spec A-6），此处只兜底
+ * padding / margin / max-width 三项。 */
+body[data-df] {
+  padding: 0;
+  margin: 0;
+  max-width: none;
+}
+
+
+/* ============================================================================
+ * §1 sanitizer 产物类（emoji_inline / script_pass 输出，站点此前无定义）
+ * ========================================================================== */
+
+/* emoji → SVG 后的包裹层。up/down/warn 继承容器语义色，绝不放大 */
+.ic-wrap {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: -2px;
+  flex: 0 0 auto;
+}
+.ic-wrap .ic { width: var(--icon-size-inline); height: var(--icon-size-inline); }
+.ic-wrap.up   { color: var(--quote-up); }
+.ic-wrap.down { color: var(--quote-down); }
+.ic-wrap.warn { color: var(--warn); }
+
+/* 个人 IP 标识（U+1F35C 面碗 / U+265F 棋子，IP_MARK 保留策略）：固定 20px 盒 + 15px 字，
+ * 禁止被上游 32px 正文带大，也禁止当功能图标用（见 detail-frame-spec §6） */
+.ip-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--icon-size-btn);
+  height: var(--icon-size-btn);
+  font-size: var(--fs-subhead);
+  line-height: 1;
+  vertical-align: -4px;
+  flex: 0 0 auto;
+}
+
+/* Chart.js 环形图降级后的静态条形图（script_pass 生成） */
+.viz-static { margin-block: var(--space-5); }
+.viz-row {
+  display: grid;
+  grid-template-columns: minmax(4.5em, auto) 1fr auto;
+  gap: var(--space-3);
+  align-items: center;
+  padding-block: var(--space-2);
+  border-bottom: 1px solid var(--separator);
+}
+.viz-row:last-of-type { border-bottom: none; }
+.viz-lb { font-size: var(--fs-subhead); color: var(--fg-2); }
+.viz-track {
+  height: var(--space-2);
+  background: var(--surface-alt);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+.viz-fill {
+  display: block;
+  height: 100%;
+  background: var(--fg-2);              /* 中性条：不花强调色预算 */
+  border-radius: var(--radius-pill);
+}
+.viz-val {
+  font-family: var(--font-mono);
+  font-variant-numeric: var(--numeric);
+  font-size: var(--fs-subhead);
+  color: var(--fg);
+}
+.viz-cap { font-size: var(--fs-caption1); color: var(--fg-3); margin-top: var(--space-3); }
+
+
+/* ============================================================================
+ * §2 阅读排版归一化（元素级，全量管辖，无白名单）
+ *
+ * 特异性说明：.doc X = (0,1,1)，稳赢上游元素选择器 (0,0,1) 与
+ * Tailwind 单类选择器 (0,1,0)；与上游 .a .b 后代选择器 (0,2,0) 冲突时，
+ * 由 §4 白名单的 .doc .a .b (0,3,0) 收口。
+ * ========================================================================== */
+
+/* 标题阶梯：页面标题（frame_pass 提升的首个标题）→ 章节 → 子节。
+ * data-sb-h 是 heading_pass 留下的一次性标记，用它还原「章节/子节」落差：
+ * 原生 h2/h3 都被映射成 h4，不借标记就分不清层级。 */
+.doc h1.doc-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-title1);
+  line-height: var(--lh-title1);
+  letter-spacing: var(--tracking-title1);
+  font-weight: var(--fw-bold);
+  color: var(--fg);
+  margin: 0 0 var(--space-4);
+}
+.doc :is(h3, h4) {
+  font-family: var(--font-display);
+  font-size: var(--fs-title3);
+  line-height: var(--lh-title3);
+  letter-spacing: var(--tracking-title3);
+  font-weight: var(--fw-semibold);
+  color: var(--fg);
+  margin: var(--space-8) 0 var(--space-3);
+}
+.doc :is(h3, h4)[data-sb-h="3->4"] {
+  font-size: var(--fs-title4);
+  line-height: var(--lh-title4);
+  letter-spacing: var(--tracking-title4);
+  color: var(--fg-2);
+}
+
+/* 正文：Apple 17px / 1.47 / CJK 安全 tracking，覆盖上游 15px·32px·1.75·1.85 */
+.doc p {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  letter-spacing: var(--tracking-body);
+  color: var(--fg);
+  margin: 0 0 var(--space-4);
+}
+.doc p:last-child { margin-bottom: 0; }
+
+/* 列表：components 层 ul{list-style:none} 的逆操作 —— 阅读流要记号 */
+.doc :is(ul, ol) { margin: 0 0 var(--space-4); padding-left: var(--space-6); }
+.doc ul { list-style: disc; }
+.doc ol { list-style: decimal; }
+.doc li {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  margin-bottom: var(--space-2);
+}
+.doc li:last-child { margin-bottom: 0; }
+.doc li::marker { color: var(--fg-3); }
+
+/* 区块节奏：零卡片，hairline 分带（SPEC §5.3 文档类内容策略） */
+.doc section {
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: var(--space-8) 0 0;
+  margin: 0;
+}
+.doc section + section { border-top: 1px solid var(--separator); }
+.doc section:last-child { padding-bottom: 0; }
+
+/* 引用：中性 2px 引文条（非彩色侧条纹） */
+.doc blockquote {
+  border-inline-start: 2px solid var(--border);
+  padding-left: var(--space-5);
+  color: var(--fg-2);
+  font-size: var(--fs-callout);
+  line-height: var(--lh-callout);
+  margin: 0 0 var(--space-4);
+}
+
+/* 行内元素 */
+.doc a { color: var(--link); }
+.doc :is(p, li, td, blockquote) a { border-bottom: 1px solid var(--border-soft); }
+.doc :is(p, li, td, blockquote) a:hover { border-bottom-color: var(--link); }
+.doc strong, .doc b { font-weight: var(--fw-semibold); }
+/* CJK 不用伪斜体：em 的强调交给字重，不用 font-style:italic */
+.doc em { font-style: normal; font-weight: var(--fw-medium); }
+.doc hr { border: none; border-top: 1px solid var(--separator); margin-block: var(--space-8); }
+.doc code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--surface-alt);
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+}
+/* D-4 代码块表面：块级与行内必须分属两个层级，否则 pre 与 code 同色，
+ * 整段代码在深色下和正文融成一片（分号/括号失去视觉锚点）。
+ * 行内 code 保持 --surface-alt（轻），块级 pre 提到 --panel-bg（重一档），
+ * 浅色下二者同为 #f5f5f7 会撞色，故浅色靠 1px hairline 区分层级。 */
+.doc pre {
+  background: var(--surface-alt);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  overflow-x: auto;
+  margin: 0 0 var(--space-4);
+  border: 1px solid var(--border-soft);
+}
+.doc pre code { background: none; padding: 0; }
+@media (prefers-color-scheme:dark){
+  .doc pre{
+    background: var(--panel-bg);
+    border-color: var(--ap-dark-sep);
+  }
+  /* 行内 code 在抬升面上再压一档，避免与 pre 抢层级 */
+  .doc code{ background: var(--ap-dark-2); }
+}
+.doc figure { margin: 0 0 var(--space-4); }
+.doc figcaption { font-size: var(--fs-caption1); color: var(--fg-3); margin-top: var(--space-2); }
+.doc img { max-width: 100%; height: auto; border-radius: var(--radius-md); }
+.doc svg { max-width: 100%; }
+
+/* 字重归一（Apple 二元制，禁 800+）：div/span/li/td 一律 400，
+ * 层级交给字号。站点组件类（.rating/.btn）用 :not 豁免 —— 它们的字重
+ * 定义在 blocks 层 (0,1,0)，会被本规则 (0,2,0) 压掉却无法在本文件之后重申。 */
+.doc :is(div, span, li, td):not(:is(.rating, .btn)) { font-weight: var(--fw-regular); }
+
+/* 涨跌色收敛：上游 .up/.down/.pos/.neg 一律走站点语义 token
+ *（上游自定义属性（如 --up 的红色值）不被 style_pass 收敛，会漏出裸 hex） */
+.doc :is(.up, .pos)   { color: var(--quote-up); }
+.doc :is(.down, .neg) { color: var(--quote-down); }
+.doc :is(.flat)       { color: var(--quote-flat); }
+
+
+/* ============================================================================
+ * §3 反色表面（上游深色封面 / 深色 hero 的管辖）
+ *
+ * 上游深渐变被 gradient_pass 收敛到 --surface-inverse 后，容器内的浅色文字
+ * 必须配 --fg-on-inverse；涨跌色用 -dk 亮变体（不随 scheme 翻转 —— 这块
+ * 容器在两种模式下永远是深底）。
+ * ========================================================================== */
+
+.doc :is(header, .cover, .weixin-cover-card) {
+  background: var(--surface-inverse);
+  color: var(--fg-on-inverse);
+  border-radius: var(--panel-radius);
+  padding: var(--card-pad);
+  margin: 0 0 var(--space-6);
+  box-shadow: none;   /* 上游封面投影（stock-review.html:37 `0 10px 25px -5px`） */
+}
+/* 微信封面卡是发布截图工件，上游 CSS 已将其绝对定位到屏外，此处加固 */
+.doc .weixin-cover-card { position: absolute; top: -9999px; left: -9999px; }
+.doc :is(header, .cover) :is(.up, .pos)   { color: var(--rt-offensive-dk); }
+.doc :is(header, .cover) :is(.down, .neg) { color: var(--rt-defensive-dk); }
+.doc :is(header, .cover) :is(.flat)       { color: var(--ap-dark-ink-2); }
+/* Tailwind text-white 在深色 hero 上反成浅底深字会不可见，收敛到反色前景 */
+.doc :is(header, .cover) .text-white { color: var(--fg-on-inverse); }
+.doc :is(header, .cover) .bar-val { font-family: var(--font-mono); font-variant-numeric: var(--numeric); }
+
+/* 反色面上的段落：.doc p 的 color:var(--fg) 特异性 (0,1,1) 会压过上游
+ * `header p{color:var(--fg-3)}`（stock-review.html:40）与 Tailwind
+ * `text-slate-400`（fund-market.html:88），把封面段落拖成 fg-on-fg。
+ * 深底专用二级墨色 --ap-dark-ink-2 在此收复（(0,1,2) 稳赢）。 */
+.doc :is(header, .cover, .weixin-cover-card) p { color: var(--ap-dark-ink-2); }
+.doc :is(header, .cover, .weixin-cover-card) :is(strong, b) { color: var(--fg-on-inverse); }
+.doc :is(header, .cover, .weixin-cover-card) a { color: var(--fg-on-inverse); }
+/* 防回归兜底：A-7 硬约束「提升后的 h1 必须移出封面」，此条保证万一提取
+ * 失败也只是配色错、不会标题隐形；位置校验由 G-1 门禁独立核查。 */
+.doc :is(header, .cover) h1.doc-title { color: var(--fg-on-inverse); }
+
+/* 封面内的纯装饰模糊光斑（fund-market 的双 blur-3xl 圆斑）与脉冲圆点：
+ * 站点基调零装饰模糊、零环境动画（MOTION_INTENSITY=2），
+ * 且它们是绝对定位装饰、不承载任何信息。 */
+.doc :is(header, .cover) :is(.blur-3xl, .blur-2xl) { display: none; }
+.doc :is(header, .cover) .animate-pulse { animation: none; }
+/* 毛玻璃状态卡去玻璃化（fund-market 账户持仓诊断卡）：backdrop 模糊 +
+ * bg-white/5 + border-white/10 三件套是站点明令禁止的默认毛玻璃。
+ * 内容保留，换成深底上的 1px 内线 + 8% 提亮面 —— 与「线条表达层级」同语言。 */
+.doc :is(header, .cover) :is(.backdrop-blur-md, .backdrop-blur-sm, .backdrop-blur) {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: color-mix(in srgb, var(--fg-on-inverse) 8%, transparent);
+  border-color: color-mix(in srgb, var(--fg-on-inverse) 16%, transparent);
+}
+
+
+/* ============================================================================
+ * §4 上游类名再皮肤白名单 v1.1（数据语义块，随上游演进追加）
+ *
+ * 收录标准：承载数据/结论的块（评级、KPI、证据、图表、快照、专家观点）。
+ * 装饰块（.wx-* / .kline-* / .voice-*）只做尺寸与容器约束，接受上游方差。
+ * v1.1 增量（2026-10-15，依据 10-15 stock-review.html 实测）：
+ *   .verdict-card 族 / .kpi-card 族 / .card+.card-title / .expert-* 族 /
+ *   .grid-2 / .footer-note；反色面段落规则（§3）与 body 回补（§0）。
+ * 增长规则见 detail-frame-spec.md §12。
+ * ========================================================================== */
+
+/* ---- 评级结论块 .verdict / .verdict-card（股票助手 / 复盘报告）：
+ * 去 6px 侧条纹（P0 绝对禁令），改交替带面板 ---- */
+.doc :is(.verdict, .verdict-card) {
+  background: var(--surface-alt);
+  border: none;
+  border-left-width: 0;
+  border-radius: var(--panel-radius);
+  padding: var(--card-pad);
+  margin: 0 0 var(--space-6);
+  box-shadow: none;
+}
+.doc :is(.verdict, .verdict-card) :is(.rating, .sigma) { border: none; background: none; padding: 0; }
+.doc :is(.verdict, .verdict-card) .rating {
+  font-size: var(--fs-title4);
+  font-weight: var(--fw-semibold);
+  color: var(--fg);
+}
+.doc :is(.verdict, .verdict-card) .sigma { font-size: var(--fs-subhead); color: var(--fg-2); font-variant-numeric: var(--numeric); }
+.doc :is(.verdict, .verdict-card) :is(.row, .verdict-header) {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+}
+.doc :is(.verdict, .verdict-card) :is(.action, .verdict-desc) {
+  font-size: var(--fs-callout);
+  line-height: var(--lh-callout);
+  color: var(--fg-2);
+}
+.doc :is(.verdict, .verdict-card) :is(.action, .verdict-desc) b { color: var(--fg); }
+
+/* ---- KPI 看板 .kpis / .kpi / .kpi-card（股票助手 / 基金盘面 / 复盘报告）：
+ * 框架 .kpi-row 同构，hairline 分格，无卡盒 ---- */
+.doc .kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0;
+  border-top: 1px solid var(--border);
+  /* margin-block 而非 margin 简写：简写会清零 L53 breakout 规则的负
+     inline margin（同特异性后者胜），导致 kpis 在 ~1100-1280px 视口
+     右溢出 64px（1152 实测 sw=1216）。margin-block 只动纵向距。 */
+  margin-block: 0 var(--space-6);
+}
+.doc :is(.kpi, .kpi-card) {
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: var(--space-5) var(--space-4) var(--space-5) 0;
+  border-left: 1px solid var(--border-soft);
+}
+.doc :is(.kpi, .kpi-card):first-child { border-left: none; padding-left: 0; }
+.doc :is(.kpi, .kpi-card) :is(.k, .kpi-name) {
+  font-size: var(--fs-caption1);
+  color: var(--fg-3);
+  letter-spacing: var(--tracking-caption);
+}
+.doc :is(.kpi, .kpi-card) :is(.v, .kpi-val) {
+  font-size: var(--fs-title4);
+  font-weight: var(--fw-semibold);
+  color: var(--fg);
+  font-variant-numeric: var(--numeric);
+}
+.doc :is(.kpi, .kpi-card) .kpi-chg {
+  font-size: var(--fs-footnote);
+  line-height: var(--lh-footnote);
+  font-variant-numeric: var(--numeric);
+}
+
+/* ---- 多空证据 .evi（股票助手）：语义淡底，无边框 ---- */
+.doc .evi {
+  background: var(--surface-alt);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+}
+.doc .evi.bull { background: var(--rating-offensive-wash); }
+.doc .evi.bear { background: var(--rating-defensive-wash); }
+.doc .evi.bull :is(h3, h4) { color: var(--quote-up); }
+.doc .evi.bear :is(h3, h4) { color: var(--quote-down); }
+
+/* ---- 数据缺口提示 .gap-note（股票助手） ---- */
+.doc .gap-note {
+  background: var(--rating-offensive-wash);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--fs-subhead);
+  line-height: var(--lh-subhead);
+  margin-top: var(--space-3);
+}
+
+/* ---- 标签 .tag（股票助手 watch/gap）：站点徽章形制 ---- */
+.doc .tag {
+  border-radius: var(--badge-radius);
+  padding: 2px 9px;
+  font-size: var(--fs-caption1);
+  letter-spacing: var(--tracking-caption);
+}
+.doc .tag.watch { background: var(--surface-alt); color: var(--fg-2); border-color: var(--border); }
+.doc .tag.gap   { background: var(--rating-offensive-wash); color: var(--quote-up); border-color: var(--rating-offensive-ring); }
+
+/* ---- 信号分值 .sig（股票助手表格）：等宽 + 600，禁 800 ---- */
+.doc .sig { font-weight: var(--fw-semibold); font-variant-numeric: var(--numeric); }
+
+/* ---- 圆桌快照 .cc-snap-grid（每日总复盘）：四栏 hairline 数据格 ---- */
+.doc .cc-snap-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--border);
+  /* 同 .kpis：禁 margin 简写，保 breakout 负 inline margin */
+  margin-block: 0 var(--space-5);
+}
+.doc .cc-snap-cell {
+  padding: var(--space-3) var(--space-4);
+  border-left: 1px solid var(--border-soft);
+  border-right: none;
+  border-bottom: none;
+}
+.doc .cc-snap-cell:nth-child(4n + 1) { border-left: none; padding-left: 0; }
+.doc .cc-snap-cell-label { font-size: var(--fs-caption1); color: var(--fg-3); letter-spacing: var(--tracking-caption); }
+.doc .cc-snap-cell-value { font-size: var(--fs-headline); font-weight: var(--fw-semibold); font-variant-numeric: var(--numeric); }
+.doc .cc-snap-cell-sub { font-size: var(--fs-caption1); color: var(--fg-3); }
+
+/* ---- 编号模块头 .mhead（每日总复盘 01/02/03） ---- */
+.doc .mhead {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin: 0 0 var(--space-4);
+}
+.doc .mnum { font-family: var(--font-mono); font-size: var(--fs-footnote); color: var(--fg-3); }
+.doc .mtitle { font-size: var(--fs-title3); font-weight: var(--fw-semibold); color: var(--fg); }
+.doc .mlede { font-size: var(--fs-subhead); color: var(--fg-3); }
+
+/* ---- 微信 CTA / 免责块（每日总复盘）：安静的小字区，不做成按钮组 ---- */
+.doc :is(.cta, .disclaimer, .foot) {
+  border-top: 1px solid var(--separator);
+  padding-top: var(--space-4);
+  margin-top: var(--space-8);
+  font-size: var(--fs-footnote);
+  line-height: var(--lh-footnote);
+  color: var(--fg-3);
+}
+.doc .cta-title { font-size: var(--fs-subhead); color: var(--fg-2); margin-bottom: var(--space-3); }
+.doc .cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  padding: 6px 14px;
+  margin: 0 var(--space-2) var(--space-2) 0;
+  font-size: var(--fs-footnote);
+  color: var(--fg-2);
+}
+.doc .cta-btn .ic { width: 14px; height: 14px; }
+
+/* ---- 圆桌头像 .voice-avatar（内联 SVG 插图，内容件）：尺寸封顶 ---- */
+.doc .voice-avatar { width: var(--space-12); height: var(--space-12); flex: 0 0 auto; }
+.doc .voice-avatar svg { width: 100%; height: 100%; }
+
+/* ---- 卡片容器 .card / .experts-box（复盘报告）：hairline 面板 ---- */
+.doc :is(.card, .experts-box) {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--panel-radius);
+  padding: var(--card-pad);
+  margin: 0 0 var(--space-6);
+  box-shadow: none;
+}
+.doc .card-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--fs-title3);
+  font-weight: var(--fw-semibold);
+  color: var(--fg);
+  margin: 0 0 var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--separator);   /* 上游 2px #f1f5f9 裸 hex */
+}
+
+/* ---- 专家观点卡 .expert-card（复盘报告）：卡中卡收敛为 hairline 分隔 ---- */
+.doc .expert-card {
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: var(--space-4) 0;
+  margin: 0;
+  border-top: 1px solid var(--separator);
+}
+.doc .expert-card:first-child { border-top: none; padding-top: 0; }
+.doc .expert-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-2);
+}
+/* 上游 .expert-badge 带裸 hex #e0f2fe/#0369a1（style_pass 不收敛 <style> 内
+ * 声明级 hex，B-3）——此处按站点徽章形制整体接管 */
+.doc .expert-badge {
+  background: var(--surface-alt);
+  color: var(--fg-2);
+  border: 1px solid var(--border);
+  border-radius: var(--badge-radius);
+  padding: 2px 9px;
+  font-size: var(--fs-caption1);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--tracking-caption);
+}
+.doc .expert-title { font-size: var(--fs-subhead); font-weight: var(--fw-semibold); color: var(--fg); }
+/* CJK 不用伪斜体：上游 font-style:italic 归一为字重强调 */
+.doc .expert-quote {
+  font-size: var(--fs-callout);
+  line-height: var(--lh-callout);
+  color: var(--fg-2);
+  font-style: normal;
+  margin: 0 0 var(--space-2);
+}
+.doc .expert-body { font-size: var(--fs-body); line-height: var(--lh-body); color: var(--fg); }
+
+/* ---- 双栏网格 .grid-2（复盘报告）：默认单列，≥901px 才双列
+ * （上游 minmax(480px,1fr) 在 680px 容器里必溢出，且 ≤900px 无探出） ---- */
+.doc .grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+  margin-block: var(--space-5);
+}
+/* G-4 兜底：grid item 自动最小尺寸 = min-content，会被 nowrap 表格经 .tbl-wrap
+ * 传导撑破轨道（实测 .card 508px > 390px 视口，页面级横滚）。min-width:0 让
+ * 轨道收缩到容器宽度，表格改在 .tbl-wrap 内部横滚（overflow-x:auto 既有行为）。 */
+.doc .grid-2 > * { min-width: 0; }
+@media (min-width: 901px) {
+  .doc .grid-2 { grid-template-columns: 1fr 1fr; }
+}
+
+/* ---- 页脚声明 .footer-note（复盘报告）：文章级免责，与站点页脚同形制 ---- */
+.doc .footer-note {
+  border-top: 1px solid var(--separator);
+  padding-top: var(--space-4);
+  margin-top: var(--space-8);
+  font-size: var(--fs-footnote);
+  line-height: var(--lh-footnote);
+  color: var(--fg-3);
+  text-align: start;   /* 上游 text-align:center 归一为阅读起点 */
+}
+
+
+/* ============================================================================
+ * §5 框架头 / 元信息 / 页脚（detail 变体，复用框架类）
+ * ========================================================================== */
+
+/* 上游旧模板标签级规则不漏进注入铬件（10-13 stock-assistant 实测）：
+   裸 nav{padding:0 48px} 把 .nav-in 推出版心（390px 视口页面级横滚，违 G-4）；
+   @media≤768px{.nav-links{display:none}} 会藏掉「返回当日时间线」（违 §3.1）。
+   以 body[data-df] 作用域 + 类选择器压制；框架页无 data-df，规则零影响。 */
+body[data-df] > nav.nav { padding: 0; }
+body[data-df] nav.nav > .nav-in > .nav-links { display: flex; }
+
+/* 返回时间线链接：quiet 形制，不抢主操作 */
+.df-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--nav-fg);
+  white-space: nowrap;
+}
+.df-back:hover { color: var(--nav-fg-hover); }
+.df-back .ic { width: 14px; height: 14px; }
+
+/* kicker = 任务名（与时间线条目同图标同文案，continuity） */
+.df-kicker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-caption1);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-caption);
+  color: var(--fg-3);
+  margin: 0 0 var(--space-2);
+}
+.df-kicker .ic { width: 13px; height: 13px; stroke-width: 2; }
+
+/* 元信息行：调度时点 / 生成时刻 / 数据时点 / 评级 / Σ / 口径提示，
+ * 与时间线条目的 meta 区同 Token 同组件（.chip/.rating/.tl-sigma/.tag） */
+.doc-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-6);
+}
+.df-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--fs-caption1);
+  color: var(--fg-3);
+  font-variant-numeric: var(--numeric);
+}
+.df-time .ic { width: 12px; height: 12px; stroke-width: 2; }
+.df-time b { font-family: var(--font-mono); font-weight: var(--fw-medium); }
+
+/* 上游 .top 的冗余 meta 行（已被 .doc-meta 结构化承载时由 frame_pass 摘除）；
+ * 若仍残留，按元信息字号呈现，不让 15px/12.5px 原文样式漏出 */
+.doc .top .meta { font-size: var(--fs-footnote); color: var(--fg-3); }
+
+
+/* ============================================================================
+ * §6 响应式（移动端 ≤900 / ≤640）
+ * ========================================================================== */
+
+@media (max-width: 900px) {
+  .doc .cc-snap-grid { grid-template-columns: repeat(2, 1fr); }
+  .doc .cc-snap-cell:nth-child(4n + 1) { border-left: 1px solid var(--border-soft); padding-left: var(--space-4); }
+  .doc .cc-snap-cell:nth-child(2n + 1) { border-left: none; padding-left: 0; }
+}
+
+@media (max-width: 640px) {
+  .doc { padding-block: 0 var(--space-10); }
+  .doc .kpis { grid-template-columns: 1fr 1fr; }
+  .doc :is(.kpi, .kpi-card) { padding: var(--space-4) var(--space-3) var(--space-4) 0; }
+  .doc :is(.kpi, .kpi-card):nth-child(2n + 1) { border-left: none; padding-left: 0; }
+  .doc :is(.kpi, .kpi-card):nth-child(n + 3) { border-top: 1px solid var(--border-soft); }
+  .doc .two { grid-template-columns: 1fr; }
+  .doc :is(header, .cover) { padding: var(--space-5); }
+  .doc section { padding-top: var(--space-6); }
+  .doc :is(h3, h4) { margin-top: var(--space-6); }
+}
+
+
+/* ============================================================================
+ * §7 打印（框架层已隐藏 .nav；此处放开阅读容器与表格横滚）
+ * ========================================================================== */
+
+@media print {
+  .doc { width: auto; max-width: none; padding: 0; }
+  .doc :is(.tbl-wrap, pre) { overflow: visible; }
+  .doc :is(header, .cover) { background: none; color: var(--fg); }
+  .doc :is(header, .cover) :is(p, .up, .pos, .down, .neg, .flat, .text-white) { color: var(--fg); }
+}

@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="auto">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>老北京的热干面 · 每日基金股票研判 | Laobeijing Hot-Dry Noodles — Daily Market Calls</title>
+<meta name="description" content="金融程序员的每日研判：代码评级、五档动作、观点台账公开结算。Code-driven five-tier ratings, decision cards and a publicly settled viewpoint ledger.">
+<meta property="og:title" content="老北京的热干面 · 每日基金股票研判">
+<meta property="og:description" content="用代码写评级，用台账记观点。Ratings by code. Calls by ledger.">
+<meta property="og:type" content="website">
+<style>
+/* ============ 设计令牌（浅色为默认，深色由 data-theme / prefers-color-scheme 覆盖） ============ */
+:root{
+  color-scheme: light;
+  --amber-600:#D97706; --amber-700:#B45309; --amber-800:#92400E;
+  --amber-50:#FFFBEB; --amber-100:#FEF3C7; --amber-200:#FDE68A;
+  --c-up:#DC2626; --c-down:#15803D; --c-flat:#78716C;
+  --t-attack-fg:#B91C1C;  --t-attack-bg:#FEF2F2;  --t-attack-bd:#FECACA;
+  --t-balanced-fg:#B45309;--t-balanced-bg:#FFFBEB;--t-balanced-bd:#FDE68A;
+  --t-conflict-fg:#475569;--t-conflict-bg:#F1F5F9;--t-conflict-bd:#CBD5E1;
+  --t-defensive-fg:#15803D;--t-defensive-bg:#F0FDF4;--t-defensive-bd:#BBF7D0;
+  --t-avoid-fg:#166534;   --t-avoid-bg:#DCFCE7;   --t-avoid-bd:#86EFAC;
+  --bg:#FAF9F7; --surface:#FFFFFF; --surface-2:#F5F4F2;
+  --border:#E7E5E4; --text:#292524; --text-2:#57534E; --text-3:#78716C;
+  --shadow:0 1px 2px rgba(28,25,23,.05), 0 8px 24px -12px rgba(28,25,23,.10);
+  --shadow-hover:0 2px 4px rgba(28,25,23,.06), 0 16px 32px -12px rgba(28,25,23,.14);
+  --focus:#D97706;
+  --font-sans:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  --font-mono:ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root[data-theme="auto"]{
+    color-scheme: dark;
+    --c-up:#F87171; --c-down:#4ADE80; --c-flat:#A8A29E;
+    --t-attack-fg:#FCA5A5; --t-attack-bg:rgba(248,113,113,.14); --t-attack-bd:rgba(248,113,113,.38);
+    --t-balanced-fg:#FCD34D; --t-balanced-bg:rgba(251,191,36,.12); --t-balanced-bd:rgba(251,191,36,.34);
+    --t-conflict-fg:#CBD5E1; --t-conflict-bg:rgba(148,163,184,.14); --t-conflict-bd:rgba(148,163,184,.34);
+    --t-defensive-fg:#6EE7B7; --t-defensive-bg:rgba(52,211,153,.12); --t-defensive-bd:rgba(52,211,153,.34);
+    --t-avoid-fg:#34D399; --t-avoid-bg:rgba(16,185,129,.20); --t-avoid-bd:rgba(52,211,153,.45);
+    --bg:#1C1917; --surface:#292524; --surface-2:#332F2D;
+    --border:#44403C; --text:#E7E5E4; --text-2:#A8A29E; --text-3:#A8A29E;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.5);
+    --shadow-hover:0 2px 4px rgba(0,0,0,.45), 0 16px 32px -12px rgba(0,0,0,.55);
+    --focus:#FBBF24;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --c-up:#F87171; --c-down:#4ADE80; --c-flat:#A8A29E;
+  --t-attack-fg:#FCA5A5; --t-attack-bg:rgba(248,113,113,.14); --t-attack-bd:rgba(248,113,113,.38);
+  --t-balanced-fg:#FCD34D; --t-balanced-bg:rgba(251,191,36,.12); --t-balanced-bd:rgba(251,191,36,.34);
+  --t-conflict-fg:#CBD5E1; --t-conflict-bg:rgba(148,163,184,.14); --t-conflict-bd:rgba(148,163,184,.34);
+  --t-defensive-fg:#6EE7B7; --t-defensive-bg:rgba(52,211,153,.12); --t-defensive-bd:rgba(52,211,153,.34);
+  --t-avoid-fg:#34D399; --t-avoid-bg:rgba(16,185,129,.20); --t-avoid-bd:rgba(52,211,153,.45);
+  --bg:#1C1917; --surface:#292524; --surface-2:#332F2D;
+  --border:#44403C; --text:#E7E5E4; --text-2:#A8A29E; --text-3:#A8A29E;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.5);
+  --shadow-hover:0 2px 4px rgba(0,0,0,.45), 0 16px 32px -12px rgba(0,0,0,.55);
+  --focus:#FBBF24;
+}
+
+/* ============ 基础 ============ */
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  font-family:var(--font-sans);
+  background:var(--bg); color:var(--text);
+  font-size:16px; line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  transition:background .2s ease, color .2s ease;
+}
+html[lang="en"] body{ letter-spacing:-0.003em; line-height:1.7; }
+.container{ max-width:1080px; margin-inline:auto; padding-inline:20px; }
+@media (min-width:768px){ .container{ padding-inline:24px; } }
+section{ scroll-margin-top:88px; }
+.num{ font-family:var(--font-mono); font-variant-numeric:tabular-nums; letter-spacing:0; }
+.up{ color:var(--c-up); } .down{ color:var(--c-down); } .flat{ color:var(--c-flat); }
+a{ color:var(--amber-700); }
+:focus-visible{ outline:2px solid var(--focus); outline-offset:2px; border-radius:4px; }
+.skip-link{ position:absolute; left:16px; top:-48px; z-index:100; background:var(--surface); color:var(--text);
+  border:1px solid var(--border); padding:8px 16px; border-radius:8px; font-size:14px; transition:top .15s; }
+.skip-link:focus{ top:12px; }
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  *,*::before,*::after{ transition:none !important; animation:none !important; }
+}
+
+/* ============ 页头 ============ */
+.site-header{ position:sticky; top:0; z-index:50; background:var(--bg);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-bottom:1px solid var(--border); }
+@supports (background: color-mix(in srgb, red 50%, transparent)){
+  .site-header{ background:color-mix(in srgb, var(--bg) 88%, transparent); }
+}
+.header-inner{ display:flex; align-items:center; gap:16px; height:64px; }
+.brand{ display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--text); flex-shrink:0; }
+.brand-avatar{ width:38px; height:38px; border-radius:10px; background:rgba(217,119,6,.16);
+  border:1px solid rgba(217,119,6,.35); display:grid; place-items:center; font-size:20px; }
+.brand-text{ display:flex; flex-direction:column; line-height:1.25; }
+.brand-text strong{ font-size:15px; letter-spacing:.01em; }
+.brand-text small{ font-size:11px; color:var(--text-3); }
+.site-nav{ display:none; margin-left:8px; }
+@media (min-width:768px){ .site-nav{ display:flex; gap:4px; } }
+.site-nav a{ color:var(--text-2); text-decoration:none; font-size:14px; padding:6px 10px; border-radius:8px; }
+.site-nav a:hover{ color:var(--text); background:var(--surface-2); }
+.header-actions{ margin-left:auto; display:flex; align-items:center; gap:8px; }
+
+/* 语言切换器（分段控件 / radiogroup） */
+.lang-switch{ display:flex; background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:2px; }
+.lang-switch button{ appearance:none; border:0; background:transparent; color:var(--text-3); cursor:pointer;
+  font-size:12px; font-weight:700; padding:5px 12px; border-radius:999px; line-height:1.3; font-family:var(--font-sans); }
+.lang-switch button[aria-checked="true"]{ background:var(--surface); color:var(--text); box-shadow:var(--shadow); }
+.lang-switch button[aria-checked="false"]:hover{ color:var(--text-2); }
+.theme-toggle{ appearance:none; width:36px; height:36px; border-radius:10px; border:1px solid var(--border);
+  background:var(--surface); color:var(--text-2); cursor:pointer; font-size:15px; display:grid; place-items:center; }
+.theme-toggle:hover{ color:var(--text); border-color:var(--text-3); }
+.btn{ display:inline-flex; align-items:center; gap:8px; font-weight:700; text-decoration:none;
+  border-radius:10px; padding:10px 18px; font-size:14px; line-height:1.4; border:1px solid transparent; cursor:pointer; }
+.btn-primary{ background:var(--amber-700); color:#fff; }
+.btn-primary:hover{ background:var(--amber-800); }
+.btn-ghost{ background:transparent; color:var(--text); border-color:var(--border); }
+.btn-ghost:hover{ border-color:var(--text-3); background:var(--surface-2); }
+.btn-github{ display:none; }
+@media (min-width:1024px){ .btn-github{ display:inline-flex; } }
+
+/* ============ Hero ============ */
+.hero{ background:radial-gradient(120% 100% at 50% 0%, #292524 0%, #1C1917 100%); color:#FAFAF9;
+  border-bottom:1px solid #44403C; position:relative; overflow:hidden; }
+.hero::before{ content:""; position:absolute; right:-80px; top:-120px; width:420px; height:420px;
+  background:radial-gradient(circle, rgba(217,119,6,.16) 0%, transparent 65%); pointer-events:none; }
+.hero::after{ content:""; position:absolute; left:-100px; bottom:-160px; width:380px; height:380px;
+  background:radial-gradient(circle, rgba(217,119,6,.08) 0%, transparent 65%); pointer-events:none; }
+.hero-inner{ position:relative; z-index:1; padding:56px 0 64px; }
+@media (min-width:768px){ .hero-inner{ padding:72px 0 80px; } }
+.hero-pill{ display:inline-flex; align-items:center; gap:8px; background:rgba(217,119,6,.16);
+  border:1px solid rgba(217,119,6,.4); color:#FCD34D; font-size:12px; font-weight:700;
+  padding:4px 14px; border-radius:999px; letter-spacing:.04em; }
+.hero-pill .dot{ width:6px; height:6px; border-radius:50%; background:#FBBF24; }
+.hero h1{ font-size:28px; font-weight:800; letter-spacing:.01em; line-height:1.25; margin:20px 0 14px; }
+html[lang="en"] .hero h1{ letter-spacing:-0.01em; }
+@media (min-width:768px){ .hero h1{ font-size:40px; } }
+.hero-sub{ color:#D6D3D1; font-size:15px; max-width:760px; }
+.hero-cta{ display:flex; flex-wrap:wrap; gap:12px; margin-top:28px; }
+.hero-cta .btn-primary{ box-shadow:0 8px 24px -8px rgba(217,119,6,.5); }
+.hero-cta .btn-ghost{ color:#FAFAF9; border-color:#57534E; }
+.hero-cta .btn-ghost:hover{ border-color:#A8A29E; background:rgba(255,255,255,.06); }
+.hero-stats{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:44px; }
+@media (min-width:768px){ .hero-stats{ grid-template-columns:repeat(4,1fr); } }
+.hero-stat{ background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);
+  border-radius:14px; padding:16px 18px; }
+.hero-stat .v{ font-size:26px; font-weight:800; color:#FCD34D; }
+.hero-stat .l{ font-size:12px; color:#A8A29E; margin-top:2px; line-height:1.5; }
+
+/* ============ 区块标题 ============ */
+.section{ padding:56px 0 8px; }
+@media (min-width:768px){ .section{ padding:64px 0 8px; } }
+.section-head{ display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 16px; margin-bottom:8px; }
+.section-head h2{ font-size:20px; font-weight:800; padding-left:12px; border-left:4px solid var(--amber-600); letter-spacing:.01em; }
+@media (min-width:768px){ .section-head h2{ font-size:24px; } }
+.section-sub{ color:var(--text-2); font-size:13.5px; margin-bottom:24px; }
+.section-head .link-arrow{ margin-left:auto; font-size:13.5px; }
+
+/* ============ 日报卡 ============ */
+.report-card{ background:var(--surface); border:1px solid var(--border); border-radius:16px;
+  box-shadow:var(--shadow); padding:22px; margin-bottom:16px; transition:box-shadow .2s ease, border-color .2s ease, transform .2s ease; }
+.report-card:hover{ box-shadow:var(--shadow-hover); }
+@media (min-width:768px){ .report-card{ padding:28px; } }
+.report-card--featured{ border-top:4px solid var(--amber-600); }
+.report-card__head{ display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin-bottom:14px; }
+.report-card__date{ font-size:13px; color:var(--text-3); font-weight:700; }
+.report-card__tags{ display:flex; gap:6px; flex-wrap:wrap; margin-left:auto; }
+.tag{ font-size:11px; font-weight:700; color:var(--text-2); background:var(--surface-2);
+  border:1px solid var(--border); border-radius:6px; padding:2px 8px; }
+.tag--demo{ color:#92400E; background:var(--amber-50); border-color:var(--amber-200); }
+@media (prefers-color-scheme: dark){ :root[data-theme="auto"] .tag--demo{ color:#FCD34D; background:rgba(251,191,36,.12); border-color:rgba(251,191,36,.34); } }
+:root[data-theme="dark"] .tag--demo{ color:#FCD34D; background:rgba(251,191,36,.12); border-color:rgba(251,191,36,.34); }
+.report-card h3{ font-size:17px; font-weight:800; line-height:1.5; margin-bottom:8px; }
+.report-card__excerpt{ font-size:13.5px; color:var(--text-2); margin-bottom:18px; }
+.report-card__excerpt strong{ color:var(--text); }
+.report-card__body{ display:grid; gap:16px; }
+@media (min-width:1024px){ .report-card--featured .report-card__body{ grid-template-columns:7fr 5fr; gap:24px; } }
+.panel{ background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:16px; }
+.panel h4{ font-size:12px; font-weight:800; color:var(--text-3); letter-spacing:.06em; text-transform:uppercase; margin-bottom:12px; }
+.report-card__foot{ margin-top:16px; padding-top:14px; border-top:1px dashed var(--border);
+  display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+.link-arrow{ font-size:13.5px; font-weight:700; text-decoration:none; color:var(--amber-700); }
+.link-arrow:hover{ text-decoration:underline; }
+.foot-note{ font-size:12px; color:var(--text-3); }
+.reports-grid{ display:grid; gap:16px; }
+@media (min-width:640px){ .reports-grid{ grid-template-columns:1fr 1fr; } }
+@media (min-width:1024px){ .reports-grid{ grid-template-columns:repeat(3,1fr); } }
+
+/* 信号评分条（中心原点发散） */
+.sigbar{ display:grid; grid-template-columns:104px 1fr 56px; align-items:center; gap:10px; padding:5px 0; }
+.sigbar-name{ font-size:12px; font-weight:700; color:var(--text-2); white-space:nowrap; }
+.sigbar-track{ position:relative; height:10px; background:var(--surface); border:1px solid var(--border); border-radius:999px; }
+.sigbar-track::after{ content:""; position:absolute; left:50%; top:-2px; bottom:-2px; width:1px; background:var(--text-3); }
+.sigbar-fill{ position:absolute; top:1px; bottom:1px; border-radius:999px; min-width:3px; }
+.sigbar-fill--up{ background:var(--c-up); }
+.sigbar-fill--down{ background:var(--c-down); }
+.sigbar-val{ font-size:12.5px; font-weight:700; text-align:right; }
+.sigma-sum{ margin-top:12px; background:#1C1917; color:#FAFAF9; border-radius:10px;
+  padding:10px 14px; font-size:13px; display:flex; flex-wrap:wrap; gap:4px 12px; align-items:center; }
+.sigma-sum strong{ color:#FCD34D; }
+
+/* 指标 chips */
+.metrics-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+@media (min-width:640px){ .metrics-grid{ grid-template-columns:repeat(3,1fr); } }
+@media (min-width:1024px){ .metrics-grid{ grid-template-columns:repeat(2,1fr); } }
+.metric{ background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:10px 12px; }
+.metric-label{ display:block; font-size:11px; color:var(--text-3); line-height:1.4; }
+.metric-val{ display:block; font-size:16px; font-weight:800; margin-top:2px; }
+.metric-val small{ font-size:11px; font-weight:700; color:var(--text-3); margin-left:4px; }
+
+/* 评级徽章 */
+.rating{ display:inline-flex; align-items:center; gap:6px; font-weight:800; border-radius:999px;
+  border:1px solid; white-space:nowrap; line-height:1.3; }
+.rating-arrow{ font-size:1em; }
+.rating-sigma{ font-weight:700; opacity:.85; font-size:.82em; }
+.rating--sm{ font-size:12px; padding:2px 10px; }
+.rating--md{ font-size:14px; padding:4px 14px; }
+.rating--lg{ font-size:17px; padding:6px 18px; }
+.rating--attack{ color:var(--t-attack-fg); background:var(--t-attack-bg); border-color:var(--t-attack-bd); }
+.rating--balanced{ color:var(--t-balanced-fg); background:var(--t-balanced-bg); border-color:var(--t-balanced-bd); }
+.rating--conflict{ color:var(--t-conflict-fg); background:var(--t-conflict-bg); border-color:var(--t-conflict-bd); }
+.rating--defensive{ color:var(--t-defensive-fg); background:var(--t-defensive-bg); border-color:var(--t-defensive-bd); }
+.rating--avoid{ color:var(--t-avoid-fg); background:var(--t-avoid-bg); border-color:var(--t-avoid-bd); }
+
+/* ============ 方法论 ============ */
+.signal-cards{ display:grid; gap:12px; margin-bottom:32px; }
+@media (min-width:640px){ .signal-cards{ grid-template-columns:repeat(2,1fr); } }
+@media (min-width:1024px){ .signal-cards{ grid-template-columns:repeat(3,1fr); } }
+.signal-card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px; }
+.signal-card__head{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.signal-card__id{ font-size:12px; font-weight:800; color:#fff; background:var(--amber-600);
+  border-radius:6px; padding:2px 7px; }
+.signal-card__name{ font-weight:800; font-size:15px; }
+.signal-card__w{ margin-left:auto; font-size:11.5px; color:var(--text-3); font-weight:700; }
+.signal-card p{ font-size:13px; color:var(--text-2); line-height:1.7; }
+.scale{ background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+.scale-row{ display:grid; gap:6px 16px; padding:16px 20px; border-bottom:1px solid var(--border); align-items:center; }
+.scale-row:last-of-type{ border-bottom:0; }
+@media (min-width:768px){ .scale-row{ grid-template-columns:200px 130px 1fr; } }
+.scale-range{ font-size:12.5px; color:var(--text-3); font-weight:700; }
+.scale-action{ font-size:13.5px; color:var(--text-2); }
+.scale-note{ padding:14px 20px; background:var(--amber-50); border-top:1px solid var(--amber-200);
+  font-size:12.5px; color:#92400E; }
+@media (prefers-color-scheme: dark){ :root[data-theme="auto"] .scale-note{ color:#FCD34D; background:rgba(251,191,36,.1); border-top-color:rgba(251,191,36,.3); } }
+:root[data-theme="dark"] .scale-note{ color:#FCD34D; background:rgba(251,191,36,.1); border-top-color:rgba(251,191,36,.3); }
+.ledger-note{ margin-top:16px; background:var(--surface); border:1px solid var(--border);
+  border-left:4px solid var(--amber-600); border-radius:0 12px 12px 0; padding:14px 18px; font-size:13.5px; color:var(--text-2); }
+.ledger-note strong{ color:var(--text); }
+
+/* ============ 订阅 ============ */
+.sub-grid{ display:grid; gap:12px; }
+@media (min-width:640px){ .sub-grid{ grid-template-columns:repeat(2,1fr); } }
+@media (min-width:1024px){ .sub-grid{ grid-template-columns:repeat(4,1fr); } }
+.sub-card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px;
+  text-decoration:none; color:var(--text); display:flex; flex-direction:column; gap:6px;
+  transition:border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+.sub-card:hover{ border-color:var(--amber-600); box-shadow:var(--shadow-hover); transform:translateY(-2px); }
+.sub-card__icon{ font-size:24px; }
+.sub-card strong{ font-size:15px; }
+.sub-card span:last-child{ font-size:12.5px; color:var(--text-3); line-height:1.6; }
+.sub-card--qr{ align-items:center; text-align:center; }
+.qr-placeholder{ width:120px; height:120px; border:2px dashed var(--border); border-radius:12px;
+  display:grid; place-items:center; font-size:12px; color:var(--text-3); background:var(--surface-2);
+  margin-bottom:4px; line-height:1.5; }
+.sub-note{ font-size:12px; color:var(--text-3); margin-top:14px; }
+
+/* ============ 页脚 ============ */
+.site-footer{ margin-top:64px; border-top:1px solid var(--border); background:var(--surface); }
+.footer-inner{ padding:36px 0 44px; display:grid; gap:20px; }
+.disclaimer{ background:var(--amber-50); border:1px solid var(--amber-200); border-left:4px solid var(--amber-600);
+  border-radius:0 12px 12px 0; padding:16px 20px; font-size:13px; color:#78350F; line-height:1.8; }
+.disclaimer strong{ display:block; margin-bottom:4px; }
+.disclaimer p+p{ margin-top:6px; }
+@media (prefers-color-scheme: dark){
+  :root[data-theme="auto"] .disclaimer{ color:#FCD34D; background:rgba(251,191,36,.1); border-color:rgba(251,191,36,.3); }
+}
+:root[data-theme="dark"] .disclaimer{ color:#FCD34D; background:rgba(251,191,36,.1); border-color:rgba(251,191,36,.3); }
+.source-line{ font-size:12.5px; color:var(--text-3); }
+.footer-meta{ display:flex; flex-wrap:wrap; gap:8px 20px; font-size:12.5px; color:var(--text-3);
+  padding-top:16px; border-top:1px solid var(--border); }
+.footer-meta a{ color:var(--text-3); }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main" data-i18n="a11y.skip">跳到主要内容</a>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="#top">
+      <span class="brand-avatar" aria-hidden="true">🍜</span>
+      <span class="brand-text">
+        <strong data-i18n="brand.name">老北京的热干面</strong>
+        <small data-i18n="brand.tag">金融程序员 · 每日研判</small>
+      </span>
+    </a>
+    <nav class="site-nav" aria-label="主导航 Main navigation">
+      <a href="#reports" data-i18n="nav.reports">日报</a>
+      <a href="#method" data-i18n="nav.method">方法论</a>
+      <a href="#archive" data-i18n="nav.archive">归档</a>
+      <a href="#subscribe" data-i18n="nav.subscribe">订阅</a>
+    </nav>
+    <div class="header-actions">
+      <div class="lang-switch" role="radiogroup" aria-label="语言 Language">
+        <button type="button" role="radio" aria-checked="true" data-set-lang="zh">中文</button>
+        <button type="button" role="radio" aria-checked="false" data-set-lang="en">EN</button>
+      </div>
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="切换深浅色模式" title="切换深浅色模式">☾</button>
+      <a class="btn btn-github" href="https://github.com/seaquake970623" rel="noopener">★ <span data-i18n="nav.github">GitHub</span></a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ================= Hero ================= -->
+  <section class="hero" id="top">
+    <div class="container hero-inner">
+      <span class="hero-pill"><span class="dot" aria-hidden="true"></span><span data-i18n="hero.pill">每交易日 4 篇研判 · 100% 可追溯数据</span></span>
+      <h1 data-i18n="hero.h1">用代码写评级，用台账记观点</h1>
+      <p class="hero-sub" data-i18n="hero.sub">我是梁海震，网名「老北京的热干面」，一名金融程序员。每个交易日，决策引擎自动完成数据采集、六维信号评分与五档评级，专家团对抗辩论后产出决策卡；所有观点次日四态结算，滚动命中率公开。</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="https://github.com/seaquake970623" rel="noopener">★ <span data-i18n="hero.cta1">Star 这个仓库</span></a>
+        <a class="btn btn-ghost" href="#subscribe" data-i18n="hero.cta2">订阅每日日报</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="v num">6</div><div class="l" data-i18n="stat1.l">维信号评分体系</div></div>
+        <div class="hero-stat"><div class="v num">5</div><div class="l" data-i18n="stat2.l">档 Σ 互斥评级</div></div>
+        <div class="hero-stat"><div class="v num">4</div><div class="l" data-i18n="stat3.l">态观点台账结算</div></div>
+        <div class="hero-stat"><div class="v num">100%</div><div class="l" data-i18n="stat4.l">数据可追溯</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 最新日报 ================= -->
+  <section class="section" id="reports">
+    <div class="container">
+      <div class="section-head">
+        <h2 data-i18n="reports.h2">最新日报</h2>
+        <a class="link-arrow" href="#archive" data-i18n="reports.archive">完整归档 →</a>
+      </div>
+      <p class="section-sub" data-i18n="reports.sub">每个交易日 4 个时点：09:28 竞价助手 · 11:00 基金盘面 · 14:30 基金指引 · 15:30 每日总复盘。</p>
+
+      <!-- 特色卡：2026-10-14 真实数据（脱敏：仅市场级数据） -->
+      <article class="report-card report-card--featured">
+        <div class="report-card__head">
+          <time class="report-card__date num" datetime="2026-10-14">2026-10-14</time>
+          <span class="rating rating--conflict rating--lg">
+            <span class="rating-arrow" aria-hidden="true">↔</span>
+            <span data-i18n="tier.conflict">信号矛盾</span>
+            <span class="rating-sigma num">σ +0.125</span>
+          </span>
+          <span class="report-card__tags">
+            <span class="tag" data-i18n="featured.tag1">每日总复盘</span>
+            <span class="tag" data-i18n="featured.tag2">决策卡</span>
+          </span>
+        </div>
+        <h3 data-i18n="featured.h3">Σ 信号矛盾：多空证据对立，引擎只列证据不给方向</h3>
+        <p class="report-card__excerpt" data-i18n="featured.excerpt">多方证据：沪指量比 1.64 交投活跃；沪深300 PE 13.21 处便宜区间且 60 日超跌 11.06%；元件板块主力净流入 22.75 亿。空方证据：上涨占比仅 32.8%（1763/5382）；指数低于 MA20 达 1.96%；成长跑输蓝筹。Σ=+0.125 落入信号矛盾档——暂停一切主动买入，只挂低于现价 ≥2% 的吸买单，定投按既定扣款执行。</p>
+        <div class="report-card__body">
+          <div class="panel">
+            <h4 data-i18n="featured.signals.h">六维信号分解</h4>
+            <div class="sigbar">
+              <span class="sigbar-name" data-i18n="s1">量能 S1</span>
+              <div class="sigbar-track"><i class="sigbar-fill sigbar-fill--up" style="left:50%;width:40%"></i></div>
+              <span class="sigbar-val num up">+0.80</span>
+            </div>
+            <div class="sigbar">
+              <span class="sigbar-name" data-i18n="s2">宽度 S2</span>
+              <div class="sigbar-track"><i class="sigbar-fill sigbar-fill--down" style="left:26.85%;width:23.15%"></i></div>
+              <span class="sigbar-val num down">−0.46</span>
+            </div>
+            <div class="sigbar">
+              <span class="sigbar-name" data-i18n="s3">动量 S3</span>
+              <div class="sigbar-track"><i class="sigbar-fill sigbar-fill--down" style="left:33.2%;width:16.8%"></i></div>
+              <span class="sigbar-val num down">−0.34</span>
+            </div>
+            <div class="sigbar">
+              <span class="sigbar-name" data-i18n="s4">分化 S4</span>
+              <div class="sigbar-track"><i class="sigbar-fill sigbar-fill--down" style="left:28.4%;width:21.6%"></i></div>
+              <span class="sigbar-val num down">−0.43</span>
+            </div>
+            <div class="sigbar">
+              <span class="sigbar-name" data-i18n="s5">资金 S5</span>
+              <div class="sigbar-track"><i class="sigbar-fill sigbar-fill--up" style="left:50%;width:7.6%"></i></div>
+              <span class="sigbar-val num up">+0.15</span>
+            </div>
+            <div class="sigbar">
+              <span class="sigbar-name" data-i18n="s6">估值 S6</span>
+              <div class="sigbar-track"><i class="sigbar-fill sigbar-fill--up" style="left:50%;width:50%"></i></div>
+              <span class="sigbar-val num up">+1.00</span>
+            </div>
+            <div class="sigma-sum">
+              <span><strong class="num">Σ = +0.125</strong></span>
+              <span data-i18n="featured.sigma.note">有效权重 1.00 · 代码计算，LLM 禁改</span>
+            </div>
+          </div>
+          <div class="panel">
+            <h4 data-i18n="featured.markets.h">盘面速览 · 15:30 收盘</h4>
+            <div class="metrics-grid">
+              <div class="metric"><span class="metric-label" data-i18n="m.sse">上证指数</span><span class="metric-val num up">+0.06%</span></div>
+              <div class="metric"><span class="metric-label" data-i18n="m.szse">深证成指</span><span class="metric-val num down">−0.43%</span></div>
+              <div class="metric"><span class="metric-label" data-i18n="m.cyber">创业板指</span><span class="metric-val num down">−0.99%</span></div>
+              <div class="metric"><span class="metric-label" data-i18n="m.star50">科创 50</span><span class="metric-val num down">−1.20%</span></div>
+              <div class="metric"><span class="metric-label" data-i18n="m.bse50">北证 50</span><span class="metric-val num up">+1.36%</span></div>
+              <div class="metric"><span class="metric-label" data-i18n="m.breadth">上涨占比</span><span class="metric-val num">32.8%<small data-i18n="m.breadth.sub">1763/5382</small></span></div>
+              <div class="metric"><span class="metric-label" data-i18n="m.limit">涨停 / 跌停</span><span class="metric-val num"><span class="up">38</span><small>/</small><span class="down">4</span></span></div>
+              <div class="metric"><span class="metric-label" data-i18n="m.volratio">沪指量比</span><span class="metric-val num">1.64</span></div>
+              <div class="metric"><span class="metric-label" data-i18n="m.pe">沪深300 PE</span><span class="metric-val num">13.21</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="report-card__foot">
+          <a class="link-arrow" href="#" data-i18n="featured.read">阅读全文 →</a>
+          <span class="foot-note" data-i18n="featured.footnote">含决策卡七件套与明日待验证信号</span>
+        </div>
+      </article>
+
+      <!-- 历史卡（演示数据） -->
+      <div class="reports-grid">
+        <article class="report-card">
+          <div class="report-card__head">
+            <time class="report-card__date num" datetime="2026-10-13">2026-10-13</time>
+            <span class="rating rating--defensive rating--md">
+              <span class="rating-arrow" aria-hidden="true">▼</span>
+              <span data-i18n="tier.defensive">防守</span>
+              <span class="rating-sigma num">σ −0.280</span>
+            </span>
+          </div>
+          <h3 data-i18n="card2.h3">宽度动量双弱，定投降档运行</h3>
+          <p class="report-card__excerpt" data-i18n="card2.excerpt">上涨占比 28.4%，成长低于 MA20 且 20 日跌幅扩大，Σ=−0.280 落入防守档：定投降档必须写明金额变化，网格暂停加码。</p>
+          <div class="metrics-grid">
+            <div class="metric"><span class="metric-label" data-i18n="m.sse">上证指数</span><span class="metric-val num down">−0.72%</span></div>
+            <div class="metric"><span class="metric-label" data-i18n="m.cyber">创业板指</span><span class="metric-val num down">−1.38%</span></div>
+            <div class="metric"><span class="metric-label" data-i18n="m.breadth">上涨占比</span><span class="metric-val num">28.4%</span></div>
+            <div class="metric"><span class="metric-label" data-i18n="m.pe">沪深300 PE</span><span class="metric-val num">13.05</span></div>
+          </div>
+          <div class="report-card__foot">
+            <span class="tag tag--demo" data-i18n="demo.tag">示例数据 · DEMO</span>
+            <a class="link-arrow" href="#" data-i18n="card.read">阅读全文 →</a>
+          </div>
+        </article>
+
+        <article class="report-card">
+          <div class="report-card__head">
+            <time class="report-card__date num" datetime="2026-10-10">2026-10-10</time>
+            <span class="rating rating--attack rating--md">
+              <span class="rating-arrow" aria-hidden="true">▲▲</span>
+              <span data-i18n="tier.attack">进攻</span>
+              <span class="rating-sigma num">σ +0.624</span>
+            </span>
+          </div>
+          <h3 data-i18n="card3.h3">量能宽度动量共振，网格上移</h3>
+          <p class="report-card__excerpt" data-i18n="card3.excerpt">量比 1.42、上涨占比 61.7%、成长相对沪深300 溢价扩大，Σ=+0.624 落入进攻档：网格上移，定投按既定金额执行，主动加仓须过决策卡七件套。</p>
+          <div class="metrics-grid">
+            <div class="metric"><span class="metric-label" data-i18n="m.sse">上证指数</span><span class="metric-val num up">+1.08%</span></div>
+            <div class="metric"><span class="metric-label" data-i18n="m.cyber">创业板指</span><span class="metric-val num up">+2.31%</span></div>
+            <div class="metric"><span class="metric-label" data-i18n="m.breadth">上涨占比</span><span class="metric-val num">61.7%</span></div>
+            <div class="metric"><span class="metric-label" data-i18n="m.volratio">沪指量比</span><span class="metric-val num">1.42</span></div>
+          </div>
+          <div class="report-card__foot">
+            <span class="tag tag--demo" data-i18n="demo.tag">示例数据 · DEMO</span>
+            <a class="link-arrow" href="#" data-i18n="card.read">阅读全文 →</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 方法论 ================= -->
+  <section class="section" id="method">
+    <div class="container">
+      <div class="section-head"><h2 data-i18n="method.h2">方法论</h2></div>
+      <p class="section-sub" data-i18n="method.sub">六维信号加权求和得 Σ，Σ 映射五档评级，评级驱动互斥动作。评分全部由代码计算，LLM 禁改；阈值首月作相对排序使用。</p>
+
+      <div class="signal-cards">
+        <div class="signal-card">
+          <div class="signal-card__head"><span class="signal-card__id num">S1</span><span class="signal-card__name" data-i18n="s1.name">量能</span><span class="signal-card__w num">w 0.20</span></div>
+          <p data-i18n="s1.d">沪指量比，相对过去 5 日同时段，盘中/收盘通用。</p>
+        </div>
+        <div class="signal-card">
+          <div class="signal-card__head"><span class="signal-card__id num">S2</span><span class="signal-card__name" data-i18n="s2.name">宽度</span><span class="signal-card__w num">w 0.20</span></div>
+          <p data-i18n="s2.d">上涨占比 70% + 涨跌停差 30%，衡量普涨普跌结构。</p>
+        </div>
+        <div class="signal-card">
+          <div class="signal-card__head"><span class="signal-card__id num">S3</span><span class="signal-card__name" data-i18n="s3.name">动量</span><span class="signal-card__w num">w 0.15</span></div>
+          <p data-i18n="s3.d">价格 vs MA5/MA20 位置，叠加 20 日涨跌幅。</p>
+        </div>
+        <div class="signal-card">
+          <div class="signal-card__head"><span class="signal-card__id num">S4</span><span class="signal-card__name" data-i18n="s4.name">分化</span><span class="signal-card__w num">w 0.15</span></div>
+          <p data-i18n="s4.d">成长（创业板+科创50）相对沪深300 的价差。</p>
+        </div>
+        <div class="signal-card">
+          <div class="signal-card__head"><span class="signal-card__id num">S5</span><span class="signal-card__name" data-i18n="s5.name">资金</span><span class="signal-card__w num">w 0.15</span></div>
+          <p data-i18n="s5.d">板块主力净流入 TOP1 减净流出 TOP1 的净差。</p>
+        </div>
+        <div class="signal-card">
+          <div class="signal-card__head"><span class="signal-card__id num">S6</span><span class="signal-card__name" data-i18n="s6.name">估值</span><span class="signal-card__w num">w 0.15</span></div>
+          <p data-i18n="s6.d">沪深300 PE 水平 + 60 日超跌代理。</p>
+        </div>
+      </div>
+
+      <h3 style="font-size:17px;font-weight:800;margin-bottom:14px" data-i18n="scale.h">五档评级与标准动作</h3>
+      <div class="scale">
+        <div class="scale-row">
+          <span class="rating rating--attack rating--md"><span class="rating-arrow" aria-hidden="true">▲▲</span><span data-i18n="tier.attack">进攻</span></span>
+          <span class="scale-range num">Σ ≥ +0.50</span>
+          <p class="scale-action" data-i18n="act.attack">网格上移，定投按既定金额执行；主动加仓须过决策卡七件套。</p>
+        </div>
+        <div class="scale-row">
+          <span class="rating rating--balanced rating--md"><span class="rating-arrow" aria-hidden="true">▲</span><span data-i18n="tier.balanced">均衡</span></span>
+          <span class="scale-range num">+0.15 ~ +0.50</span>
+          <p class="scale-action" data-i18n="act.balanced">定投与网格正常运行；持仓「不动」必须写明距触发线距离。</p>
+        </div>
+        <div class="scale-row">
+          <span class="rating rating--conflict rating--md"><span class="rating-arrow" aria-hidden="true">↔</span><span data-i18n="tier.conflict">信号矛盾</span></span>
+          <span class="scale-range num">−0.15 ~ +0.15</span>
+          <p class="scale-action" data-i18n="act.conflict">暂停一切主动买入；只挂低于现价 ≥2% 的吸买单；只列证据，不给方向。</p>
+        </div>
+        <div class="scale-row">
+          <span class="rating rating--defensive rating--md"><span class="rating-arrow" aria-hidden="true">▼</span><span data-i18n="tier.defensive">防守</span></span>
+          <span class="scale-range num">−0.50 ~ −0.15</span>
+          <p class="scale-action" data-i18n="act.defensive">定投降档必须写明金额变化；网格暂停加码。</p>
+        </div>
+        <div class="scale-row">
+          <span class="rating rating--avoid rating--md"><span class="rating-arrow" aria-hidden="true">▼▼</span><span data-i18n="tier.avoid">回避</span></span>
+          <span class="scale-range num">Σ ≤ −0.50</span>
+          <p class="scale-action" data-i18n="act.avoid">只保留底仓定投，主动仓全面防御。</p>
+        </div>
+        <div class="scale-note" data-i18n="scale.note">阈值说明：Σ 阈值未经历史回测标定，首月作相对排序使用；观点台账滚动命中率低于 50% 时触发人工权重审查。</div>
+      </div>
+
+      <div class="ledger-note">
+        <strong data-i18n="ledger.h">观点台账 ·</strong>
+        <span data-i18n="ledger.d">昨日观点按「触发 / 未触发 / 无法评估 / 漏报」四态结算，滚动命中率公开——骑墙被定价。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 归档锚点（占位） ================= -->
+  <section class="section" id="archive" style="padding-top:24px">
+    <div class="container">
+      <p style="font-size:13.5px;color:var(--text-2)" data-i18n="archive.note">完整日报归档位于 GitHub 仓库 <a href="https://github.com/seaquake970623" rel="noopener">seaquake970623</a> 的 reports/ 目录，按日期与四时点组织，附原始数据快照。</p>
+    </div>
+  </section>
+
+  <!-- ================= 订阅 ================= -->
+  <section class="section" id="subscribe">
+    <div class="container">
+      <div class="section-head"><h2 data-i18n="subscribe.h2">订阅与关注</h2></div>
+      <p class="section-sub" data-i18n="subscribe.sub">日报全文在 GitHub 归档，公众号 / 知乎 / 抖音同步更新。</p>
+      <div class="sub-grid">
+        <div class="sub-card sub-card--qr">
+          <div class="qr-placeholder" aria-hidden="true"><span data-i18n="sub.qr">二维码<br>占位</span></div>
+          <strong data-i18n="sub.wechat.t">微信公众号</strong>
+          <span data-i18n="sub.wechat.d">扫码关注，每日推送</span>
+        </div>
+        <a class="sub-card" href="#" rel="noopener">
+          <span class="sub-card__icon" aria-hidden="true">📖</span>
+          <strong data-i18n="sub.zhihu.t">知乎专栏</strong>
+          <span data-i18n="sub.zhihu.d">每日研判长文 · 方法论沉淀</span>
+        </a>
+        <a class="sub-card" href="#" rel="noopener">
+          <span class="sub-card__icon" aria-hidden="true">🎬</span>
+          <strong data-i18n="sub.douyin.t">抖音</strong>
+          <span data-i18n="sub.douyin.d">盘中 60 秒解读</span>
+        </a>
+        <a class="sub-card" href="https://github.com/seaquake970623" rel="noopener">
+          <span class="sub-card__icon" aria-hidden="true">★</span>
+          <strong data-i18n="sub.github.t">GitHub</strong>
+          <span data-i18n="sub.github.d">源码 · 数据 · 归档</span>
+        </a>
+      </div>
+      <p class="sub-note" data-i18n="sub.note">除 GitHub 外均为占位链接，上线时替换为真实地址。</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================= 页脚 ================= -->
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="disclaimer">
+      <strong data-i18n="foot.dh">免责声明</strong>
+      <p data-i18n="foot.dz">本站内容基于公开市场数据与量化分析，仅供参考，不构成任何投资建议。市场有风险，投资需谨慎。任何投资决策应结合个人风险承受能力、资金状况和投资目标独立判断，必要时咨询持牌专业机构。过往表现不预示未来收益。</p>
+      <p data-i18n="foot.de">All content is based on public market data and quantitative analysis, provided for information only and not investment advice. Markets carry risk. Any investment decision should be made independently in light of your own risk tolerance and objectives. Past performance does not indicate future returns.</p>
+    </div>
+    <p class="source-line" data-i18n="foot.source">数据来源：腾讯自选股 MCP（westock-mcp）实时采集 · 各报告时点已标注 · 报告由 AI 辅助生成。</p>
+    <div class="footer-meta">
+      <span data-i18n="foot.license">内容 CC BY-NC-SA 4.0 · 代码 MIT · © 2026 老北京的热干面</span>
+      <a href="#top" data-i18n="foot.top">回到顶部 ↑</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  /* ============ 双语字典 ============ */
+  var I18N = {
+    zh: {
+      "a11y.skip":"跳到主要内容",
+      "brand.name":"老北京的热干面","brand.tag":"金融程序员 · 每日研判",
+      "nav.reports":"日报","nav.method":"方法论","nav.archive":"归档","nav.subscribe":"订阅","nav.github":"GitHub",
+      "hero.pill":"每交易日 4 篇研判 · 100% 可追溯数据",
+      "hero.h1":"用代码写评级，用台账记观点",
+      "hero.sub":"我是梁海震，网名「老北京的热干面」，一名金融程序员。每个交易日，决策引擎自动完成数据采集、六维信号评分与五档评级，专家团对抗辩论后产出决策卡；所有观点次日四态结算，滚动命中率公开。",
+      "hero.cta1":"Star 这个仓库","hero.cta2":"订阅每日日报",
+      "stat1.l":"维信号评分体系","stat2.l":"档 Σ 互斥评级","stat3.l":"态观点台账结算","stat4.l":"数据可追溯",
+      "reports.h2":"最新日报","reports.archive":"完整归档 →",
+      "reports.sub":"每个交易日 4 个时点：09:28 竞价助手 · 11:00 基金盘面 · 14:30 基金指引 · 15:30 每日总复盘。",
+      "tier.attack":"进攻","tier.balanced":"均衡","tier.conflict":"信号矛盾","tier.defensive":"防守","tier.avoid":"回避",
+      "featured.tag1":"每日总复盘","featured.tag2":"决策卡",
+      "featured.h3":"Σ 信号矛盾：多空证据对立，引擎只列证据不给方向",
+      "featured.excerpt":"多方证据：沪指量比 1.64 交投活跃；沪深300 PE 13.21 处便宜区间且 60 日超跌 11.06%；元件板块主力净流入 22.75 亿。空方证据：上涨占比仅 32.8%（1763/5382）；指数低于 MA20 达 1.96%；成长跑输蓝筹。Σ=+0.125 落入信号矛盾档——暂停一切主动买入，只挂低于现价 ≥2% 的吸买单，定投按既定扣款执行。",
+      "featured.signals.h":"六维信号分解","featured.sigma.note":"有效权重 1.00 · 代码计算，LLM 禁改",
+      "featured.markets.h":"盘面速览 · 15:30 收盘",
+      "featured.read":"阅读全文 →","featured.footnote":"含决策卡七件套与明日待验证信号",
+      "card.read":"阅读全文 →","demo.tag":"示例数据 · DEMO",
+      "card2.h3":"宽度动量双弱，定投降档运行",
+      "card2.excerpt":"上涨占比 28.4%，成长低于 MA20 且 20 日跌幅扩大，Σ=−0.280 落入防守档：定投降档必须写明金额变化，网格暂停加码。",
+      "card3.h3":"量能宽度动量共振，网格上移",
+      "card3.excerpt":"量比 1.42、上涨占比 61.7%、成长相对沪深300 溢价扩大，Σ=+0.624 落入进攻档：网格上移，定投按既定金额执行，主动加仓须过决策卡七件套。",
+      "s1":"量能 S1","s2":"宽度 S2","s3":"动量 S3","s4":"分化 S4","s5":"资金 S5","s6":"估值 S6",
+      "s1.name":"量能","s2.name":"宽度","s3.name":"动量","s4.name":"分化","s5.name":"资金","s6.name":"估值",
+      "s1.d":"沪指量比，相对过去 5 日同时段，盘中/收盘通用。",
+      "s2.d":"上涨占比 70% + 涨跌停差 30%，衡量普涨普跌结构。",
+      "s3.d":"价格 vs MA5/MA20 位置，叠加 20 日涨跌幅。",
+      "s4.d":"成长（创业板+科创50）相对沪深300 的价差。",
+      "s5.d":"板块主力净流入 TOP1 减净流出 TOP1 的净差。",
+      "s6.d":"沪深300 PE 水平 + 60 日超跌代理。",
+      "m.sse":"上证指数","m.szse":"深证成指","m.cyber":"创业板指","m.star50":"科创 50","m.bse50":"北证 50",
+      "m.breadth":"上涨占比","m.breadth.sub":"1763/5382","m.limit":"涨停 / 跌停","m.volratio":"沪指量比","m.pe":"沪深300 PE",
+      "method.h2":"方法论",
+      "method.sub":"六维信号加权求和得 Σ，Σ 映射五档评级，评级驱动互斥动作。评分全部由代码计算，LLM 禁改；阈值首月作相对排序使用。",
+      "scale.h":"五档评级与标准动作",
+      "act.attack":"网格上移，定投按既定金额执行；主动加仓须过决策卡七件套。",
+      "act.balanced":"定投与网格正常运行；持仓「不动」必须写明距触发线距离。",
+      "act.conflict":"暂停一切主动买入；只挂低于现价 ≥2% 的吸买单；只列证据，不给方向。",
+      "act.defensive":"定投降档必须写明金额变化；网格暂停加码。",
+      "act.avoid":"只保留底仓定投，主动仓全面防御。",
+      "scale.note":"阈值说明：Σ 阈值未经历史回测标定，首月作相对排序使用；观点台账滚动命中率低于 50% 时触发人工权重审查。",
+      "ledger.h":"观点台账 ·",
+      "ledger.d":"昨日观点按「触发 / 未触发 / 无法评估 / 漏报」四态结算，滚动命中率公开——骑墙被定价。",
+      "archive.note":'完整日报归档位于 GitHub 仓库 <a href="https://github.com/seaquake970623" rel="noopener">seaquake970623</a> 的 reports/ 目录，按日期与四时点组织，附原始数据快照。',
+      "subscribe.h2":"订阅与关注","subscribe.sub":"日报全文在 GitHub 归档，公众号 / 知乎 / 抖音同步更新。",
+      "sub.qr":"二维码<br>占位","sub.wechat.t":"微信公众号","sub.wechat.d":"扫码关注，每日推送",
+      "sub.zhihu.t":"知乎专栏","sub.zhihu.d":"每日研判长文 · 方法论沉淀",
+      "sub.douyin.t":"抖音","sub.douyin.d":"盘中 60 秒解读",
+      "sub.github.t":"GitHub","sub.github.d":"源码 · 数据 · 归档",
+      "sub.note":"除 GitHub 外均为占位链接，上线时替换为真实地址。",
+      "foot.dh":"免责声明",
+      "foot.dz":"本站内容基于公开市场数据与量化分析，仅供参考，不构成任何投资建议。市场有风险，投资需谨慎。任何投资决策应结合个人风险承受能力、资金状况和投资目标独立判断，必要时咨询持牌专业机构。过往表现不预示未来收益。",
+      "foot.de":"All content is based on public market data and quantitative analysis, provided for information only and not investment advice. Markets carry risk. Any investment decision should be made independently in light of your own risk tolerance and objectives. Past performance does not indicate future returns.",
+      "foot.source":"数据来源：腾讯自选股 MCP（westock-mcp）实时采集 · 各报告时点已标注 · 报告由 AI 辅助生成。",
+      "foot.license":"内容 CC BY-NC-SA 4.0 · 代码 MIT · © 2026 老北京的热干面",
+      "foot.top":"回到顶部 ↑",
+      "theme.aria":"切换深浅色模式"
+    },
+    en: {
+      "a11y.skip":"Skip to main content",
+      "brand.name":"Laobeijing Hot-Dry Noodles","brand.tag":"Finance dev · Daily calls",
+      "nav.reports":"Reports","nav.method":"Method","nav.archive":"Archive","nav.subscribe":"Subscribe","nav.github":"GitHub",
+      "hero.pill":"4 reports per trading day · 100% traceable data",
+      "hero.h1":"Ratings by code. Calls by ledger.",
+      "hero.sub":"I'm Liang Haizhen — \"Laobeijing Hot-Dry Noodles\", a finance-major-turned developer. Every trading day, a decision engine collects the data, scores six signals and maps them to a five-tier rating; an expert panel debates and outputs a decision card. Every call is settled into four states the next day, with the rolling hit rate published.",
+      "hero.cta1":"Star this repo","hero.cta2":"Subscribe daily",
+      "stat1.l":"signal dimensions","stat2.l":"Σ rating tiers","stat3.l":"ledger states","stat4.l":"traceable data",
+      "reports.h2":"Latest Reports","reports.archive":"Full archive →",
+      "reports.sub":"Four fixed slots every trading day: 09:28 auction scout · 11:00 fund board · 14:30 fund playbook · 15:30 daily debrief.",
+      "tier.attack":"Attack","tier.balanced":"Balanced","tier.conflict":"Conflict","tier.defensive":"Defensive","tier.avoid":"Avoid",
+      "featured.tag1":"Daily debrief","featured.tag2":"Decision card",
+      "featured.h3":"Σ signal conflict: opposing evidence, no direction from the engine",
+      "featured.excerpt":"Bulls: SSE volume ratio 1.64 signals active trading; CSI300 PE 13.21 sits in the cheap zone after an 11.06% 60-day drawdown; components saw +¥2.275B main-force inflow. Bears: only 32.8% of stocks advanced (1763/5382); the index sits 1.96% below MA20; growth lagged blue chips. Σ=+0.125 lands in the conflict tier — pause all active buys, bid only ≥2% below market, keep the scheduled SIP.",
+      "featured.signals.h":"Six-signal breakdown","featured.sigma.note":"Effective weight 1.00 · computed in code, LLM may not alter",
+      "featured.markets.h":"Market snapshot · 15:30 close",
+      "featured.read":"Read full report →","featured.footnote":"Includes the 7-item decision card and tomorrow's watch list",
+      "card.read":"Read full report →","demo.tag":"Demo data",
+      "card2.h3":"Breadth and momentum weaken; SIP steps down",
+      "card2.excerpt":"28.4% advancers, growth below MA20 with a widening 20-day loss; Σ=−0.280 lands in the defensive tier: any SIP step-down must state the new amount, and the grid pauses adds.",
+      "card3.h3":"Volume, breadth and momentum align; grid ratchets up",
+      "card3.excerpt":"Volume ratio 1.42, 61.7% advancers, growth premium widening vs CSI300; Σ=+0.624 lands in the attack tier: the grid ratchets up, the SIP runs at its scheduled amount, and any active add must pass the 7-item decision card.",
+      "s1":"Volume S1","s2":"Breadth S2","s3":"Momentum S3","s4":"Dispersion S4","s5":"Flows S5","s6":"Valuation S6",
+      "s1.name":"Volume","s2.name":"Breadth","s3.name":"Momentum","s4.name":"Dispersion","s5.name":"Flows","s6.name":"Valuation",
+      "s1.d":"SSE volume ratio against the same window over the past 5 sessions.",
+      "s2.d":"Advance share (70%) plus limit-up/down spread (30%).",
+      "s3.d":"Price position vs MA5/MA20, plus the 20-day change.",
+      "s4.d":"Growth (ChiNext + STAR50) spread vs CSI300.",
+      "s5.d":"Top sector main-force inflow minus top outflow.",
+      "s6.d":"CSI300 PE level plus a 60-day drawdown proxy.",
+      "m.sse":"SSE Composite","m.szse":"SZSE Component","m.cyber":"ChiNext","m.star50":"STAR 50","m.bse50":"BSE 50",
+      "m.breadth":"Advancers","m.breadth.sub":"1763/5382","m.limit":"Limit up / down","m.volratio":"SSE volume ratio","m.pe":"CSI300 PE",
+      "method.h2":"Methodology",
+      "method.sub":"Six weighted signals sum to Σ; Σ maps to one of five tiers; each tier drives mutually exclusive actions. Scores are computed in code and the LLM may not alter them; thresholds are used for relative ranking in the first month.",
+      "scale.h":"Five tiers & standard actions",
+      "act.attack":"Grid ratchets up; SIP at its scheduled amount. Any active add must pass the 7-item decision card.",
+      "act.balanced":"SIP and grid run as usual; any \"hold\" must state the distance to the trigger line.",
+      "act.conflict":"Pause all active buys; bid only ≥2% below market. List evidence, give no direction.",
+      "act.defensive":"Any SIP step-down must state the new amount; the grid pauses adds.",
+      "act.avoid":"Keep the core SIP only; defensive stance across active positions.",
+      "scale.note":"Note: Σ thresholds are not yet backtested; they serve for relative ranking in the first month. A rolling hit rate below 50% triggers a manual weight review.",
+      "ledger.h":"Viewpoint ledger ·",
+      "ledger.d":"Yesterday's calls settle into four states — triggered / not triggered / unevaluable / missed — with the rolling hit rate published. Fence-sitting gets priced in.",
+      "archive.note":'The full report archive lives in the <a href="https://github.com/seaquake970623" rel="noopener">seaquake970623</a> repo under reports/, organized by date and the four time slots, with raw data snapshots attached.',
+      "subscribe.h2":"Subscribe & Follow","subscribe.sub":"Full reports are archived on GitHub and mirrored on WeChat, Zhihu and Douyin.",
+      "sub.qr":"QR code<br>placeholder","sub.wechat.t":"WeChat Official Account","sub.wechat.d":"Scan to follow for daily pushes",
+      "sub.zhihu.t":"Zhihu Column","sub.zhihu.d":"Daily long-form notes & methodology",
+      "sub.douyin.t":"Douyin","sub.douyin.d":"60-second intraday reads",
+      "sub.github.t":"GitHub","sub.github.d":"Source · data · archive",
+      "sub.note":"All links except GitHub are placeholders, to be replaced with real URLs at launch.",
+      "foot.dh":"Disclaimer",
+      "foot.dz":"本站内容基于公开市场数据与量化分析，仅供参考，不构成任何投资建议。市场有风险，投资需谨慎。任何投资决策应结合个人风险承受能力、资金状况和投资目标独立判断，必要时咨询持牌专业机构。过往表现不预示未来收益。",
+      "foot.de":"All content is based on public market data and quantitative analysis, provided for information only and not investment advice. Markets carry risk. Any investment decision should be made independently in light of your own risk tolerance, financial situation and objectives; consult licensed professionals when necessary. Past performance does not indicate future returns.",
+      "foot.source":"Data source: Tencent Self-Selected Stocks MCP (westock-mcp), collected in real time; each report states its timestamp. Reports are AI-assisted.",
+      "foot.license":"Content CC BY-NC-SA 4.0 · Code MIT · © 2026 Laobeijing Hot-Dry Noodles",
+      "foot.top":"Back to top ↑",
+      "theme.aria":"Toggle dark mode"
+    }
+  };
+
+  var html = document.documentElement;
+  var langBtns = Array.prototype.slice.call(document.querySelectorAll("[data-set-lang]"));
+
+  function applyLang(lang){
+    if(I18N[lang] == null) lang = "zh";
+    html.setAttribute("lang", lang === "en" ? "en" : "zh-CN");
+    document.querySelectorAll("[data-i18n]").forEach(function(el){
+      var key = el.getAttribute("data-i18n");
+      var val = I18N[lang][key];
+      if(val == null) return;
+      if(val.indexOf("<a ") > -1 || val.indexOf("<br") > -1){ el.innerHTML = val; }
+      else { el.textContent = val; }
+    });
+    langBtns.forEach(function(b){
+      b.setAttribute("aria-checked", String(b.getAttribute("data-set-lang") === lang));
+    });
+    try{ localStorage.setItem("ip-lang", lang); }catch(e){}
+  }
+
+  langBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){ applyLang(btn.getAttribute("data-set-lang")); });
+    btn.addEventListener("keydown", function(e){
+      var i = langBtns.indexOf(btn), next = null;
+      if(e.key === "ArrowRight" || e.key === "ArrowDown") next = langBtns[(i+1) % langBtns.length];
+      if(e.key === "ArrowLeft" || e.key === "ArrowUp") next = langBtns[(i-1+langBtns.length) % langBtns.length];
+      if(next){ e.preventDefault(); applyLang(next.getAttribute("data-set-lang")); next.focus(); }
+    });
+  });
+
+  /* ============ 主题切换 ============ */
+  var themeBtn = document.getElementById("themeToggle");
+  var mq = window.matchMedia("(prefers-color-scheme: dark)");
+  function effective(){
+    var t = html.getAttribute("data-theme");
+    return t === "dark" || t === "light" ? t : (mq.matches ? "dark" : "light");
+  }
+  function paint(){
+    var eff = effective();
+    themeBtn.textContent = eff === "dark" ? "☀︎" : "☾";
+    var label = (I18N[html.getAttribute("lang") === "en" ? "en" : "zh"] || I18N.zh)["theme.aria"];
+    themeBtn.setAttribute("aria-label", label);
+    themeBtn.setAttribute("title", label);
+  }
+  themeBtn.addEventListener("click", function(){
+    var next = effective() === "dark" ? "light" : "dark";
+    html.setAttribute("data-theme", next);
+    try{ localStorage.setItem("ip-theme", next); }catch(e){}
+    paint();
+  });
+  mq.addEventListener && mq.addEventListener("change", function(){
+    if(!html.getAttribute("data-theme") || html.getAttribute("data-theme") === "auto") paint();
+  });
+
+  /* ============ 初始化 ============ */
+  var savedLang = null, savedTheme = null;
+  try{ savedLang = localStorage.getItem("ip-lang"); savedTheme = localStorage.getItem("ip-theme"); }catch(e){}
+  if(savedTheme === "light" || savedTheme === "dark") html.setAttribute("data-theme", savedTheme);
+  if(savedLang !== "en" && (navigator.language || "").toLowerCase().indexOf("zh") !== 0 && !savedLang){
+    applyLang("en");
+  } else {
+    applyLang(savedLang === "en" ? "en" : "zh");
+  }
+  paint();
+})();
+</script>
+</body>
+</html>

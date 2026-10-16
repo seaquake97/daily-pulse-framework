@@ -1,0 +1,102 @@
+========================================================================
+发布流水线全量自测（两段式：desensitize v3 → redline_hardening）
+========================================================================
+
+[PASS] 基金每日盘面分析（11:00）/2026-10-14/fund_market_analysis.html
+  v3: {'broker': 0, 'account': 0, 'phone': 0, 'idcard': 0, 'bankcard': 0, 'context_money': 9, 'sentence_money': 0, 'shares': 0, 'table_cols': 6, 'md_table_cols': 0, 'yen_money': 16, 'sentence_percent': 710, 'script_removed': 1}
+  harden: {'format': 'html', 'names': 1, 'money': 3, 'shares': 0, 'account': 0, 'grid_range': 0, 'price_ctx': 0, 'protected': 9, 'replaced': 109, 'masked_percent': 17, 'comments': 0, 'table_cells': 63, 'word_surface': 2, 'md_table_cells': 0}
+
+[PASS] 基金每日盘面分析（11:00）/2026-10-14/fund_market_analysis.md
+  v3: {'broker': 0, 'account': 0, 'phone': 0, 'idcard': 0, 'bankcard': 0, 'context_money': 12, 'sentence_money': 0, 'shares': 0, 'table_cols': 0, 'md_table_cols': 74, 'yen_money': 13, 'sentence_percent': 112, 'script_removed': 0}
+  harden: {'format': 'md', 'names': 0, 'money': 4, 'shares': 0, 'account': 0, 'grid_range': 0, 'price_ctx': 0, 'protected': 19, 'replaced': 20, 'masked_percent': 0, 'comments': 0, 'table_cells': 0, 'word_surface': 2, 'md_table_cells': 52}
+
+[PASS] 每日总复盘（15:30）/2026-10-13/daily_review.html
+  v3: {'broker': 0, 'account': 0, 'phone': 0, 'idcard': 0, 'bankcard': 0, 'context_money': 33, 'sentence_money': 13, 'shares': 28, 'table_cols': 1, 'md_table_cols': 0, 'yen_money': 0, 'sentence_percent': 863, 'script_removed': 0}
+  harden: {'format': 'html', 'names': 0, 'money': 6, 'shares': 0, 'account': 0, 'grid_range': 15, 'price_ctx': 6, 'protected': 3, 'replaced': 68, 'masked_percent': 5, 'comments': 0, 'table_cells': 26, 'word_surface': 2, 'md_table_cells': 0}
+
+[PASS] 每日总复盘（15:30）/2026-10-13/stock_review.md
+  v3: {'broker': 0, 'account': 0, 'phone': 0, 'idcard': 0, 'bankcard': 0, 'context_money': 21, 'sentence_money': 18, 'shares': 22, 'table_cols': 0, 'md_table_cols': 0, 'yen_money': 0, 'sentence_percent': 101, 'script_removed': 0}
+  harden: {'format': 'md', 'names': 0, 'money': 13, 'shares': 0, 'account': 0, 'grid_range': 6, 'price_ctx': 6, 'protected': 3, 'replaced': 23, 'masked_percent': 3, 'comments': 0, 'table_cells': 0, 'word_surface': 0, 'md_table_cells': 0}
+
+[PASS] 基金每日操作指引（14:30）/2026-10-13/fund_operation_guide.md
+  v3: {'broker': 0, 'account': 0, 'phone': 0, 'idcard': 0, 'bankcard': 0, 'context_money': 5, 'sentence_money': 23, 'shares': 0, 'table_cols': 0, 'md_table_cols': 48, 'yen_money': 0, 'sentence_percent': 115, 'script_removed': 0}
+  harden: {'format': 'md', 'names': 0, 'money': 1, 'shares': 0, 'account': 0, 'grid_range': 0, 'price_ctx': 0, 'protected': 34, 'replaced': 9, 'masked_percent': 8, 'comments': 0, 'table_cells': 0, 'word_surface': 3, 'md_table_cells': 24}
+
+[PASS] 基金每日操作指引（14:30）/2026-10-14/fund_operation_guide.md
+  v3: {'broker': 1, 'account': 0, 'phone': 0, 'idcard': 0, 'bankcard': 0, 'context_money': 30, 'sentence_money': 44, 'shares': 4, 'table_cols': 0, 'md_table_cols': 26, 'yen_money': 0, 'sentence_percent': 127, 'script_removed': 0}
+  harden: {'format': 'md', 'names': 0, 'money': 10, 'shares': 0, 'account': 0, 'grid_range': 0, 'price_ctx': 1, 'protected': 36, 'replaced': 18, 'masked_percent': 4, 'comments': 0, 'table_cells': 0, 'word_surface': 2, 'md_table_cells': 51}
+
+[PASS] 股票助手/2026-10-14/stock_assistant.html
+  v3: {'broker': 0, 'account': 0, 'phone': 0, 'idcard': 0, 'bankcard': 0, 'context_money': 4, 'sentence_money': 0, 'shares': 4, 'table_cols': 0, 'md_table_cols': 0, 'yen_money': 0, 'sentence_percent': 165, 'script_removed': 0}
+  harden: {'format': 'html', 'names': 0, 'money': 0, 'shares': 0, 'account': 0, 'grid_range': 1, 'price_ctx': 7, 'protected': 6, 'replaced': 17, 'masked_percent': 0, 'comments': 0, 'table_cells': 17, 'word_surface': 0, 'md_table_cells': 0}
+
+[PASS] 股票助手/2026-10-14/stock_assistant.md
+  v3: {'broker': 0, 'account': 0, 'phone': 0, 'idcard': 0, 'bankcard': 0, 'context_money': 6, 'sentence_money': 0, 'shares': 4, 'table_cols': 0, 'md_table_cols': 0, 'yen_money': 0, 'sentence_percent': 73, 'script_removed': 0}
+  harden: {'format': 'md', 'names': 0, 'money': 0, 'shares': 0, 'account': 0, 'grid_range': 2, 'price_ctx': 9, 'protected': 6, 'replaced': 0, 'masked_percent': 0, 'comments': 0, 'table_cells': 0, 'word_surface': 0, 'md_table_cells': 15}
+
+========================================================================
+L5 A/B 双面验收（team-lead 2026-10-14 裁决口径）
+========================================================================
+A 面（个人数据零残留，25 项跨文件扫描）:
+  ✓ 已掩 1,403.64
+  ✓ 已掩 4,357.50
+  ✓ 已掩 2.36%
+  ✓ 已掩 1.65%
+  ✓ 已掩 34.74
+  ✓ 已掩 27.41
+  ✓ 已掩 width: 27.41
+  ✓ 已掩 18.50-24.50
+  ✓ 已掩 6.50-8.50
+  ✓ 已掩 0.850-1.250
+  ✓ 已掩 1.065
+  ✓ 已掩 1.020-1.025
+  ✓ 已掩 7.05
+  ✓ 已掩 7.25
+  ✓ 已掩 13.40
+  ✓ 已掩 5.15
+  ✓ 已掩 4.90
+  ✓ 已掩 20.40
+  ✓ 已掩 21.00
+  ✓ 已掩 4.20
+  ✓ 已掩 13.67
+  ✓ 已掩 19.89
+  ✓ 已掩 19.90
+  ✓ 已掩 0.955
+  ✓ 已掩 0.956
+  ✅ A 面全部掩除
+B 面（公开数据保留，逐文件）:
+  ✓ 保留 fund_market_analysis.html: 100%
+  ✓ 保留 fund_market_analysis.html: 11 只基金
+  ✓ 保留 fund_market_analysis.html: 3,807.50
+  ✓ 保留 fund_market_analysis.html: +0.17%
+  ✓ 保留 fund_market_analysis.md: 5273
+  ✓ 保留 fund_market_analysis.md: 100%
+  ✓ 保留 daily_review.html: -2.67%
+  ✓ 保留 daily_review.html: -0.44%
+  ✓ 保留 daily_review.html: +0.10%
+  ✓ 保留 daily_review.html: +0.31%
+  ✓ 保留 daily_review.html: 4.51%
+  ✓ 保留 daily_review.html: 4.55%
+  ✓ 保留 stock_review.md: 3800.86
+  ✓ 保留 stock_review.md: 12353.70
+  ✓ 保留 stock_review.md: 16,891.33
+  ✓ 保留 stock_review.md: 13.91%
+  ✓ 保留 stock_review.md: 4.5%
+  ✓ 保留 fund_operation_guide.md: -2.82%
+  ✓ 保留 fund_operation_guide.md: 51 亿元
+  ✓ 保留 fund_operation_guide.md: 沪深300
+  ✓ 保留 fund_operation_guide.md: 4280
+  ✓ 保留 stock_assistant.html: 33.1%
+  ✓ 保留 stock_assistant.html: 1,788
+  ✓ 保留 stock_assistant.html: 5,397
+  ✓ 保留 stock_assistant.html: 3,609
+  ✓ 保留 stock_assistant.html: 8,608 亿
+  ✓ 保留 stock_assistant.md: 上涨占比 33.1%
+  ✓ 保留 stock_assistant.md: 8,608 亿
+  ✓ 保留 stock_assistant.md: 13.19
+  ✅ B 面全部保留
+  备注: 基金 md 宽度表 57.7%/3.7%/38.6% 为 v3 引擎误杀（非本层），已上报 team-lead，不纳入本层验收
+
+========================================================================
+退出码规范（与 publish_to_github.py 对齐）: 0=通过 1=泄漏(含A面) 2=误杀(B面) 3=幂等失败 4=结构损坏
+本次退出码: 0

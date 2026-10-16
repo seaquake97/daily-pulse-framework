@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>研判方法论 · Methodology | 每日市场脉搏</title>
+<meta name="description" content="每日市场脉搏的研判方法论：daily-decision-engine 决策引擎七步流水线、S1-S6 确定性信号评分与五档 Σ 评级规则。">
+<!-- 本文件为静态方法论页，样式由 scripts/build_site.py 注入 Token 层 + 组件层 -->
+<style>/*__TOKENS__*/</style>
+<style>
+/* 页面专属版式：只写布局，颜色 / 字号 / 间距全部引用 Token */
+.mp-shell{ max-width:var(--container-prose); margin:0 auto; padding:0 var(--gutter-tablet); }
+.mp-nav{ padding:var(--space-8) 0 0; font-size:var(--fs-footnote); }
+.mp-nav a{ color:var(--link); display:inline-flex; align-items:center; gap:5px; transition:color var(--motion-fast) var(--ease-out); }
+.mp-nav a:hover{ color:var(--link-hover); }
+.mp-head{ padding:var(--space-12) 0 var(--space-8); }
+.mp-head h1{ margin-bottom:var(--space-3); }
+.mp-head .sub{ color:var(--fg-2); font-size:var(--fs-callout); line-height:var(--lh-callout); max-width:64ch; }
+.mp-sec{ background:var(--surface-alt); border-radius:var(--panel-radius); padding:var(--feature-pad); margin-bottom:var(--space-6); }
+@media (prefers-color-scheme:dark){ .mp-sec{ background:var(--panel-bg); } }
+/* 分区标题：靠字号建层级，不用彩色左边框（SPEC §11.2 禁令） */
+.mp-sec > h2{ font-family:var(--font-display); font-size:var(--fs-title3); line-height:var(--lh-title3);
+  letter-spacing:var(--tracking-title3); font-weight:var(--fw-semibold); color:var(--fg); margin-bottom:var(--space-4); }
+.mp-sec h3{ font-family:var(--font-display); font-size:var(--fs-headline); line-height:var(--lh-headline);
+  letter-spacing:var(--tracking-headline); font-weight:var(--fw-semibold); color:var(--fg); margin:var(--space-5) 0 var(--space-2); }
+.mp-sec p{ font-size:var(--fs-body); line-height:var(--lh-body); color:var(--fg-2); margin:var(--space-2) 0; }
+.mp-sec ol,.mp-sec ul{ margin:var(--space-2) 0 0 22px; list-style:revert; }
+.mp-sec li{ font-size:var(--fs-callout); line-height:var(--lh-callout); color:var(--fg-2); margin:var(--space-2) 0; }
+.mp-sec li b{ color:var(--fg); font-weight:var(--fw-semibold); }
+.mp-flow{ display:flex; flex-wrap:wrap; gap:var(--space-2); margin:var(--space-3) 0 var(--space-4); }
+.mp-step{ background:var(--bg); border:1px solid var(--border-soft); border-radius:var(--radius-sm);
+  padding:9px 13px; font-size:var(--fs-footnote); color:var(--fg-2); font-weight:var(--fw-medium);
+  corner-shape:var(--corner-shape,squircle); }
+@media (prefers-color-scheme:dark){ .mp-step{ background:var(--ap-dark-2); border-color:var(--ap-dark-sep); } }
+.mp-step b{ color:var(--accent); font-family:var(--font-mono); margin-right:5px; }
+.mp-note{ border:1px solid var(--border); border-left:0; border-radius:var(--radius-sm);
+  padding:var(--space-3) var(--space-4); font-size:var(--fs-subhead); line-height:var(--lh-subhead);
+  color:var(--fg-2); background:var(--bg); margin:var(--space-4) 0; }
+@media (prefers-color-scheme:dark){ .mp-note{ background:var(--ap-dark-2); border-color:var(--ap-dark-sep); } }
+.mp-note b{ color:var(--fg); font-weight:var(--fw-semibold); }
+.mp-muted{ color:var(--fg-3); font-size:var(--fs-footnote); }
+.mp-foot{ margin-top:var(--space-16); border-top:1px solid var(--border); padding-top:var(--space-5);
+  font-size:var(--fs-footnote); line-height:var(--lh-footnote); color:var(--fg-3); }
+.mp-foot p + p{ margin-top:var(--space-2); }
+.mp-foot b{ color:var(--fg-2); font-weight:var(--fw-semibold); }
+@media (max-width:640px){
+  .mp-shell{ padding:0 var(--gutter-phone); }
+  .mp-sec{ padding:var(--space-6) var(--space-5); }
+}
+</style>
+</head>
+<body>
+<!-- SVG 图标符号库：与全站同一套 Lucide 描边图标（viewBox 24 / stroke 1.75） -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-chevron-right" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+<symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></symbol>
+<symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+<symbol id="i-sigma" viewBox="0 0 24 24"><path d="M18 7V5a1 1 0 0 0-1-1H6.5a.5.5 0 0 0-.4.8l4.5 6a2 2 0 0 1 0 2.4l-4.5 6a.5.5 0 0 0 .4.8H17a1 1 0 0 0 1-1v-2"/></symbol>
+<symbol id="i-scale" viewBox="0 0 24 24"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></symbol>
+<symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></symbol>
+<symbol id="i-arrow-up" viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></symbol>
+<symbol id="i-arrow-down" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
+<symbol id="i-trending-up" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></symbol>
+<symbol id="i-chevrons-down" viewBox="0 0 24 24"><polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+<symbol id="i-line-chart" viewBox="0 0 24 24"><line x1="3" y1="3" x2="3" y2="21"/><line x1="3" y1="21" x2="21" y2="21"/><polyline points="7 16 11 10 15 13 20 6"/></symbol>
+<symbol id="i-rss" viewBox="0 0 24 24"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></symbol>
+</defs></svg>
+
+<a class="skip-link" href="#main">跳到主要内容</a>
+
+<!-- 导航由 build_site.py 注入 site_render.nav_block()（占位符 __NAV__）。
+     2026-10-16 起不再在本文件写死导航：写死版本漂移出指向裸 XML 源的订阅入口，
+     导致方法论页右上角订阅直达源码（用户实锤）。导航是全站资产，
+     单一生产者 = site_render.nav_block()。 -->
+<!--__NAV__-->
+
+<main id="main" class="frame">
+<div class="mp-shell">
+
+  <p class="mp-nav"><a href="../"><svg class="ic" style="width:13px;height:13px" aria-hidden="true" focusable="false"><use href="#i-chevron-right"/></svg>返回首页 / Back to Home</a></p>
+
+  <header class="mp-head">
+    <h1 class="t-title1">研判方法论</h1>
+    <p class="sub">每日市场脉搏的全部结论由 daily-decision-engine 决策引擎按确定性流程产出：数据硬校验 → 代码化信号评分 → 专家圆桌对抗辩论 → Σ 评级。<br>
+    All conclusions are produced by a deterministic pipeline: validated data → code-computed signals → adversarial expert roundtable → Sigma rating.</p>
+  </header>
+
+  <section class="mp-sec" aria-labelledby="mp-pipeline">
+    <h2 id="mp-pipeline">决策引擎七步流水线 / Seven-Step Pipeline</h2>
+    <div class="mp-flow">
+      <span class="mp-step"><b>01</b>交易日判定</span>
+      <span class="mp-step"><b>02</b>数据采集（MCP）</span>
+      <span class="mp-step"><b>03</b>信号评分（代码）</span>
+      <span class="mp-step"><b>04</b>持仓解析</span>
+      <span class="mp-step"><b>05</b>硬校验</span>
+      <span class="mp-step"><b>06</b>专家研判 + 对抗辩论</span>
+      <span class="mp-step"><b>07</b>决策卡 + 台账落档</span>
+    </div>
+    <ol>
+      <li><b>交易日判定</b>：经交易日历确认目标日为 A 股交易日；非交易日静默结束，不产出。</li>
+      <li><b>数据采集</b>：行情、板块资金、涨跌分布、估值等全部经腾讯自选股 MCP（westock-mcp）实时获取，禁止写死数值或凭记忆填数。</li>
+      <li><b>信号评分</b>：S1-S6 六信号由代码计算并合入 verdict 字段，LLM 禁止手工调分。</li>
+      <li><b>持仓解析</b>：持仓与网格参数从本地记忆文件动态解析，代码与提示词中不写死任何持仓数据。</li>
+      <li><b>硬校验</b>：数据完整性断言任一失败即停产出，标注缺口清单，禁止带脏数据出报告。</li>
+      <li><b>专家研判</b>：六位虚拟专家（产业/信号/估值/逆向/财报/短线维度）多空对抗辩论，观点须引用当日数据。</li>
+      <li><b>决策卡落档</b>：结构化决策卡与观点台账归档，供后续准确率结算与连续错误熔断。</li>
+    </ol>
+  </section>
+
+  <section class="mp-sec" aria-labelledby="mp-signals">
+    <h2 id="mp-signals">S1-S6 确定性信号评分 / Signal Scoring</h2>
+    <p>六信号全部由代码计算，缺失信号自动从归一化权重中剔除；Σ 为加权求和，范围 [-1, +1]。</p>
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <caption>每维信号独立取值，权重公开；缺失即降权而非补零</caption>
+      <thead><tr>
+        <th scope="col">信号</th><th scope="col">维度</th>
+        <th scope="col" class="num">权重</th><th scope="col">输入口径</th><th scope="col">计算逻辑（简化）</th>
+      </tr></thead>
+      <tbody>
+        <tr><th scope="row" class="rowkey">S1</th><td>量能 Volume</td><td class="num">0.20</td><td>沪指量比（相对过去 5 日同时段归一化）</td><td class="num">clamp((量比-1.0)/0.8)</td></tr>
+        <tr><th scope="row" class="rowkey">S2</th><td>宽度 Breadth</td><td class="num">0.20</td><td>上涨占比、涨停/跌停家数</td><td class="num">宽度项 0.7 + 涨跌停项 0.3</td></tr>
+        <tr><th scope="row" class="rowkey">S3</th><td>动量 Momentum</td><td class="num">0.15</td><td>上证 vs MA5/MA20 + 20 日涨跌幅</td><td class="num">均线偏离 0.5+0.5 与 20 日涨幅平均</td></tr>
+        <tr><th scope="row" class="rowkey">S4</th><td>分化 Dispersion</td><td class="num">0.15</td><td>创业板指 + 科创50 均值 vs 沪深300</td><td class="num">clamp(价差/2.0)</td></tr>
+        <tr><th scope="row" class="rowkey">S5</th><td>资金 Flows</td><td class="num">0.15</td><td>板块主力净流入 TOP1 − 净流出 TOP1</td><td class="num">clamp(净差/50亿)</td></tr>
+        <tr><th scope="row" class="rowkey">S6</th><td>估值 Valuation</td><td class="num">0.15</td><td>沪深300 PE + 60 日涨跌幅（超跌代理）</td><td class="num">clamp((15−PE)/3 + 超跌项 0.5)</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="mp-note"><b>有效权重封顶规则（v1.2）</b>：有效权重 &lt; 0.50（过半信号缺失）时，评级强制封顶为「信号矛盾」并标记数据不足 —— 单一信号不得主导方向性结论。</p>
+  </section>
+
+  <section class="mp-sec" aria-labelledby="mp-tiers">
+    <h2 id="mp-tiers">Σ 评级五档 / Sigma Rating Tiers</h2>
+    <div class="tbl-wrap">
+    <table class="tbl">
+      <caption>颜色 + SVG 图标 + 箭头 + 文字四重编码，色觉障碍与灰度打印下均可辨</caption>
+      <thead><tr>
+        <th scope="col">评级</th><th scope="col" class="num">Σ 区间</th><th scope="col">操作含义</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="rating rating-offensive"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-trending-up"/></svg><span class="arrow">▲▲</span>进攻</span></td>
+          <td class="num">≥ +0.50</td>
+          <td>做多窗口：定投上浮 ≤20%、网格卖档上移、新增买入 ≤ 总仓位 5%</td>
+        </tr>
+        <tr>
+          <td><span class="rating rating-balanced"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow-up"/></svg><span class="arrow">▲</span>均衡</span></td>
+          <td class="num">+0.15 ~ +0.50</td>
+          <td>基准定投 + 网格原参数，不主动加减仓</td>
+        </tr>
+        <tr>
+          <td><span class="rating rating-conflict"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-shuffle"/></svg><span class="arrow">↔</span>信号矛盾</span></td>
+          <td class="num">-0.15 ~ +0.15</td>
+          <td>暂停主动买入；只列多空证据 + 明日待验证信号，禁止给方向</td>
+        </tr>
+        <tr>
+          <td><span class="rating rating-defensive"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-arrow-down"/></svg><span class="arrow">▼</span>防守</span></td>
+          <td class="num">-0.50 ~ -0.15</td>
+          <td>暂停主动买入、定投可降 ≤30%、只挂更低吸买单</td>
+        </tr>
+        <tr>
+          <td><span class="rating rating-avoid"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-chevrons-down"/></svg><span class="arrow">▼▼</span>回避</span></td>
+          <td class="num">≤ -0.50</td>
+          <td>定投暂停一期、浮亏 &gt;15% 品种分笔减 ≤1/3、防御仓再平衡</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="mp-muted">评级徽章采用颜色 + 图标 + 箭头 + 文字四重编码（色盲友好）。箭头只表方向强度，颜色仅区分档位，不与涨跌语义混淆。</p>
+    <p class="mp-note"><b>行情颜色惯例</b>：本站行情数字遵循中国市场惯例 <span style="color:var(--quote-up);font-weight:var(--fw-semibold)">红涨</span> / <span style="color:var(--quote-down);font-weight:var(--fw-semibold)">绿跌</span>，仅用于行情数值呈现；评级档位不用红绿表方向。</p>
+  </section>
+
+  <section class="mp-sec" aria-labelledby="mp-antiabuse">
+    <h2 id="mp-antiabuse">反滥用设计 / Anti-Abuse Design</h2>
+    <ul>
+      <li><b>代码计算 Σ</b>：Σ 由代码写入数据文件的 verdict 字段，报告引用必须原样呈现，禁止四舍五入或改述。</li>
+      <li><b>LLM 禁调分</b>：语言模型不得修改任何信号分值，研判文本只解释代码结论。</li>
+      <li><b>零编造</b>：数据缺失明确标注「数据缺口」并降级，禁止用代理指标伪装真实值。</li>
+      <li><b>信息隔离</b>：持仓数据不参与信号评分输入，避免禀赋效应污染方向判断。</li>
+      <li><b>观点台账</b>：全部历史观点归档结算，连续错误触发熔断降级。</li>
+    </ul>
+  </section>
+
+  <section class="mp-sec" aria-labelledby="mp-privacy">
+    <h2 id="mp-privacy">数据来源与隐私 / Data &amp; Privacy</h2>
+    <ul>
+      <li>数据来源：腾讯自选股 MCP（westock-mcp）实时采集的行情、板块资金、涨跌分布与估值数据。</li>
+      <li>数据时点：每期报告头部标注（竞价 / 盘中 / 收盘），不同时点的结论不可直接对比；缺少宽度口径标注时，Σ 值旁会显式提示不可跨时点比较。</li>
+      <li>隐私边界：公开版本报告仅包含市场数据、信号评分与方法论；个人持仓金额、成本、盈亏与账户信息在发布前经自动化脱敏流水线移除，并经红线门禁校验（零命中方可发布）。</li>
+    </ul>
+  </section>
+
+  <footer class="mp-foot">
+    <p><b>免责声明 / Disclaimer</b>：本站内容基于公开数据与量化分析生成，仅供参考，不构成投资建议。市场有风险，投资需谨慎。</p>
+    <p>Content is generated from public data and quantitative analysis, for reference only, not investment advice.</p>
+    <p>引擎版本：daily-decision-engine v1.3 · 数据截至 / Data as of __GENERATED_AT__</p>
+  </footer>
+
+</div>
+</main>
+</body>
+</html>

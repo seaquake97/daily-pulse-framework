@@ -1,0 +1,137 @@
+{
+  "$schema": "design-tokens-v2 / 增量提案",
+  "meta": {
+    "version": "2.0.0-proposal",
+    "date": "2026-10-16",
+    "author": "mvp-dev-expert-team-designer",
+    "scope": "仅列本轮新增/修改令牌。已存在且取值不变的令牌一律不列（完整清单见 design-tokens.json）。",
+    "layering": "沿用现有 LAYER 0 色板原语 --ap-* + 语义层 var() 引用模式。新令牌一律落在语义层，禁止新增第二套色板。",
+    "acceptance": "每个 new 令牌必须通过 test_dark_mode.py 的 D-1（浅色原语必须有深色覆写）与 D-2（深色前景对比度 >= 4.5:1）。",
+    "measured_on": "WCAG 2.1 相对亮度比，脚本实算，非估算。"
+  },
+
+  "philosophy": {
+    "D-1_四级表面": "画布 canvas / 抬升面 raised / 分隔 separator / 前景 foreground。深色下层级靠「明度递进」表达，不靠投影。同一层级内不得再分表面。",
+    "D-2_为何深色必须开斑马纹": "--ap-dark-sep-soft(#2c2c2e) 在纯黑画布上仅 1.51:1，跨 5 列宽表时读者无法把「第 N 行的数字」与「第 N 列表头」对应。浅色 --table-zebra 保持 none（Apple 官方从不用斑马纹），深色单独开——两套模式规则不同是有理由的，不是漏改。",
+    "D-3_结论三段式": "段1 评级·Σ（--fg）｜段2 标准动作（--fg-2）｜段3 关键事实（--fg-3）。三段必须互不同色，否则「不看正文知不知道今天该干什么」的目标落空。",
+    "D-4_代码块双层": "块级 pre 与行内 code 必须分属两个表面层级。浅色同值靠 hairline 区分，深色靠表面差区分。"
+  },
+
+  "tokens": [
+    {
+      "name": "--surface-raised",
+      "status": "new",
+      "light": "var(--ap-surface-alt)",
+      "light_hex": "#f5f5f7",
+      "dark": "var(--ap-dark-1)",
+      "dark_hex": "#1c1c1e",
+      "layer": "语义层 / 表面",
+      "usage": "时间线「日组」抬升面、详情页分组容器。承载「一组多条」的结构边界，不是单卡片。",
+      "contrast_vs_canvas": { "light": "1.09:1（浅色靠 hairline 分层，不靠表面）", "dark": "1.23:1 vs #000000" },
+      "why_not_hex": "直接引用 LAYER 0 原语，深色块无需重复定义，自动跟随主题切换。",
+      "consumed_by": ["site_blocks.css .issue", "detail-frame.css 深色斑马纹"]
+    },
+    {
+      "name": "--surface-sunken",
+      "status": "new",
+      "light": "var(--ap-surface-alt)",
+      "light_hex": "#f5f5f7",
+      "dark": "var(--ap-dark-2)",
+      "dark_hex": "#2c2c2e",
+      "layer": "语义层 / 表面",
+      "usage": "行内代码底色、深色下的次级填充。比 raised 再低一档，位于 raised 之上、canvas 之下。",
+      "contrast_vs_canvas": { "dark": "1.51:1 vs #000000；1.22:1 vs #1c1c1e（抬升面之上仍可辨）" },
+      "consumed_by": ["detail-frame.css 深色 .doc code"]
+    },
+    {
+      "name": "--separator-strong",
+      "status": "new",
+      "light": "var(--ap-hairline)",
+      "light_hex": "#d2d2d7",
+      "dark": "var(--ap-dark-sep)",
+      "dark_hex": "#38383a",
+      "layer": "语义层 / 描边",
+      "usage": "承担结构分隔职责的描边：表头下沿、KPI 分格、时间线组内行分隔。装饰性分隔仍用 --separator。",
+      "contrast_vs_canvas": { "dark": "1.79:1 vs #000000（UI 边界阈值为 3:1，此处仍不足，故表头文字另加 --table-head-fg 提亮，详见 design-tokens.css 既有取值）" },
+      "consumed_by": ["detail-frame.css 深色 th/td", "site_blocks.css 深色 .issue-head / .tl-item"]
+    },
+    {
+      "name": "--concl-fact-fg",
+      "status": "new",
+      "light": "var(--ap-ink-tertiary)",
+      "light_hex": "#6e6e73",
+      "dark": "var(--ap-dark-ink-3)",
+      "dark_hex": "#86868b",
+      "layer": "语义层 / 前景",
+      "usage": "结论三段式第 3 段「关键事实」。刻意弱于第 2 段，构成三档权重。",
+      "contrast": { "light_on_white": "5.07:1", "dark_on_black": "5.80:1", "dark_on_raised": "4.70:1 vs #1c1c1e" },
+      "consumed_by": ["site_blocks.css .tl-sum .concl-fact"]
+    },
+    {
+      "name": "--concl-sep",
+      "status": "new",
+      "light": "var(--ap-hairline)",
+      "light_hex": "#d2d2d7",
+      "dark": "var(--ap-dark-sep)",
+      "dark_hex": "#38383a",
+      "layer": "语义层 / 描边",
+      "usage": "结论三段式之间的 1px 竖分隔符。深色下 1.79:1 不足以承担结构职责，故配合 opacity 抬升（见 DESIGN-SYSTEM-v2 D-3）。",
+      "consumed_by": ["site_blocks.css .tl-sum .concl-sep"]
+    },
+    {
+      "name": "--code-block-bg",
+      "status": "new",
+      "light": "var(--ap-surface-alt)",
+      "light_hex": "#f5f5f7",
+      "dark": "var(--panel-bg)",
+      "dark_hex": "#1c1c1e",
+      "layer": "语义层 / 表面",
+      "usage": "块级代码 pre 的底色。深色下与行内 code 拉开一档，避免整段代码与正文融成一片。",
+      "consumed_by": ["detail-frame.css .doc pre"]
+    },
+    {
+      "name": "--code-block-border",
+      "status": "new",
+      "light": "var(--ap-hairline-soft)",
+      "light_hex": "#e8e8ed",
+      "dark": "var(--ap-dark-sep)",
+      "dark_hex": "#38383a",
+      "layer": "语义层 / 描边",
+      "usage": "块级代码 pre 的 1px 描边。浅色下 pre 与行内 code 同为 #f5f5f7，靠这根 hairline 分层。",
+      "consumed_by": ["detail-frame.css .doc pre"]
+    }
+  ],
+
+  "modified_existing": [
+    {
+      "name": "--table-zebra",
+      "current_light": "none",
+      "current_dark": "none（未定义覆写 = 沿用 none）",
+      "proposed_dark": "var(--surface-raised)",
+      "status": "modified",
+      "finding": "令牌已存在但零消费者 —— 声明了从不生效。本轮起被 detail-frame.css 深色斑马纹真正消费。",
+      "note": "浅色必须保持 none。Apple 表格从不斑马纹，改浅色等于违背 Apple 语言。"
+    },
+    {
+      "name": "--card-bg",
+      "current_dark": "var(--ap-black)",
+      "status": "keep-as-is",
+      "finding": "深色下 --card-bg == --bg == #000000，这是「时间线卡片纯黑无区分」的根因。",
+      "decision": "不改。--card-bg 等于画布是刻意的：Apple 深色模式不给列表行做卡片，靠 hairline 分组。把 --card-bg 改成 #1c1c1e 会让每个 chip/tag 都变成卡片，破坏零卡片节奏。本轮改在「日组」这一层加抬升，而非在 --card-bg 全局抬升。"
+    },
+    {
+      "name": "--fg-muted",
+      "current_dark": "#6e6e73",
+      "measured": "3.36:1 on #1c1c1e（抬升面）/ 4.14:1 on #000000（画布）",
+      "status": "keep-as-is",
+      "finding": "在抬升面上跌破 4.5:1 正文阈值。",
+      "decision": "保留但收紧适用范围：仅限 >=17px 非关键文本与占位符，禁止用于任何承载结论或数值的文本。已写入 DESIGN-SYSTEM-v2 D-1 使用禁区。"
+    }
+  ],
+
+  "not_added": [
+    { "candidate": "rgba 白 3% 斑马纹", "reason": "在纯黑上等价于 #0f0f0f，是「自造第五级表面」，破坏四级契约。改用 --surface-raised (#1c1c1e)，即 Apple 官方深色 inset list 取值。" },
+    { "candidate": "深色阴影 token", "reason": "纯黑画布上阴影不可见，Apple 深色靠明度递进而非投影。新增阴影 token 是反模式。" },
+    { "candidate": "深色渐变 token", "reason": "全站 0.25:1 渐变禁令，任何模式都禁止。" }
+  ]
+}

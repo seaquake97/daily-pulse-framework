@@ -1,0 +1,123 @@
+# report_contract.yaml — 五任务报告章节契约（GAP-A2）
+
+# 用途：把「每个任务必须有哪些章节、叫什么、什么顺序」固化为机器可检的契约。
+# 这是「风格不一致」的**上游治理**——过去五个任务各写各的章节名与编号体系，
+# 渲染层无法稳定映射区块，只能靠正则猜测，于是每页长得都不一样。
+#
+# 语义标签（semantic）是关键：章节标题可以变，但语义标签不可变。
+# 渲染层按 semantic 映射区块（verdict-card / disclaimer / data-source），
+# 标题措辞交给内容侧自由表达。
+
+meta:
+  version: "1.0"
+  authored: "2026-10-16"
+  basis: "基于 5 任务 × 最新产物的真实章节结构盘点"
+  numbering: "统一用「一、二、三」中文序号；禁止 emoji 装饰、禁止 '01' 阿拉伯序号"
+  h1: "由渲染层 build_page 注入规范标题，md 内首个 H1 会被剥离（勿重复写）"
+
+# 章节通用规则
+rules:
+  required_first_section: "结论/决策类章节必须是第一个 h2（读者首屏要看结论）"
+  verdict_keywords: ["结论卡", "核心决策", "决策卡"]     # 命中即渲染为 verdict-card
+  disclaimer_keywords: ["免责声明", "风险提示", "重要声明"]
+  data_source_keywords: ["数据源", "取数说明", "数据说明"]
+  forbidden:
+    - emoji_in_heading          # 标题禁 emoji（P0-1）
+    - version_suffix            # 禁 "— v1.3" 之类副标题
+    - empty_section             # 章节必须有正文
+    - level_jump                # 禁 h2 后直接 h4
+
+tasks:
+
+  stock-assistant:
+    label: "股票助手 · 早盘竞价研判"
+    stage: pre_open
+    required:
+      - semantic: verdict
+        title_pattern: "^[ ]*([一二三四五六七八九十]+、)?[ ]*(结论卡|核心结论|竞价结论)"
+        note: "竞价时点的核心判断"
+      - semantic: signals
+        title_pattern: "^(二、|三、)?(六信号|信号明细|评分依据)"
+        note: "六维信号得分与依据（由 compute_signals 计算，不得手写）"
+      - semantic: viewpoint_settlement
+        title_pattern: "(观点|兑现|台账).*(结算|兑现|四态)"
+      - semantic: holdings_actions
+        title_pattern: "(持仓|网格).*(诊断|动作|执行)"
+    optional:
+      - semantic: degraded_notice
+        title_pattern: "(连接器|数据源).*(提示|说明|降级)"
+      - semantic: foreign
+        title_pattern: "外盘"
+
+  fund-market:
+    label: "基金盘面分析 · 午盘"
+    stage: intraday
+    required:
+      - semantic: breadth
+        title_pattern: "(行情家数|涨跌分布|市场家数|结构统计)"
+      - semantic: sector_flow
+        title_pattern: "(板块|资金流)"
+      - semantic: holdings_breakdown
+        title_pattern: "(基金持仓|持仓穿透|标的.*(表现|明细))"
+    optional:
+      - semantic: foreign
+        title_pattern: "外盘"
+      - semantic: concentration
+        title_pattern: "(集中度|调仓)"
+
+  fund-guide:
+    label: "基金操作指引 · 尾盘"
+    stage: intraday
+    required:
+      - semantic: verdict
+        title_pattern: "(核心决策|结论卡|干预指令)"
+      - semantic: signals
+        title_pattern: "(信号|校验结果|六维)"
+      - semantic: holdings_actions
+        title_pattern: "(持仓诊断|调仓|操作指令)"
+      - semantic: viewpoint_settlement
+        title_pattern: "(观点|台账).*(结算|兑现|记录)"
+    optional:
+      - semantic: disclaimer
+        title_pattern: "(免责声明|风险提示)"
+
+  stock-review:
+    label: "股票复盘 · 收盘"
+    stage: close
+    required:
+      - semantic: verdict
+        title_pattern: "^(0?1、?)?(结论卡|核心结论)"
+      - semantic: expert_views
+        title_pattern: "(子专家|圆桌|多视角)"
+      - semantic: viewpoint_settlement
+        title_pattern: "(昨日观点|兑现|台账)"
+      - semantic: decision_cards
+        title_pattern: "决策卡"
+    optional:
+      - semantic: watchlist
+        title_pattern: "(后续关注|关注)"
+      - semantic: disclaimer
+        title_pattern: "(免责声明|风险提示)"
+
+  daily-review:
+    label: "每日总复盘 · 收盘汇总"
+    stage: close
+    required:
+      - semantic: verdict
+        title_pattern: "(结论卡|总结|汇总结论)"
+      - semantic: day_summary
+        title_pattern: "(当日|全日|汇总)"
+      - semantic: viewpoint_settlement
+        title_pattern: "(兑现|台账|结算)"
+    optional:
+      - semantic: holdings_actions
+        title_pattern: "(持仓|网格|动作)"
+      - semantic: disclaimer
+        title_pattern: "(免责声明|风险提示)"
+
+# 全局必备（所有任务）
+global_required:
+  - rating_consistency: "正文出现的评级必须与 market_data.json 的 verdict.rating 一致"
+  - sigma_consistency: "正文出现的 Σ 值必须与 verdict.sigma 一致（误差 <0.001）"
+  - eval_at: "写入 viewpoint.json 的观点必须带 eval_at（close/intraday/pre_open）"
+  - no_fabricated_action: "data_gaps 非空时，正文不得给出可执行动作指令"

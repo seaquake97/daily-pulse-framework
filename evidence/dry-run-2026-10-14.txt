@@ -1,0 +1,39 @@
+=== 收集到 5 个任务产出: 基金盘面分析, 股票助手, 基金操作指引, 股票复盘, 每日总复盘 ===
+    评级: 防守 Σ=-0.339 | 标题: 股票助手 · 2026-10-14（周三）盘中研判
+  [脱敏] fund-market.html: v3 742 处 + 加固 204 处 | 门禁 CLEAN
+  [脱敏] fund-market.md: v3 211 处 + 加固 97 处 | 门禁 CLEAN
+  [脱敏] stock-assistant.html: v3 173 处 + 加固 48 处 | 门禁 CLEAN
+  [脱敏] stock-assistant.md: v3 83 处 + 加固 32 处 | 门禁 CLEAN
+  [脱敏] fund-guide.md: v3 232 处 + 加固 122 处 | 门禁 CLEAN
+  [脱敏] stock-review.md: v3 174 处 + 加固 55 处 | 门禁 CLEAN
+  [脱敏] daily-review.html: v3 885 处 + 加固 112 处 | 门禁 CLEAN
+  [meta] rating=防守 tasks=5 | 本次发布 7 个产出文件
+  [聚合首页] ✅ 聚合页已生成: /Users/lianghaizhen/WorkBuddy/2026-10-14-10-29-45/github-ip-plan/_stage/docs/index.html（2 期日报）
+  [站点结构层] 站点结构层: 2 个日期页 / 1 周归档 / 1 月归档 / feed / sitemap / methodology
+
+=== dry-run 完成: 24 个文件已暂存至 /Users/lianghaizhen/WorkBuddy/2026-10-14-10-29-45/github-ip-plan/_stage/ ===
+  docs/daily/2026-10-13/daily-review.html
+  docs/daily/2026-10-13/fund-guide.md
+  docs/daily/2026-10-13/fund-market.html
+  docs/daily/2026-10-13/fund-market.md
+  docs/daily/2026-10-13/index.html
+  docs/daily/2026-10-13/meta.json
+  docs/daily/2026-10-13/stock-assistant.html
+  docs/daily/2026-10-13/stock-assistant.md
+  docs/daily/2026-10-13/stock-review.md
+  docs/daily/2026-10-14/daily-review.html
+  docs/daily/2026-10-14/fund-guide.md
+  docs/daily/2026-10-14/fund-market.html
+  docs/daily/2026-10-14/fund-market.md
+  docs/daily/2026-10-14/index.html
+  docs/daily/2026-10-14/meta.json
+  docs/daily/2026-10-14/stock-assistant.html
+  docs/daily/2026-10-14/stock-assistant.md
+  docs/daily/2026-10-14/stock-review.md
+  docs/index.html
+  docs/weekly/2026-W42/index.html
+  docs/monthly/2026-10/index.html
+  docs/feed.xml
+  docs/sitemap.xml
+  docs/methodology/index.html
+（dry-run 模式：未推送。加 --push 查看 MCP 推送指令）

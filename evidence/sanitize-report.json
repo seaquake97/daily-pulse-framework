@@ -1,0 +1,1142 @@
+{
+  "files": [
+    {
+      "source": "/Users/lianghaizhen/WorkBuddy/2026-10-14-10-29-45/github-ip-plan/_stage/docs/daily/2026-10-16/daily-review.html",
+      "total": 112,
+      "counts": {
+        "emoji": 11,
+        "emoji-kept": 2,
+        "gradient": 18,
+        "heading": 1,
+        "icon": 2,
+        "style": 51,
+        "token": 1,
+        "unmapped-color": 26
+      },
+      "changes": [
+        {
+          "kind": "gradient",
+          "detail": "<style>: linear-gradient → var(--surface-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "gradient",
+          "detail": "<style>: radial-gradient → var(--surface-sunken)",
+          "count": 1
+        },
+        {
+          "kind": "gradient",
+          "detail": "<style>: linear-gradient → var(--surface-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "gradient",
+          "detail": "<style>: radial-gradient → var(--surface-sunken)",
+          "count": 1
+        },
+        {
+          "kind": "gradient",
+          "detail": "<style>: linear-gradient → var(--surface-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "gradient",
+          "detail": "<style>: radial-gradient → var(--surface-sunken)",
+          "count": 1
+        },
+        {
+          "kind": "gradient",
+          "detail": "<style>: linear-gradient → var(--surface-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "gradient",
+          "detail": "<style>: radial-gradient → var(--surface-alt)（明度判别不确定，建议人工确认）",
+          "count": 1
+        },
+        {
+          "kind": "gradient",
+          "detail": "<style>: linear-gradient → var(--surface-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "gradient",
+          "detail": "<style>: radial-gradient → var(--surface-sunken)",
+          "count": 1
+        },
+        {
+          "kind": "gradient",
+          "detail": "<style>: linear-gradient → var(--surface-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "gradient",
+          "detail": "<style>: radial-gradient → var(--surface-alt)（明度判别不确定，建议人工确认）",
+          "count": 1
+        },
+        {
+          "kind": "gradient",
+          "detail": "<style>: linear-gradient → var(--surface-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "gradient",
+          "detail": "<style>: linear-gradient → var(--surface-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "gradient",
+          "detail": "<style>: linear-gradient → var(--surface-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "gradient",
+          "detail": "<style>: linear-gradient → var(--surface-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "gradient",
+          "detail": "<style>: linear-gradient → var(--surface-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "gradient",
+          "detail": "<style>: linear-gradient → var(--surface-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "style属性 → background:var(--rating-offensive-wash);color:var(--quote-up);border:1",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "style属性: #D1FAE5",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "style属性: #059669",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "style属性: #6EE7B7",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-on-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-on-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: background → var(--warn)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-on-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: background → var(--surface-sunken)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: border → 2px solid var(--warn)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: #1F1912",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-on-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: border → 2px solid var(--warn)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: #2D0F0F",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: #FCA5A5",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: border-color → var(--quote-up)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: #0D261A",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-on-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: border-color → var(--quote-down)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-on-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-on-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(0,0,0,0.6)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-on-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-on-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-on-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-on-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(255, 255, 255, 0.08)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(255, 255, 255, 0.15)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(217, 119, 6, 0.3)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-on-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: border → 1px solid var(--warn)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(220, 38, 38, 0.3)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: #FCA5A5",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: border-color → var(--quote-up)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(16, 185, 129, 0.3)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-on-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: border-color → var(--quote-down)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-on-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--quote-up)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: #34D399",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(255, 255, 255, 0.12)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--quote-up)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: #34D399",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-3)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: border → 2px solid var(--warn)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: background → var(--rating-balanced-wash)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--warn)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: background → var(--rating-offensive-wash)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--quote-up)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: #DBEAFE",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: #1D4ED8",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: background → var(--rating-offensive-wash)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: #991B1B",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: #DBEAFE",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: #1E40AF",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: background → var(--rating-balanced-wash)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--warn)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: border → 2px solid var(--warn)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-on-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-on-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(217,119,6,0.22)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: border → 2px solid var(--warn)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-on-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --bg-primary → var(--surface)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --bg-card → var(--surface-alt)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --bg-elevated → var(--surface-alt)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --bg-warm → var(--rating-balanced-wash)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --text-primary → var(--fg)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: --text-secondary 的值 #374151",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: --text-muted 的值 #4B5563",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --accent → var(--warn)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --accent-light → var(--fg-on-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --accent-hover → var(--warn)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --border 收敛目标 --border 会与 design token 定义互环，保留原值（显式留痕，非静默）",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --border-light → var(--border)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --red → var(--quote-up)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: --green 的值 #059669",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "⚖️ → #i-scale",
+          "count": 1
+        },
+        {
+          "kind": "emoji-kept",
+          "detail": "♟️ (个人 IP 标识，白名单保留)",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "⚖️ → #i-scale",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "📈 → #i-trending-up (up)",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "📊 → #i-bar-chart",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "📉 → #i-trending-down (down)",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "⚠️ → #i-alert-triangle (warn)",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "⚠️ → #i-alert-triangle (warn)",
+          "count": 1
+        },
+        {
+          "kind": "emoji-kept",
+          "detail": "♟️ (个人 IP 标识，白名单保留)",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "👍 → #i-check",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "⭐ → #i-star",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "🔁 → #i-repeat",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "👀 → #i-eye",
+          "count": 1
+        },
+        {
+          "kind": "heading",
+          "detail": "h2 → h4（国防军工+4%领涨，国防军工走强，水泥+3%助攻）",
+          "count": 1
+        },
+        {
+          "kind": "icon",
+          "detail": "注入 symbol 子集 9 个: alert-triangle, bar-chart, check, eye, repeat, scale, star, trending-down, trending-up",
+          "count": 1
+        },
+        {
+          "kind": "icon",
+          "detail": "注入图标 CSS（.ic/.ic-20/.ic-24 尺寸 + .ic-wrap 行内对齐 + currentColor 描边）",
+          "count": 1
+        },
+        {
+          "kind": "token",
+          "detail": "注入缺失 Token 21 个: --ap-black, --ap-canvas, --ap-dark-1, --ap-dark-2, --ap-dark-ink, --ap-dark-ink-3, --ap-ink, --ap-ink-tertiary, --ap-surface-alt, --fg, --fg-3, --fg-on-inverse, --quote-down, --quote-up, --rating-balanced-wash, --rating-offensive-wash, --surface, --surface-alt, --surface-inverse, --surface-sunken, --warn",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "source": "/Users/lianghaizhen/WorkBuddy/2026-10-14-10-29-45/github-ip-plan/_stage/docs/daily/2026-10-16/fund-guide.html",
+      "total": 2,
+      "counts": {
+        "icon": 2
+      },
+      "changes": [
+        {
+          "kind": "icon",
+          "detail": "注入 symbol 子集 1 个: alert-triangle",
+          "count": 1
+        },
+        {
+          "kind": "icon",
+          "detail": "注入图标 CSS（.ic/.ic-20/.ic-24 尺寸 + .ic-wrap 行内对齐 + currentColor 描边）",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "source": "/Users/lianghaizhen/WorkBuddy/2026-10-14-10-29-45/github-ip-plan/_stage/docs/daily/2026-10-16/fund-market.html",
+      "total": 61,
+      "counts": {
+        "chart-static": 1,
+        "emoji": 9,
+        "emoji-kept": 1,
+        "gradient": 2,
+        "heading": 7,
+        "icon": 2,
+        "script": 3,
+        "style": 21,
+        "token": 1,
+        "unmapped-color": 13,
+        "unmapped-token": 1
+      },
+      "changes": [
+        {
+          "kind": "chart-static",
+          "detail": "环形图降级为静态 CSS 条形图（6 项，数据原样保留）",
+          "count": 1
+        },
+        {
+          "kind": "script",
+          "detail": "Tailwind Play CDN(1) → 内联预编译静态 CSS（16388 字节），样式能力等价",
+          "count": 1
+        },
+        {
+          "kind": "script",
+          "detail": "Chart.js CDN 与内联初始化已移除（1 块，数据已静态化）",
+          "count": 1
+        },
+        {
+          "kind": "script",
+          "detail": "清除图表库说明注释 1 处（对应脚本已移除，注释属悬空引用）",
+          "count": 1
+        },
+        {
+          "kind": "gradient",
+          "detail": "<style>: linear-gradient → var(--surface-alt)",
+          "count": 1
+        },
+        {
+          "kind": "gradient",
+          "detail": "<style>: radial-gradient → var(--surface-inverse)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "style属性 → font-size: 11px; color: var(--fg-3); font-weight: 500;",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "style属性 → font-size: 16px; font-weight: 800; color: var(--fg); font-family: 'Jet",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "style属性 → background-color: var(--quote-up)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "style属性 → width: 27.41%; background-color: var(--quote-up)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "style属性 → background-color: var(--warn)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "style属性 → width: 7.33%; background-color: var(--warn)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "style属性 → background-color: var(--accent)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "style属性 → width: 9.36%; background-color: var(--accent)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "style属性 → background-color: var(--quote-down)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "style属性 → width: 6.73%; background-color: var(--quote-down)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "style属性 → background-color: var(--accent)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "style属性 → width: 5.35%; background-color: var(--accent)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "style属性 → background-color: var(--fg-3)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "style属性 → width: 50.39%; background-color: var(--fg-3)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: border → 0 solid var(--border)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-3)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg-3)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(251,191,36,.3)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(16,185,129,.3)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(251,191,36,.2)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(255,251,235,.5)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(245,158,11,.1)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(245,158,11,.2)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(239,246,255,.5)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(59,130,246,.1)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(16,185,129,.2)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(248,250,252,.6)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(146,64,14,.9)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(30,64,175,.9)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: rgba(248,250,252,.8)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--fg)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: background → var(--surface)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: border → 1px solid var(--border)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: border-color → var(--border)",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "📅 → #i-calendar",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "🎯 → #i-target",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "👤 → #i-user",
+          "count": 1
+        },
+        {
+          "kind": "emoji-kept",
+          "detail": "🍜 (个人 IP 标识，白名单保留)",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "⚠️ → #i-alert-triangle (warn)",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "🏆 → #i-award",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "💡 → #i-lightbulb",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "⚠️ → #i-alert-triangle (warn)",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "🛑 → #i-ban",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "🎯 → #i-target",
+          "count": 1
+        },
+        {
+          "kind": "heading",
+          "detail": "h1 → h3（基金每日盘面分析与持仓穿透报告）",
+          "count": 1
+        },
+        {
+          "kind": "heading",
+          "detail": "h2 → h4（A 股全场行情结构快照）",
+          "count": 1
+        },
+        {
+          "kind": "heading",
+          "detail": "h2 → h4（外盘企稳校验与主力异动）",
+          "count": 1
+        },
+        {
+          "kind": "heading",
+          "detail": "h2 → h4（基金持仓穿透与板块集中度诊断）",
+          "count": 1
+        },
+        {
+          "kind": "heading",
+          "detail": "h3 → h4（组合穿透十大重仓股票（个股层级实时行情与市值贡献））",
+          "count": 1
+        },
+        {
+          "kind": "heading",
+          "detail": "h2 → h4（组合各标的预估表现明细（11只标的全景））",
+          "count": 1
+        },
+        {
+          "kind": "heading",
+          "detail": "h2 → h4（集中度诊断与调仓可行性深度评估（养基宝调性））",
+          "count": 1
+        },
+        {
+          "kind": "icon",
+          "detail": "注入 symbol 子集 7 个: alert-triangle, award, ban, calendar, lightbulb, target, user",
+          "count": 1
+        },
+        {
+          "kind": "icon",
+          "detail": "注入图标 CSS（.ic/.ic-20/.ic-24 尺寸 + .ic-wrap 行内对齐 + currentColor 描边）",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-token",
+          "detail": "--tw-shadow-color 被引用但 design-tokens.css 无定义，无法注入（保持悬空）",
+          "count": 1
+        },
+        {
+          "kind": "token",
+          "detail": "注入缺失 Token 22 个: --accent, --ap-black, --ap-blue, --ap-canvas, --ap-dark-1, --ap-dark-2, --ap-dark-ink, --ap-dark-ink-3, --ap-dark-sep, --ap-hairline, --ap-ink, --ap-ink-tertiary, --ap-surface-alt, --border, --fg, --fg-3, --quote-down, --quote-up, --surface, --surface-alt, --surface-inverse, --warn",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "source": "/Users/lianghaizhen/WorkBuddy/2026-10-14-10-29-45/github-ip-plan/_stage/docs/daily/2026-10-16/stock-assistant.html",
+      "total": 41,
+      "counts": {
+        "emoji": 1,
+        "heading": 6,
+        "icon": 2,
+        "style": 28,
+        "token": 1,
+        "unmapped-color": 3
+      },
+      "changes": [
+        {
+          "kind": "style",
+          "detail": "<style>: background → var(--rating-balanced-wash)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: border → 1px solid var(--rating-balanced-wash)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--warn)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--quote-up)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--quote-up)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: #f5f5f4",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: background → var(--rating-offensive-wash)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--quote-up)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: border → 1px solid var(--rating-offensive-wash)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: background → var(--surface-alt)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: #4b5563",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: border → 1px solid var(--border)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: background → var(--rating-balanced-wash)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: color → var(--warn)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: border → 1px solid var(--rating-balanced-wash)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: background → var(--surface-alt)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --up → var(--quote-up)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --up-bg → var(--rating-offensive-wash)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --up-border → var(--rating-offensive-wash)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --down → var(--quote-down)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --down-bg → var(--rating-defensive-wash)",
+          "count": 1
+        },
+        {
+          "kind": "unmapped-color",
+          "detail": "<style>: --down-border 的值 #bbf7d0",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --flat → var(--fg-3)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --amber → var(--warn)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --amber-bg → var(--rating-balanced-wash)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --amber-border → var(--rating-balanced-wash)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --ink → var(--fg)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --sub → var(--fg-3)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --line → var(--border)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --bg → var(--surface-alt)",
+          "count": 1
+        },
+        {
+          "kind": "style",
+          "detail": "<style>: 自定义属性 --card → var(--surface)",
+          "count": 1
+        },
+        {
+          "kind": "emoji",
+          "detail": "⚠️ → #i-alert-triangle (warn)",
+          "count": 1
+        },
+        {
+          "kind": "heading",
+          "detail": "h1 → h3（股票助手 · 集合竞价全景研判）",
+          "count": 1
+        },
+        {
+          "kind": "heading",
+          "detail": "h2 → h4（六确定性信号评分明细（代码计算））",
+          "count": 1
+        },
+        {
+          "kind": "heading",
+          "detail": "h2 → h4（昨日观点台账结算（四态追踪））",
+          "count": 1
+        },
+        {
+          "kind": "heading",
+          "detail": "h2 → h4（持仓诊断与网格动作执行卡）",
+          "count": 1
+        },
+        {
+          "kind": "heading",
+          "detail": "h2 → h4（决策卡七件套（可验证承诺））",
+          "count": 1
+        },
+        {
+          "kind": "heading",
+          "detail": "h2 → h4（明日待验证信号（收盘后跟踪））",
+          "count": 1
+        },
+        {
+          "kind": "icon",
+          "detail": "注入 symbol 子集 1 个: alert-triangle",
+          "count": 1
+        },
+        {
+          "kind": "icon",
+          "detail": "注入图标 CSS（.ic/.ic-20/.ic-24 尺寸 + .ic-wrap 行内对齐 + currentColor 描边）",
+          "count": 1
+        },
+        {
+          "kind": "token",
+          "detail": "注入缺失 Token 21 个: --ap-black, --ap-canvas, --ap-dark-1, --ap-dark-ink, --ap-dark-ink-3, --ap-dark-sep, --ap-hairline, --ap-ink, --ap-ink-tertiary, --ap-surface-alt, --border, --fg, --fg-3, --quote-down, --quote-up, --rating-balanced-wash, --rating-defensive-wash, --rating-offensive-wash, --surface, --surface-alt, --warn",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

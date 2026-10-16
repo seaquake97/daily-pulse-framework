@@ -1,0 +1,153 @@
+{
+  "files": [
+    {
+      "file": "2026-10-12/fund-market.html",
+      "date": "2026-10-12",
+      "slug": "fund-market",
+      "changed": true,
+      "actions": [
+        "A-5 摘除最小 sprite",
+        "C-14 交叉类: 无",
+        "A-7 标题移出 masthead",
+        "A-8 doc-meta",
+        "A-9 表格包裹 2",
+        "A-6 body 布局类过滤 3: max-w-6xl mx-auto space-y-6"
+      ]
+    },
+    {
+      "file": "2026-10-13/stock-assistant.html",
+      "date": "2026-10-13",
+      "slug": "stock-assistant",
+      "changed": true,
+      "actions": [
+        "A-5 摘除最小 sprite",
+        "C-14 交叉类: foot-brand",
+        "A-7 标题移出 masthead",
+        "A-8 doc-meta",
+        "A-9 表格包裹 3"
+      ]
+    },
+    {
+      "file": "2026-10-13/fund-market.html",
+      "date": "2026-10-13",
+      "slug": "fund-market",
+      "changed": true,
+      "actions": [
+        "A-5 摘除最小 sprite",
+        "C-14 交叉类: 无",
+        "A-7 标题移出 masthead",
+        "A-8 doc-meta",
+        "A-9 表格包裹 2",
+        "A-6 body 布局类过滤 3: max-w-6xl mx-auto space-y-6"
+      ]
+    },
+    {
+      "file": "2026-10-13/daily-review.html",
+      "date": "2026-10-13",
+      "slug": "daily-review",
+      "changed": true,
+      "actions": [
+        "A-5 摘除最小 sprite",
+        "C-14 交叉类: sub",
+        "A-7 标题移出 masthead",
+        "A-8 doc-meta",
+        "A-9 表格包裹 5"
+      ]
+    },
+    {
+      "file": "2026-10-14/stock-assistant.html",
+      "date": "2026-10-14",
+      "slug": "stock-assistant",
+      "changed": true,
+      "actions": [
+        "A-5 摘除最小 sprite",
+        "C-14 交叉类: 无",
+        "A-7 标题移出 masthead",
+        "A-8 doc-meta",
+        "A-9 表格包裹 2",
+        "A-9 评级徽章升级 1"
+      ]
+    },
+    {
+      "file": "2026-10-14/fund-market.html",
+      "date": "2026-10-14",
+      "slug": "fund-market",
+      "changed": true,
+      "actions": [
+        "A-5 摘除最小 sprite",
+        "C-14 交叉类: 无",
+        "A-7 标题移出 masthead",
+        "A-8 doc-meta",
+        "A-9 表格包裹 2",
+        "A-6 body 布局类过滤 3: max-w-6xl mx-auto space-y-6"
+      ]
+    },
+    {
+      "file": "2026-10-14/daily-review.html",
+      "date": "2026-10-14",
+      "slug": "daily-review",
+      "changed": true,
+      "actions": [
+        "A-5 摘除最小 sprite",
+        "C-14 交叉类: sub",
+        "A-7 标题移出 masthead",
+        "A-8 doc-meta",
+        "A-9 表格包裹 5"
+      ]
+    },
+    {
+      "file": "2026-10-15/stock-assistant.html",
+      "date": "2026-10-15",
+      "slug": "stock-assistant",
+      "changed": true,
+      "actions": [
+        "C-14 交叉类: 无",
+        "A-7 标题移出 masthead",
+        "A-8 doc-meta",
+        "A-9 表格包裹 2",
+        "A-9 评级徽章升级 1"
+      ]
+    },
+    {
+      "file": "2026-10-15/fund-market.html",
+      "date": "2026-10-15",
+      "slug": "fund-market",
+      "changed": true,
+      "actions": [
+        "A-5 摘除最小 sprite",
+        "C-14 交叉类: 无",
+        "A-7 标题移出 masthead",
+        "A-8 doc-meta",
+        "A-9 表格包裹 2",
+        "A-6 body 布局类过滤 3: max-w-6xl mx-auto space-y-6"
+      ]
+    },
+    {
+      "file": "2026-10-15/stock-review.html",
+      "date": "2026-10-15",
+      "slug": "stock-review",
+      "changed": true,
+      "actions": [
+        "A-5 摘除最小 sprite",
+        "C-14 交叉类: 无",
+        "A-7 标题移出 masthead",
+        "A-8 doc-meta",
+        "A-9 表格包裹 3",
+        "A-9 评级徽章升级 1"
+      ]
+    },
+    {
+      "file": "2026-10-15/daily-review.html",
+      "date": "2026-10-15",
+      "slug": "daily-review",
+      "changed": true,
+      "actions": [
+        "A-5 摘除最小 sprite",
+        "C-14 交叉类: sub",
+        "A-7 标题移出 masthead",
+        "A-8 doc-meta",
+        "A-9 表格包裹 5"
+      ]
+    }
+  ]
+}

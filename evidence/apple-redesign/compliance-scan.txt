@@ -1,0 +1,104 @@
+# 合规扫描 2026-10-16 20:55:58
+生成页面数: 9
+上游详情页数: 21（daily/*/ 下非 index.html）
+── 2. GRADIENT ──
+   linear/radial/conic-gradient: 0
+   background-image 残留:        0
+── 3. ZERO-JS ──
+   <script:        0
+   on*= 事件属性:   0
+   外部 http(s):0
+   javascript:      0
+── 4. LINE COUNT ──
+      165 scripts/build_site.py
+      296 scripts/site_theme.py
+      238 scripts/site_content.py
+      330 scripts/site_render.py
+      415 scripts/site_pages.py
+      162 scripts/site_components.css
+      1606 total
+── 5. 禁用项 ──
+   弹跳缓动:                9
+   紫粉渐变/靛蓝:            0
+   组件层裸 hex:            0
+   组件层彩色 border-left:    0
+   font-weight 800+:         0
+── 6. 深色模式 / 动效降级 / 断点 ──
+   prefers-color-scheme 块:  75
+   prefers-reduced-motion:   18
+   @media 总数:              184
+   @supports corner-shape:   27
+   saturate(180%) blur(20px):9
+   color-scheme meta:        9
+── 7. 栅格 / 行宽 / 交互蓝 ──
+   --container-max:980px:    9
+   --container-prose:680px:  9
+   --tl-gutter:92px:         9
+   浅色交互蓝 #0071e3:       9
+   深色交互蓝 #2997ff:       36
+   CJK tracking (非拉丁):    9
+   手写 -0.028em(应为0):     9
+── 8. 功能契约 ──
+   .tl-item[data-time][data-slug]:        84
+   .dp-card[data-date/-rating/-sigma]:     15
+   tag gap 双类（Σ 数据缺口）:108
+   tag-warn（统计口径不同）:      93
+   chip-pending（网页版待补齐）:  9
+   Σ 0.000 兜底(应为 0):        0
+   评级箭头冗余编码:            84
+   SVG symbol sprite:          381
+   内联 <use> 引用:            880
+── 9. 无信息量链接标签（应为 0）──
+   '阅读网页版': 0
+   'HTML 版': 0
+   '阅读 Markdown': 0
+   '阅读全文 / Read Full': 0
+── 10. 产物完整性 ──
+   _stage/docs/feed.xml: 3009 bytes
+   _stage/docs/sitemap.xml: 979 bytes
+   _stage/docs/index.html: 116518 bytes
+   _stage/docs/methodology/index.html: 77912 bytes
+   _stage/docs/weekly/2026-W42/index.html: 117468 bytes
+   _stage/docs/monthly/2026-10/index.html: 117464 bytes
+── 11. 上游详情页（daily 详情页，消毒前后对比基准）──
+   详情页数:                  21
+   <script 数:                0
+   gradient 数:               0
+   emoji 数（P0 口径）:        27
+   emoji 数（sanitizer 口径）: 51
+   sanitizer 漏检字符数:       0（P0 口径命中但 sanitizer EMOJI_PATTERN 未覆盖）码点: 无
+   裸 hex 数:                 2181
+     其中 <style> 层内:       1413（Token 定义层 + 注释；declaration 级非 #fff/#000 字面量须为 0，由组件/框架层分别度量）
+   <use> 引用数:              423
+   <symbol> 定义数:           966
+   <use> 悬空引用数:          0（引用无对应 symbol 定义）
+   逐页明细:  file | script | gradient | emoji(P0/san/gap) | hex | use/symbol | dangling
+     _stage/docs/daily/2026-10-12/fund-guide.html: 0 | 0 | 0/0/0 | 84 | 22/46 | 0
+     _stage/docs/daily/2026-10-12/fund-market.html: 0 | 0 | 0/0/0 | 84 | 16/46 | 0
+     _stage/docs/daily/2026-10-13/daily-review.html: 0 | 0 | 6/12/0 | 175 | 36/46 | 0
+     _stage/docs/daily/2026-10-13/fund-guide.html: 0 | 0 | 0/0/0 | 84 | 22/46 | 0
+     _stage/docs/daily/2026-10-13/fund-market.html: 0 | 0 | 0/0/0 | 84 | 16/46 | 0
+     _stage/docs/daily/2026-10-13/stock-assistant.html: 0 | 0 | 0/0/0 | 84 | 15/46 | 0
+     _stage/docs/daily/2026-10-13/stock-review.html: 0 | 0 | 0/0/0 | 84 | 27/46 | 0
+     _stage/docs/daily/2026-10-14/daily-review.html: 0 | 0 | 6/12/0 | 175 | 25/46 | 0
+     _stage/docs/daily/2026-10-14/fund-guide.html: 0 | 0 | 0/0/0 | 84 | 15/46 | 0
+     _stage/docs/daily/2026-10-14/fund-market.html: 0 | 0 | 0/0/0 | 84 | 16/46 | 0
+     _stage/docs/daily/2026-10-14/stock-assistant.html: 0 | 0 | 0/0/0 | 84 | 15/46 | 0
+     _stage/docs/daily/2026-10-14/stock-review.html: 0 | 0 | 0/0/0 | 84 | 14/46 | 0
+     _stage/docs/daily/2026-10-15/daily-review.html: 0 | 0 | 6/12/0 | 175 | 25/46 | 0
+     _stage/docs/daily/2026-10-15/fund-guide.html: 0 | 0 | 0/0/0 | 84 | 19/46 | 0
+     _stage/docs/daily/2026-10-15/fund-market.html: 0 | 0 | 0/0/0 | 84 | 16/46 | 0
+     _stage/docs/daily/2026-10-15/stock-assistant.html: 0 | 0 | 0/0/0 | 84 | 14/46 | 0
+     _stage/docs/daily/2026-10-15/stock-review.html: 0 | 0 | 0/0/0 | 84 | 19/46 | 0
+     _stage/docs/daily/2026-10-16/daily-review.html: 0 | 0 | 6/12/0 | 178 | 27/46 | 0
+     _stage/docs/daily/2026-10-16/fund-guide.html: 0 | 0 | 0/0/0 | 84 | 21/46 | 0
+     _stage/docs/daily/2026-10-16/fund-market.html: 0 | 0 | 3/3/0 | 115 | 26/46 | 0
+     _stage/docs/daily/2026-10-16/stock-assistant.html: 0 | 0 | 0/0/0 | 103 | 17/46 | 0
+   悬空 <use> 引用明细: 无
+   基线对比（2026-10-15 18:47:51，上游详情页消毒前基线（backend sanitizer 修复前快照，供对比消毒前后））:
+     script: 基线 13 → 当前 0（-13）
+     gradient: 基线 63 → 当前 0（-63）
+     emoji(P0): 基线 98 → 当前 27（-71）
+     sanitizer 漏检: 基线 2 → 当前 0（-2）
+     裸 hex: 基线 695 → 当前 2181（+1486）
+     悬空 use: 基线 0 → 当前 0（0）
