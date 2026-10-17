@@ -1,262 +1,251 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""rules.py — 持仓配置的校验规则集（纯标准库，零依赖）
+"""rules.py — 持仓配置校验规则集门面（纯标准库，零依赖）
 
 与 validate_config.py 的分工：本文件只回答「这份配置合不合规」，
-不含 CLI、不含文件 IO、不含 YAML 解析。规则集随契约版本（holdings.yaml 的 version）演进。
+不含 CLI、不含文件 IO、不含 YAML 解析。
 
-设计原则：
-  · 硬错误阻断流水线——配置错了还往下跑等于带病出报告
-  · 软警告提示但不放过——--strict 下也失败，供 CI 使用
-  · 每条错误必须带 location（哪一段哪一条），让用户能直接定位
-  · 每条硬错误都必须有反例测试，见 test_validate_config.py
+v2 变更（ADR-007 §2.2 / U1 / U6）
+--------------------------------
+结构从 v1 的三段（stocks / grid / funds）改为**双轨结构**：
+
+    version: 2
+    profile / risk / cash
+    holdings:
+      stock: { positions, grid }     场内可交易标的，可网格可做 T
+      fund:  { positions, plans }    场外基金，禁网格键
+      gold                          实物/积存金，单列不进 fund
+
+**不保留 v1 读取能力。** 这是有意的取舍，不是省事：
+  · v1 的 funds 段允许 asset_class=gold 混在基金里，与「基金轨只收场外基金」
+    的判据直接冲突；若同时支持两版，校验器就得为 gold 在两套结构里各写一次
+    统计分支，同一条规则两份实现，漂移就是静默故障；
+  · v1 没有 listing 字段，无法表达「这只到底是场内还是场外」。
+    而归属判据恰恰是 v2 的核心（由数据决定，不由代码硬编码）——
+    缺这个字段的 v1 配置在 v2 里根本无法无损升级；
+  · v1 已被 portfolio.yaml 取代，MEMORY.md 只是人工编辑的源文档
+    （ADR-007 §4：方向是 MEMORY.md → yaml 一次性迁移，此后 yaml 为准）。
+    保留一个正在退场的格式的读取能力，是纯负债。
+遇到 version:1 时直接报错并给出迁移路径，而不是「尽力猜着读」。
+
+模块划分（依赖严格单向，无环）：
+    codes -> rules_core -> rules_stock -> rules
+                       -> rules_fund  -> rules
 """
 from __future__ import annotations
 
-import re
+from rules_core import (
+    E_CASH, E_PROFILE, E_RISK, E_STRUCTURE, E_UNKNOWN_KEY, E_VERSION,
+    SCHEMA_VERSION, SUPPORTED_VERSIONS, Report, W_EMPTY,
+)
 
-# 契约版本（规则层的常量：rules 不依赖门面，门面 re-export 它）
-SCHEMA_VERSION = 1
+TOP_KEYS = ("version", "profile", "risk", "cash", "holdings")
+PROFILE_KEYS = ("owner", "base_currency", "mode", "note")
+RISK_KEYS = ("max_single_position_pct", "max_total_drawdown_pct",
+             "grid_step_pct_cap", "fund_holding_days_min")
+CASH_KEYS = ("currency", "amount", "note")
 
-# 代码规范化统一走 codes.py —— 全框架唯一实现，与 parse_holdings.py 对齐。
-# 不在 rules.py 内重复定义，也不从 validate_config 回引（门面会回引本文件，
-# 形成循环导入；2026-10-16 实测会让整个测试套件 ImportError）。
-from codes import code_mismatch, normalize_code
-
-
-# ---------------------------------------------------------------------------
-class Report:
-    def __init__(self) -> None:
-        self.errors: list = []
-        self.warnings: list = []
-
-    def err(self, loc: str, msg: str, hint: str = "") -> None:
-        self.errors.append({"level": "error", "location": loc, "message": msg, "hint": hint})
-
-    def warn(self, loc: str, msg: str, hint: str = "") -> None:
-        self.warnings.append({"level": "warning", "location": loc, "message": msg, "hint": hint})
-
-    @property
-    def ok(self) -> bool:
-        return not self.errors
-
-
-# 注：market_of / normalize_code / code_mismatch 已移入 codes.py。
-# 保留副本会导致「同一规则两份实现」，一旦漂移就是静默故障——
-# 校验器说 ok 而实际取数打空。唯一实现比就近方便更重要。
+V1_MIGRATION_HINT = (
+    "检测到 v1 配置（三段 stocks/grid/funds）。v2 改为双轨结构："
+    "holdings.stock{positions,grid} 收场内标的，holdings.fund{positions,plans} "
+    "收场外基金，积存金移入 holdings.gold。"
+    "参考 config/portfolio.example.yaml 手工迁移，或用 "
+    "scripts/migrate_memory_to_portfolio.py 从 MEMORY.md 生成。"
+)
 
 
 def validate(cfg: dict, rep: Report) -> None:
+    """校验整份配置。rep 携带行号索引时错误带行号。"""
     if not isinstance(cfg, dict):
         rep.err("root", "配置根节点必须是映射（键值对）", "检查文件是否为空或格式错乱")
         return
 
     for key in cfg:
-        if key not in ("version", "profile", "market_data", "holdings", "snapshot"):
+        if key not in TOP_KEYS:
             rep.err(key, f"未知顶层键 '{key}'",
-                    "合法键：version / profile / market_data / holdings / snapshot")
-    if "version" not in cfg:
-        rep.err("version", "缺少必填键 version", f"当前契约版本应为 {SCHEMA_VERSION}")
-    elif cfg["version"] != SCHEMA_VERSION:
-        rep.err("version", f"version={cfg['version']!r} 与当前契约 {SCHEMA_VERSION} 不符",
-                "major 变更需运行迁移脚本，勿手改数字")
+                    f"合法键：{' / '.join(TOP_KEYS)}", E_UNKNOWN_KEY)
 
-    prof = cfg.get("profile")
-    if not isinstance(prof, dict):
-        rep.err("profile", "缺少必填段 profile（owner / base_currency）")
-    else:
-        if not prof.get("owner"):
-            rep.err("profile.owner", "owner 为空", "填你的标识，用于产物署名")
-        if prof.get("base_currency") != "CNY":
-            rep.err("profile.base_currency",
-                    f"base_currency={prof.get('base_currency')!r}，当前仅支持 CNY")
-        dp = prof.get("disclaimer_profile", "investing")
-        if dp not in ("investing", "personal"):
-            rep.err("profile.disclaimer_profile",
-                    f"disclaimer_profile={dp!r} 非法", "可选：investing / personal")
-
-    md = cfg.get("market_data")
-    if isinstance(md, dict):
-        if md.get("source", "westock-mcp") != "westock-mcp":
-            rep.err("market_data.source",
-                    "行情源必须为 westock-mcp",
-                    "框架铁律：行情只走 MCP，HTTP 爬虫不可作为主源")
-
-    hold = cfg.get("holdings")
-    if not isinstance(hold, dict):
-        rep.err("holdings", "缺少必填段 holdings（stocks / grid / funds）")
+    version = cfg.get("version")
+    if version is None:
+        rep.err("version", "缺少必填键 version",
+                f"当前契约版本应为 {SCHEMA_VERSION}", E_VERSION)
+        # 版本缺失时继续校验会产出一堆误导性错误（按 v2 结构去挑 v1 的键），
+        # 只补一条可执行的迁移提示后返回。
+        if any(k in cfg for k in ("holdings", "profile")):
+            rep.err("version", V1_MIGRATION_HINT, "", E_VERSION)
         return
-    for seg in ("stocks", "grid", "funds"):
-        if seg not in hold:
-            rep.err(f"holdings.{seg}", f"缺少必填段 {seg}（无内容请写 []）")
+    if version not in SUPPORTED_VERSIONS:
+        rep.err("version",
+                f"version={version!r} 不受支持（当前支持 {list(SUPPORTED_VERSIONS)}）",
+                "major 变更需迁移，勿手改数字", E_VERSION)
+        if version == 1:
+            rep.err("version", V1_MIGRATION_HINT, "", E_VERSION)
+        return
 
-    stocks = hold.get("stocks") or []
-    grid = hold.get("grid") or []
-    funds = hold.get("funds") or []
-    for name, arr in (("stocks", stocks), ("grid", grid), ("funds", funds)):
-        if not isinstance(arr, list):
-            rep.err(f"holdings.{name}", f"{name} 必须是列表", "无内容写 []，不要留空值")
+    _validate_profile(cfg.get("profile"), rep)
+    _validate_risk(cfg.get("risk"), rep)
+    _validate_cash(cfg.get("cash"), rep)
+    _validate_holdings(cfg.get("holdings"), rep)
 
-    if not stocks and not funds:
-        rep.warn("holdings", "股票与基金均为空",
-                 "引擎会降级为「仅大盘研判」，不产出持仓诊断")
 
-    # 股票
-    seen = {}
-    for i, s in enumerate(stocks if isinstance(stocks, list) else []):
-        loc = f"holdings.stocks[{i}]"
-        if not isinstance(s, dict):
-            rep.err(loc, "股票条目必须是映射"); continue
-        for k in ("code", "name", "shares", "cost"):
-            if k not in s or s[k] is None:
-                rep.err(f"{loc}.{k}", f"股票缺少必填字段 {k}")
-        code = s.get("code")
-        if code is not None:
-            norm = normalize_code(code)
-            if not re.fullmatch(r"(sh|sz|bj)\d{6}", norm):
-                rep.err(f"{loc}.code", f"code={code!r} 无法识别市场",
-                        "须为 6 位数字；ETF 用 6 位基金代码")
-            else:
-                if norm in seen:
-                    rep.err(f"{loc}.code", f"重复持仓 {norm}",
-                            f"与 holdings.stocks[{seen[norm]}] 冲突")
-                seen[norm] = i
-                bad = code_mismatch(code)
-                if bad:
-                    rep.err(f"{loc}.code", bad, "去掉前缀只填 6 位数字可避免此问题")
-        for k in ("shares", "available"):
-            v = s.get(k)
-            if v is not None and (not isinstance(v, int) or v < 0):
-                rep.err(f"{loc}.{k}", f"{k}={v!r} 必须是非负整数")
-        cost = s.get("cost")
-        if cost is not None and (not isinstance(cost, (int, float)) or cost < 0):
-            rep.err(f"{loc}.cost", f"cost={cost!r} 必须是非负数")
-        if s.get("shares", 0) == 0:
-            rep.warn(f"{loc}.shares", "持仓为 0",
-                     "已清仓请从配置删除，勿留 0 占用行情请求配额")
-        if s.get("available") and s.get("shares") and s["available"] > s["shares"]:
-            rep.err(f"{loc}.available",
-                    f"available={s['available']} > shares={s['shares']}",
-                    "可用份额不可能超过持仓份额")
+def _validate_profile(prof, rep: Report) -> None:
+    if not isinstance(prof, dict):
+        rep.err("profile", "缺少必填段 profile（owner / base_currency / mode）",
+                "mode=personal 表示自用存档", E_PROFILE)
+        return
+    for k in ("owner", "base_currency", "mode"):
+        if not prof.get(k):
+            rep.err(f"profile.{k}", f"profile 缺少必填字段 {k}", "", E_PROFILE)
+    if prof.get("base_currency") not in (None, "CNY"):
+        rep.err("profile.base_currency",
+                f"base_currency={prof.get('base_currency')!r}，当前仅支持 CNY",
+                "", E_PROFILE)
+    if prof.get("mode") not in (None, "personal", "publishing"):
+        rep.err("profile.mode", f"mode={prof.get('mode')!r} 非法",
+                "可选：personal（自用）/ publishing（对外发布）", E_PROFILE)
 
-    # 网格
-    gseen = {}
-    for i, g in enumerate(grid if isinstance(grid, list) else []):
-        loc = f"holdings.grid[{i}]"
+
+def _validate_risk(risk, rep: Report) -> None:
+    """风控参数段。ADR-007 §2.3：风控不撤，改为随建议下发，故必须有此段。"""
+    if risk is None:
+        rep.err("risk", "缺少必填段 risk",
+                "ADR-007 §2.3：风控参数随每条建议下发，不允许缺省", E_RISK)
+        return
+    if not isinstance(risk, dict):
+        rep.err("risk", "risk 必须是映射", "写成 {max_single_position_pct: 20}", E_RISK)
+        return
+    for k in risk:
+        if k not in RISK_KEYS:
+            rep.err(f"risk.{k}", f"未知键 '{k}'",
+                    f"本段合法键：{' / '.join(RISK_KEYS)}", E_UNKNOWN_KEY)
+    for k in ("max_single_position_pct", "max_total_drawdown_pct",
+              "grid_step_pct_cap"):
+        v = risk.get(k)
+        if v is None:
+            rep.err(f"risk.{k}", f"缺少必填字段 {k}",
+                    "风控参数不允许缺省：没有上限就等于没有风控", E_RISK)
+        elif isinstance(v, bool) or not isinstance(v, (int, float)) or not 0 < v <= 100:
+            rep.err(f"risk.{k}", f"{k}={v!r} 必须是 (0, 100] 的数值",
+                    "单位是百分比", E_RISK)
+    v = risk.get("fund_holding_days_min")
+    if v is None:
+        rep.err("risk.fund_holding_days_min",
+                "缺少必填字段 fund_holding_days_min",
+                "场外赎回费窗口的下限，天数", E_RISK)
+    elif isinstance(v, bool) or not isinstance(v, int) or not 0 <= v <= 3650:
+        rep.err("risk.fund_holding_days_min",
+                f"fund_holding_days_min={v!r} 必须是 0~3650 的整数", "", E_RISK)
+
+
+def _validate_cash(cash, rep: Report) -> None:
+    if cash is None:
+        rep.err("cash", "缺少必填段 cash", "写成 {currency: CNY, amount: 0}", E_CASH)
+        return
+    if not isinstance(cash, dict):
+        rep.err("cash", "cash 必须是映射", "", E_CASH)
+        return
+    for k in cash:
+        if k not in CASH_KEYS:
+            rep.err(f"cash.{k}", f"未知键 '{k}'",
+                    f"本段合法键：{' / '.join(CASH_KEYS)}", E_UNKNOWN_KEY)
+    if cash.get("currency") not in (None, "CNY"):
+        rep.err("cash.currency",
+                f"currency={cash.get('currency')!r}，当前仅支持 CNY", "", E_CASH)
+    amt = cash.get("amount")
+    if amt is None:
+        rep.err("cash.amount", "缺少必填字段 amount", "可用现金（元）", E_CASH)
+    elif isinstance(amt, bool) or not isinstance(amt, (int, float)) or amt < 0:
+        rep.err("cash.amount", f"amount={amt!r} 必须是非负数", "", E_CASH)
+
+
+def _validate_holdings(hold, rep: Report) -> None:
+    """调度双轨校验。两条轨的规则彼此独立，任一段缺失不阻断另一段——
+    允许「只做基金」或「只做股票」的用户，这也是框架被复用时的常见形态。"""
+    from rules_fund import validate_fund
+    from rules_stock import validate_stock
+    if not isinstance(hold, dict):
+        rep.err("holdings", "缺少必填段 holdings（stock / fund / gold）",
+                "无内容也要显式写出来", E_STRUCTURE)
+        return
+    for k in ("stock", "fund", "gold"):
+        if k not in hold:
+            rep.err(f"holdings.{k}", f"缺少必填段 {k}",
+                    "缺省写 {} 或 []，不要留空", E_STRUCTURE)
+    if isinstance(hold.get("stock"), dict):
+        validate_stock(hold.get("stock"), rep)
+    if isinstance(hold.get("fund"), dict):
+        validate_fund(hold.get("fund"), rep)
+    _validate_gold(hold.get("gold"), rep)
+
+    sp = (hold.get("stock") or {}).get("positions") or []
+    fp = (hold.get("fund") or {}).get("positions") or []
+    if not sp and not fp:
+        rep.warn("holdings", "股票轨与基金轨均为空",
+                 "引擎会降级为「仅大盘研判」，不产出持仓诊断", W_EMPTY)
+
+
+def _validate_gold(gold, rep: Report) -> None:
+    """积存金/实物黄金单列。
+
+    MEMORY.md 时代黄金靠「代码列为 - 且名称含黄金」被启发式识别成 GOLD，
+    这是隐式契约。v2 把它显式化为独立段，且**禁止混入 fund.positions**：
+    黄金不是基金，计入 fund_amount 会污染基金轨的统计口径与赎回窗口判断。
+    """
+    if gold is None:
+        # `gold:`（空值）与 `gold: []` 语义不同：前者是「写漏了」，
+        # 与 stock/fund 段「缺段 vs 空段」同一原则，必须报错而非放过。
+        rep.err("holdings.gold", "gold 段为空值",
+                "无黄金请显式写 gold: []", E_STRUCTURE)
+        return
+    if not isinstance(gold, list):
+        rep.err("holdings.gold", "gold 必须是列表", "无内容写 []")
+        return
+    for i, g in enumerate(gold):
+        loc = f"holdings.gold[{i}]"
         if not isinstance(g, dict):
-            rep.err(loc, "网格条目必须是映射"); continue
-        for k in ("code", "name", "enabled"):
-            if k not in g:
-                rep.err(f"{loc}.{k}", f"网格缺少必填字段 {k}")
-        norm = normalize_code(g.get("code", ""))
-        if g.get("code") is not None:
-            if not re.fullmatch(r"(sh|sz|bj)\d{6}", norm):
-                rep.err(f"{loc}.code", f"code={g.get('code')!r} 无法识别市场")
-            elif norm in gseen:
-                rep.err(f"{loc}.code", f"重复网格参数 {norm}",
-                        f"与 holdings.grid[{gseen[norm]}] 冲突")
-            else:
-                gseen[norm] = i
-                bad = code_mismatch(g.get("code", ""))
-                if bad:
-                    rep.err(f"{loc}.code", bad, "去掉前缀只填 6 位数字可避免此问题")
-        en = g.get("enabled")
-        if not isinstance(en, bool):
-            rep.err(f"{loc}.enabled", f"enabled={en!r} 必须是 true/false",
-                    "底仓长线持有写 false，不要留空")
-            en = False
-        rng = [g.get("range_low"), g.get("range_high")]
-        if en:
-            if None in rng:
-                rep.err(f"{loc}.range_low", "启用网格时必须同时给出 range_low 与 range_high")
-            elif rng[0] >= rng[1]:
-                rep.err(f"{loc}.range_low",
-                        f"区间非法：low={rng[0]} >= high={rng[1]}",
-                        "下沿必须严格小于上沿")
-            if g.get("base_price") is None:
-                rep.err(f"{loc}.base_price", "启用网格时必须给出 base_price")
-            elif rng[0] is not None and not (rng[0] <= g["base_price"] <= rng[1]):
-                rep.warn(f"{loc}.base_price",
-                         f"base_price={g['base_price']} 不在区间 "
-                         f"[{rng[0]}, {rng[1]}] 内",
-                         "基准价通常取区间中枢，越界说明参数未校准")
-            if g.get("step_pct") is None:
-                rep.err(f"{loc}.step_pct", "启用网格时必须给出 step_pct")
-            elif not (0 < g["step_pct"] <= 50):
-                rep.err(f"{loc}.step_pct", f"step_pct={g['step_pct']} 超出 (0, 50]")
-        else:
-            for k in ("range_low", "range_high", "step_pct"):
-                if g.get(k) is not None:
-                    rep.warn(f"{loc}.{k}",
-                             f"enabled=false 但仍设置了 {k}={g[k]!r}",
-                             "该值不会被引擎读取，确认是否漏改 enabled")
-        mn, mx = g.get("min_position"), g.get("max_position")
-        if isinstance(mn, int) and isinstance(mx, int) and mn > mx:
-            rep.err(f"{loc}.min_position",
-                    f"min_position={mn} > max_position={mx}", "底仓不应大于顶仓")
-        if norm and norm in seen and en:
-            sh = next((x for x in stocks if normalize_code(x.get("code", "")) == norm), None)
-            if sh and isinstance(mn, int) and mn > (sh.get("shares") or 0):
-                rep.warn(f"{loc}.min_position",
-                         f"min_position={mn} 超过当前持仓 {sh.get('shares')}",
-                         "网格会立即触发停卖，请确认参数")
-
-    # 基金
-    fseen = set()
-    fund_amount = gold_amount = 0.0
-    for i, f in enumerate(funds if isinstance(funds, list) else []):
-        loc = f"holdings.funds[{i}]"
-        if not isinstance(f, dict):
-            rep.err(loc, "基金条目必须是映射"); continue
-        if not f.get("name"):
-            rep.err(f"{loc}.name", "基金缺少必填字段 name")
-        ac = f.get("asset_class")
-        if ac not in ("fund", "gold"):
-            rep.err(f"{loc}.asset_class", f"asset_class={ac!r} 非法", "可选：fund / gold")
+            rep.err(loc, "黄金条目必须是映射")
             continue
-        code = f.get("code")
-        if ac == "fund":
-            if not code:
-                rep.err(f"{loc}.code", "asset_class=fund 时 code 必填（6 位基金代码）")
-            elif not re.fullmatch(r"\d{6}", str(code)):
-                rep.err(f"{loc}.code", f"code={code!r} 不是 6 位数字")
-            elif code in fseen:
-                rep.err(f"{loc}.code", f"重复基金 {code}")
-            else:
-                fseen.add(str(code))
-        amt = f.get("amount")
-        if amt is not None and (not isinstance(amt, (int, float)) or amt < 0):
-            rep.err(f"{loc}.amount", f"amount={amt!r} 必须是非负数")
-        elif isinstance(amt, (int, float)):
-            if ac == "gold":
-                gold_amount += amt
-            else:
-                fund_amount += amt
-        plan = f.get("plan")
-        if plan is not None and plan not in (
-                "regular", "smart", "smart_take_profit", "holding", "none"):
-            rep.err(f"{loc}.plan", f"plan={plan!r} 非法",
-                    "可选：regular / smart / smart_take_profit / holding / none")
-
-    if not rep.errors and not stocks and funds:
-        rep.err("holdings", "只有基金没有股票持仓",
-                "确认是否漏填 stocks 段")
+        for k in g:
+            if k not in ("name", "amount", "note"):
+                rep.err(f"{loc}.{k}", f"未知键 '{k}'",
+                        "本段合法键：name / amount / note", E_UNKNOWN_KEY)
+        if not g.get("name"):
+            rep.err(f"{loc}.name", "黄金条目缺少必填字段 name", "", E_REQUIRED)
+        amt = g.get("amount")
+        if amt is None:
+            rep.err(f"{loc}.amount", "缺少必填字段 amount", "", E_REQUIRED)
+        elif isinstance(amt, bool) or not isinstance(amt, (int, float)) or amt < 0:
+            rep.err(f"{loc}.amount", f"amount={amt!r} 必须是非负数", "", E_CASH)
 
 
 def build_summary(cfg: dict) -> dict:
+    """汇总视图，供 CLI 打印与 --export 使用。
+
+    track 字段是 v2 的关键增量：导出后每个标的都自带归属，
+    下游任务无需再靠「在哪个段里」反推轨道。
+    """
+    from codes import normalize_code
     hold = (cfg or {}).get("holdings") or {}
-    stocks = hold.get("stocks") or []
-    funds = hold.get("funds") or []
-    grid = hold.get("grid") or []
+    stock = hold.get("stock") or {}
+    fund = hold.get("fund") or {}
+    sp = [s for s in (stock.get("positions") or []) if isinstance(s, dict)]
+    grid = [g for g in (stock.get("grid") or []) if isinstance(g, dict)]
+    fp = [f for f in (fund.get("positions") or []) if isinstance(f, dict)]
+    gold = [g for g in (hold.get("gold") or []) if isinstance(g, dict)]
     return {
-        "stock_count": len(stocks),
-        "grid_enabled": len([g for g in grid if isinstance(g, dict) and g.get("enabled")]),
+        "schema_version": (cfg or {}).get("version"),
+        "stock_count": len(sp),
+        "grid_enabled": len([g for g in grid if g.get("enabled")]),
         "grid_total": len(grid),
-        "fund_count": len([f for f in funds if isinstance(f, dict)
-                           and f.get("asset_class") != "gold"]),
-        "fund_amount": round(sum(f.get("amount") or 0 for f in funds
-                                 if isinstance(f, dict) and f.get("asset_class") != "gold"), 2),
-        "gold_amount": round(sum(f.get("amount") or 0 for f in funds
-                                 if isinstance(f, dict) and f.get("asset_class") == "gold"), 2),
-        "codes": [normalize_code(s.get("code", "")) for s in stocks if isinstance(s, dict)],
+        "fund_count": len(fp),
+        "plan_count": len([p for p in (fund.get("plans") or []) if isinstance(p, dict)]),
+        "gold_count": len(gold),
+        "stock_amount": round(sum(
+            (s.get("shares") or 0) * (s.get("cost") or 0) for s in sp), 2),
+        "fund_amount": round(sum(f.get("amount") or 0 for f in fp), 2),
+        "gold_amount": round(sum(g.get("amount") or 0 for g in gold), 2),
+        "tracks": {
+            "stock": [normalize_code(s.get("code", "")) for s in sp],
+            "fund": [str(f.get("code", "")) for f in fp],
+        },
     }

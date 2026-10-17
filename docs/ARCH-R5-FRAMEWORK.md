@@ -34,7 +34,7 @@
 |------|---------|------|------|
 | 决策协议 | `SKILL.md` + `references/{signal-scoring,decision-card,forbidden-words,expert-roundtable}.md` + `templates/market_data.schema.json` | 6 | 纯文档 |
 | 决策脚本 | `compute_signals.py` `validate_market_data.py` `settle_viewpoints.py` | 3 | 纯标准库 |
-| 配置层（新增） | `config/schema.json` `config/holdings.example.yaml` `scripts/validate_config.py` `scripts/{yaml_min,rules,codes}.py` `scripts/test_validate_config.py` | 7 | 纯标准库 |
+| 配置层（新增） | `config/schema.json` `config/portfolio.example.yaml` `scripts/validate_config.py` `scripts/{yaml_min,yaml_emit,rules,rules_core,rules_stock,rules_fund,codes}.py` `scripts/test_validate_config.py` `scripts/test_migrate_portfolio.py` `scripts/migrate_memory_to_portfolio.py` | 11 | 纯标准库 |
 | 渲染层 | `render_md.py` + `md_render/{__init__,blocks,document,inline,meta}.py` | 5 | 纯标准库 |
 | 脱敏层 | `sanitizer/{__init__,core,emoji_inline,emoji_map,freshness,gradient_pass,heading_pass,html_utils,icon_pass,report,script_pass,style_pass,token_map,token_pass}.py` | 15 | 纯标准库 |
 | 站点结构层 | `build_site.py` `site_pages.py` `site_render.py` `site_content.py` `site_theme.py` `site_blocks.css` `site_components.css` `content_contract.py` `content_dictionary.py` | 9 | 纯标准库 |
@@ -64,11 +64,12 @@ validate_config.py  CLI 门面       -> codes / rules / yaml_min
 
 | 文件 | 内容 | 分发方式 |
 |------|------|---------|
-| `holdings.yaml` | `version` / `profile` / `market_data` / `holdings.{stocks,grid,funds}` / `snapshot` | 本地文件或私有仓 |
+| `config/portfolio.yaml` | `version` / `profile` / `risk` / `cash` / `holdings.{stock,fund,gold}` | 本地文件或私有仓（仓内只留 `.example.yaml`） |
 | `.env` 或 shell profile | 5 个环境变量（见 §7.1） | 本地 |
 | GitHub token | 发布凭证 | `GH_TOKEN_FILE` 指向的文件，权限最小化 |
 
-**`holdings.yaml` 是本框架唯一的新增「用户输入面」。** 其他一切都是框架或产物。
+**`config/portfolio.yaml` 是本框架唯一的新增「用户输入面」。** 其他一切都是框架或产物。
+换人复用框架时只替换这一个文件——这是「事实源单一」的直接收益。
 
 ### 1.3 用户产物（用户自己的输出，进内容仓）
 
@@ -96,54 +97,82 @@ MEMORY.md 三表能跑，但作为「可复用框架的配置契约」有四个�
 3. **人和框架混在一处**——MEMORY.md 同时装着个人画像、移民调研、协作铁律、品牌署名。别人 clone 框架仓不可能、也不应该拿到这些。
 4. **不可校验**——没有任何东西能告诉用户「你的最小底仓大于最大顶仓」。
 
-### 2.2 三段映射（与 MEMORY.md 逐列对齐）
+### 2.2 双轨映射（v2，与 MEMORY.md 逐列对齐）
 
-| MEMORY.md 表 | 配置段 | 列 → 字段 | 不进配置的原因 |
-|--------------|--------|-----------|--------------|
-| 股票持仓 | `holdings.stocks` | 标的→`name` 代码→`code` 持仓→`shares` 可用→`available` 成本→`cost` 状态/方向→`note` | 现价/市值/盈亏额/盈亏率/当日盈亏**全部不填**——它们是取数实时计算的变量，写进配置必然过期 |
-| 网格交易参数 | `holdings.grid` | 标的→`name` 证券代码→`code` 基准价→`base_price` **区间拆两列**→`range_low`+`range_high` 步长→`step_pct`（去 %） 单笔→`per_trade` 最小底仓→`min_position` 最大顶仓→`max_position` 指引→`guide` | **委托档位不填**——纯券商 UI 概念（卖二买二），与计算无关 |
-| 基金持仓 | `holdings.funds` | 标的→`name` 代码→`code` 金额→`amount` 备注→`note` 在途→`plan`（枚举化） | 持有收益/昨日收益/占纯基金比**不填**——属于 `snapshot`，每日刷新 |
+契约从 v1 的三段（`stocks` / `grid` / `funds`）改为**双轨结构**。依据是 ADR-007 §2.2：
+用户前提「基金没有挂单/条件单，没有中间态」**只对场外基金成立**——场内 ETF 有挂单，
+因此留在股票轨。归属由数据字段 `listing` 决定（`exchange` / `otc`），**不由代码硬编码**。
 
-三处关键设计决策：
+```
+version: 2
+profile / risk / cash
+holdings:
+  stock: { positions, grid }    场内可交易标的：个股 + 场内 ETF/LOF
+  fund:  { positions, plans }   场外基金：联接 / 场外指数 / QDII / 主动权益
+  gold                         实物/积存金，单列，不进 fund
+```
+
+| MEMORY.md 表 | v2 配置段 | 列 → 字段 | 不进配置的原因 |
+|--------------|-----------|-----------|--------------|
+| 股票持仓 | `holdings.stock.positions` | 标的→`name` 代码→`code` 持仓→`shares` 可用→`available` 成本→`cost` 状态/方向→`note` 隐式→`listing: exchange` | 现价/市值/盈亏额/盈亏率/当日盈亏**全部不填**——取数实时计算的变量，写进配置必然过期 |
+| 网格交易参数 | `holdings.stock.grid` | 标的→`name` 证券代码→`code`（剥 `sh`/`sz` 前缀）基准价→`base_price` **区间拆两列**→`range_low`+`range_high` 步长→`step_pct`（去 %）单笔→`per_trade` 最小底仓→`min_position` 最大顶仓→`max_position` 指引→`guide` 隐式→`listing: exchange` | **委托档位不填**——纯券商 UI 概念（卖二买二），与计算无关 |
+| 基金持仓 | `holdings.fund.positions` | 标的→`name` 代码→`code` 金额→`amount` 备注→`note` 定投方式→`plan` 隐式→`listing: otc` | 持有收益/昨日收益/占纯基金比**不填**——每日变量，属 `snapshot` |
+| 基金定投安排 | `holdings.fund.plans` | 代码→`code` 方式→`type` 每期金额→`amount_per_period`（浮动上限→`amount_per_period_max`） | 扣款日 MEMORY.md 未记载，一律留空——编造扣款日会算出不存在的执行日 |
+| 黄金（非基金） | `holdings.gold` | 名称→`name` 金额→`amount` | 黄金不是基金。混进 `fund.positions` 会污染基金轨统计口径与赎回窗口判断 |
+
+四处关键设计决策：
 
 - **非网格标的用 `enabled: false`，不从数组删除。** MEMORY.md 里江苏银行/中国广核/上海金三行是区间/步长均为 `-` 的底仓形态。删掉就丢了底仓上下限的留档。
 - **`step_pct` 存 `2.5` 而非 `2.5%`。** 百分号是展示层的事，配置层存纯数值。
-- **`asset_class: gold` 显式化。** MEMORY.md 里黄金靠「代码列为 `-` 且名称含黄金」被启发式识别成 `GOLD`——这是隐式契约，配置里必须显式声明。
+- **`listing` 必填且与所属段一致。** 校验器拒绝「`otc` 出现在 grid 段」「`exchange` 出现在 fund 段」两类错误。让归属留空等于把「这只到底是场内还是场外」重新变成隐式契约——那正是 MEMORY.md 时代「代码列填 `-`」的静默错位根源。
+- **`gold` 独立成段而非 `asset_class: gold`。** v1 靠枚举混在基金里，v2 把口径差异提到结构上。
+
+**双轨隔离的落地方式**：基金段禁一切网格键（`base_price` / `range_low` / `range_high` / `step_pct` / `per_trade` / `min_position` / `max_position`），且禁 `available`（可用量是挂单概念，场外申赎无此中间态）。违反报 `E_TRACK_GRID_KEY_IN_FUND` / `E_TRACK_OTC_IN_GRID`。
+
+**不保留 v1 读取能力。** v1 的 `funds` 允许 gold 混在基金里，与「基金轨只收场外基金」直接冲突；同时 v1 没有 `listing`，无法表达场内/场外归属，而归属判据正是 v2 的核心。缺这个字段的 v1 配置无法无损升级，因此遇到 `version: 1` 直接报错并给出迁移路径，而不是「尽力猜着读」。
 
 ### 2.3 校验规则清单
 
-完整 schema 见 `framework/config/schema.json`，实现见 `framework/scripts/validate_config.py`（29 个测试用例）。
+完整 schema 见 `framework/config/schema.json`，实现见 `framework/scripts/{validate_config,rules,rules_core,rules_stock,rules_fund}.py`（24 个测试用例）。所有诊断带**行号**与**稳定错误码**（`E_*` / `W_*`），CI 可按错误码断言，不解析文案。
 
 **硬错误（阻断流水线，退出码 1）**
 
-| 规则 | 位置 | 理由 |
-|------|------|------|
-| `version` 缺失或不等于 1 | `version` | 契约版本必须显式声明 |
-| 未知顶层键 | 根 | 防拼写错误静默生效 |
-| `base_currency != CNY` | `profile` | 当前只支持 CNY |
-| `market_data.source != westock-mcp` | `market_data` | 框架铁律：行情只走 MCP |
-| 股票/基金/网格段缺失 | `holdings.*` | 缺失与「空」语义不同，必须显式 `[]` |
-| 股票缺 `code`/`name`/`shares`/`cost` | `holdings.stocks[]` | 事实源最小集 |
-| 股票代码重复 | `holdings.stocks[]` | 同一标的只能一行 |
-| 市场前缀与代码段冲突 | `holdings.*.code` | 如 `sz600919`——写错前缀会让行情请求打空 |
-| `available > shares` | `holdings.stocks[]` | 可用不可能多于持仓 |
-| 启用网格但缺区间/基准价/步长 | `holdings.grid[]` | 缺参数无法算触发价 |
-| `range_low >= range_high` | `holdings.grid[]` | 区间反了 |
-| `min_position > max_position` | `holdings.grid[]` | 底仓大于顶仓 |
-| `asset_class=fund` 但缺 code | `holdings.funds[]` | 基金必须有 6 位代码 |
-| `asset_class` 非 fund/gold | `holdings.funds[]` | 枚举封闭 |
-| `plan` 非法枚举值 | `holdings.funds[]` | 同上 |
-| 重复键 / Tab 缩进 / 不支持语法 | 解析期 | 带行号报错，退出码 2 |
+| 规则 | 错误码 | 位置 | 理由 |
+|------|--------|------|------|
+| `version` 缺失或不等于 2 | `E_VERSION` | `version` | 契约版本必须显式声明；v1 直接拒绝并给迁移提示 |
+| 未知顶层键 / 段内未知键 | `E_UNKNOWN_KEY` | 任意段 | 防拼写错误静默生效 |
+| `base_currency != CNY` | `E_PROFILE` | `profile` | 当前只支持 CNY |
+| `risk` 段缺失或参数越界 | `E_RISK` | `risk` | 风控参数必须显式：没有上限等于没有风控 |
+| `cash.amount` 缺失或为负 | `E_CASH` | `cash` | 可用现金约束加仓建议 |
+| `stock`/`fund`/`gold` 段缺失或为空值 | `E_STRUCTURE` | `holdings.*` | 缺失与「空」语义不同，必须显式 `[]` |
+| **`otc` 标的出现在 `stock.grid`** | `E_TRACK_OTC_IN_GRID` | `holdings.stock.grid[]` | 双轨隔离：场外基金没有挂单与条件单，不存在日内中间态 |
+| **`exchange` 标的出现在 `fund.positions`** | `E_TRACK_OTC_IN_GRID` | `holdings.fund.positions[]` | 反向边界：场内 ETF/LOF 可挂单可网格 |
+| **基金段出现网格键** | `E_TRACK_GRID_KEY_IN_FUND` | `holdings.fund.*` | 网格键对场外基金无效（遍历网格键全集判定） |
+| **基金段出现 `available`** | `E_TRACK_GRID_KEY_IN_FUND` | `holdings.fund.positions[]` | 可用量是挂单概念，场外申赎无此中间态 |
+| `listing` 缺失或与所属段冲突 | `E_LISTING` | 两轨 `[]` | 归属必须由数据显式声明，不得隐式推断 |
+| 股票缺 `code`/`name`/`shares`/`cost` | `E_REQUIRED` | `holdings.stock.positions[]` | 事实源最小集 |
+| 股票代码重复 | `E_DUPLICATE` | `holdings.stock.positions[]` | 同一标的只能一行 |
+| 市场前缀与代码段冲突 | `E_CODE_PREFIX` | `holdings.*.code` | 如 `sz600919`——写错前缀会让行情请求打空 |
+| `available > shares` 或数量为负 | `E_RANGE` | `holdings.stock.positions[]` | 可用不可能多于持仓 |
+| 启用网格但缺区间/基准价/步长 | `E_GRID` | `holdings.stock.grid[]` | 缺参数无法算触发价 |
+| `range_low >= range_high` | `E_GRID` | `holdings.stock.grid[]` | 区间反了 |
+| `min_position > max_position` | `E_GRID` | `holdings.stock.grid[]` | 底仓大于顶仓 |
+| 基金缺 6 位 `code` | `E_REQUIRED` / `E_FUND` | `holdings.fund.positions[]` | 场外代码不带市场前缀 |
+| `plan`/`type` 非法枚举值 | `E_ENUM` | `holdings.fund.*` | 枚举封闭 |
+| `day_of_month` 越界（1~28） | `E_FUND` | `holdings.fund.plans[]` | 短月无 30/31 号，定投日必须可实现 |
+| 定投标的不在 `fund.positions` 中 | `E_FUND` | `holdings.fund.plans[]` | 无持仓的定投计划不参与计算 |
+| 重复键 / Tab 缩进 / 不支持语法 | 解析期 | — | 带行号报错，退出码 2 |
 
 **软警告（`--strict` 下也失败）**
 
-| 规则 | 理由 |
-|------|------|
-| `shares == 0` | 已清仓应删除，否则白占行情请求配额 |
-| `base_price` 不在区间内 | 参数未校准 |
-| `min_position` 超过实际持仓 | 网格会立即停卖 |
-| `enabled=false` 却仍设了区间 | 大概率漏改 `enabled` |
-| 股票与基金全空 | 会降级为「仅大盘研判」 |
+| 规则 | 错误码 | 理由 |
+|------|--------|------|
+| `shares == 0` | `W_ZERO_SHARES` | 已清仓应删除，否则白占行情请求配额 |
+| `base_price` 不在区间内 | `W_BASE_PRICE` | 参数未校准 |
+| `min_position` 超过实际持仓 | `W_MIN_POSITION` | 网格会立即停卖 |
+| `enabled=false` 却仍设了区间 | `W_NO_GRID_PARAMS` | 大概率漏改 `enabled` |
+| 网格标的不在 `stock.positions` 中 | `W_GRID_ORPHAN` | 无持仓的网格参数不参与计算 |
+| 两轨持仓全空 | `W_EMPTY` | 会降级为「仅大盘研判」 |
 
 ### 2.4 YAML 子集限制（重要，必须让用户知道）
 
@@ -158,7 +187,7 @@ MEMORY.md 三表能跑，但作为「可复用框架的配置契约」有四个�
 | int / float / bool / null | 非空流式集合 `[]` `{}`（空 `[]` 支持） |
 | `- key: value` 序列项内联首键 | 复杂键 `?` |
 
-**这是有意的取舍**：配置契约只需表达三段持仓结构，不值得为动态特性引入
+**这是有意的取舍**：配置契约只需表达双轨持仓结构，不值得为动态特性引入
 「写法正确但解析结果不符预期」的风险面。遇到不支持的语法时脚本**显式报行号**，
 不猜、不静默降级。
 
@@ -178,7 +207,7 @@ MEMORY.md 三表能跑，但作为「可复用框架的配置契约」有四个�
 ### 3.2 依赖方向（单向，不可逆）
 
 ```
-用户配置(holdings.yaml) ──┐
+用户配置(portfolio.yaml) ─┐
                           ├──> 框架资产 ──> 产物 ──> 用户内容仓
 westock-mcp(行情) ────────┘                     │
                                                 └──> (R6) 小程序只读消费
@@ -195,12 +224,12 @@ westock-mcp(行情) ────────┘                     │
 | 对象 | 版本位 | 变更影响 |
 |------|--------|---------|
 | 框架仓 | 语义化版本 | `MAJOR` = 配置契约不兼容；`MINOR` = 新增可选字段；`PATCH` = 修 bug |
-| `holdings.yaml` | `version` 字段（当前 `1`） | 校验器按此决定规则集；不匹配直接报错而非猜测 |
+| `config/portfolio.yaml` | `version` 字段（当前 `2`） | 校验器按此决定规则集；不匹配直接报错而非猜测。v1 不再支持读取 |
 | 决策协议 | `daily-decision-engine` 自带 `version`（当前 1.0.0，SKILL.md 内文提及 v1.3 顺序铁律） | 两者**独立版本**，框架不锁死协议版本，只声明依赖范围 |
 
 **破坏性变更清单**（改动任一项即为 MAJOR，必须提供迁移脚本）：
 
-1. `holdings.yaml` 删除或改名任何 required 字段
+1. `config/portfolio.yaml` 删除或改名任何 required 字段
 2. 改变代码市场前缀推断规则（会让存量配置的行情请求打空）
 3. 改变 `fund`/`gold` 的金额统计口径（影响站点展示的历史可比性）
 4. 改变 `plan` 枚举值（下游按枚举渲染）
@@ -287,9 +316,9 @@ daily-pulse-framework（新）
 | 步 | 操作 | 预计耗时 | 验证点 |
 |----|------|---------|--------|
 | 1 | `git clone` 框架仓 | 1 min | 目录含 `config/ scripts/ skills/ README.md LICENSE` |
-| 2 | `cp config/holdings.example.yaml holdings.yaml` | 10 s | 文件存在 |
-| 3 | 填三段持仓 | 10-20 min | 股票/基金 code 各 6 位；网格 `step_pct` 不带 % |
-| 4 | `python3 scripts/validate_config.py --config holdings.yaml --strict` | 5 s | **退出码 0**；非 0 必须先修 |
+| 2 | `cp config/portfolio.example.yaml config/portfolio.yaml` | 10 s | 文件存在 |
+| 3 | 填双轨持仓 | 10-20 min | `listing` 必填且与所属段一致；场内 code 6 位、场外 code 6 位不带前缀；网格 `step_pct` 不带 % |
+| 4 | `python3 framework/scripts/validate_config.py --config config/portfolio.yaml --strict` | 5 s | **退出码 0**；非 0 必须先修 |
 | 5 | 连 `westock-mcp` 连接器并授权 | 2-5 min | 能取到 `sh000001` 行情 |
 | 6 | 配 5 个环境变量 | 5 min | `PULSE_CONFIG` 等非空 |
 | 7 | 装 `daily-decision-engine` skill | 1 min | skill 可被加载 |
@@ -333,7 +362,7 @@ daily-pulse-framework（新）
 框架统一环境变量表（已在 SKILL.md §4 与 README 定义）：
 
 ```
-PULSE_CONFIG           # holdings.yaml
+PULSE_CONFIG           # config/portfolio.yaml（默认即此值）
 PULSE_WORK_ROOT        # 产物根
 PULSE_CONTENT_REPO     # 内容仓
 DECISION_ENGINE_MEMORY # 迁移期回退
@@ -388,4 +417,4 @@ GH_TOKEN_FILE          # GitHub token
 1. **采集三步补不补脚本？** 不补则框架不可复现（agent 行为随模型波动）；补则是主要工程量。倾向补。
 2. **内容仓是否允许公开？** 涉及个人持仓与收益数据泄露，建议私有。若要公开，须先做持仓脱敏（代码→脱敏别名）。
 3. **迁移期以谁为准？** 建议阶段 B/C 全程以 MEMORY.md 为准，yaml 只做校验与演练，避免双源打架。
-4. **是否要 `holdings.yaml` 支持多账户？** 当前 schema 单账户。多账户需在 `profile` 下加 `accounts[]` 并让各段带 `account` 字段——是 MAJOR 变更。
+4. **是否要 `portfolio.yaml` 支持多账户？** 当前 schema 单账户。多账户需在 `profile` 下加 `accounts[]` 并让各段带 `account` 字段——是 MAJOR 变更。

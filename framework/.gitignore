@@ -1,4 +1,9 @@
-# 持仓配置绝不能进公开仓
+# 持仓数据仓绝不能进公开仓（ADR-007 §4：yaml 为唯一事实源）
+# 真实数据只提交 example；仓里出现 portfolio.yaml 即为泄露个人持仓。
+portfolio.yaml
+portfolio.*.yaml
+!portfolio.example.yaml
+# 兼容 v1 命名（holdings.yaml 已被 portfolio.yaml 取代，保留忽略以防旧文件入库）
 holdings.yaml
 holdings.*.yaml
 !holdings.example.yaml

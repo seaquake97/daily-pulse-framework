@@ -125,20 +125,22 @@ def _tokenize(text: str) -> list:
     return out
 
 
-def _parse_block(lines: list, i: int, indent: int):
+def _parse_block(lines: list, i: int, indent: int, index: dict, prefix: str):
     """解析一个缩进块。返回 (value, next_index)。"""
     if i >= len(lines):
         return None, i
     if lines[i].text.startswith("- "):
-        return _parse_seq(lines, i, indent)
-    return _parse_map(lines, i, indent)
+        return _parse_seq(lines, i, indent, index, prefix)
+    return _parse_map(lines, i, indent, index, prefix)
 
 
-def _parse_seq(lines: list, i: int, indent: int):
+def _parse_seq(lines: list, i: int, indent: int, index: dict, prefix: str):
     items = []
     while i < len(lines) and lines[i].indent == indent and lines[i].text.startswith("- "):
         line = lines[i]
         body = line.text[2:].strip()
+        item_path = f"{prefix}[{len(items)}]"
+        index[item_path] = line.no
         if ":" in body and not (body.startswith(("\"", "'")) and body.count(":") > 0
                                 and body.index(":") > body.index(body[0])):
             # 序列项内联首个键：- key: value
@@ -147,12 +149,12 @@ def _parse_seq(lines: list, i: int, indent: int):
             while j < len(lines) and lines[j].indent > indent:
                 virtual.append(lines[j])
                 j += 1
-            val, _ = _parse_map(virtual, 0, indent + 2)
+            val, _ = _parse_map(virtual, 0, indent + 2, index, item_path)
             items.append(val)
             i = j
         else:
             if j_has_child(lines, i + 1, indent):
-                val, i = _parse_block(lines, i + 1, lines[i + 1].indent)
+                val, i = _parse_block(lines, i + 1, lines[i + 1].indent, index, item_path)
             else:
                 val, i = _scalar(body, line.no), i + 1
             items.append(val)
@@ -163,7 +165,7 @@ def j_has_child(lines: list, i: int, indent: int) -> bool:
     return i < len(lines) and lines[i].indent > indent
 
 
-def _parse_map(lines: list, i: int, indent: int):
+def _parse_map(lines: list, i: int, indent: int, index: dict, prefix: str):
     out = {}
     while i < len(lines) and lines[i].indent == indent:
         line = lines[i]
@@ -175,30 +177,44 @@ def _parse_map(lines: list, i: int, indent: int):
         key, rest = m.group(1).strip().strip("\"'"), (m.group(2) or "").strip()
         if key in out:
             raise ConfigError(f"第 {line.no} 行：重复键 '{key}'")
+        child = f"{prefix}.{key}" if prefix else key
+        index[child] = line.no
         if rest:
             out[key] = _scalar(rest, line.no)
             i += 1
         elif i + 1 < len(lines) and lines[i + 1].indent > indent:
-            out[key], i = _parse_block(lines, i + 1, lines[i + 1].indent)
+            out[key], i = _parse_block(lines, i + 1, lines[i + 1].indent, index, child)
         elif i + 1 < len(lines) and lines[i + 1].text.startswith("- ") \
                 and lines[i + 1].indent == indent:
-            out[key], i = _parse_seq(lines, i + 1, indent)
+            out[key], i = _parse_seq(lines, i + 1, indent, index, child)
         else:
             out[key], i = None, i + 1
     return out, i
 
 
 def parse_yaml_subset(text: str):
-    """把 holdings.yaml 文本解析成 dict。受限语法，非法即抛 ConfigError。"""
+    """把配置文件文本解析成 dict。受限语法，非法即抛 ConfigError。"""
+    value, _index = parse_yaml_subset_indexed(text)
+    return value
+
+
+def parse_yaml_subset_indexed(text: str):
+    """同 parse_yaml_subset，额外返回 路径 -> 行号 的索引。
+
+    错误必须带行号，否则用户拿到「holdings.stock.positions[3].shares 不是整数」
+    只能自己数行。索引在解析时顺带产出，不做第二遍扫描——
+    同一份文本只解析一次，也就不存在「两套解析器结论不一致」的可能。
+    """
     lines = _tokenize(text)
+    index: dict = {}
     if not lines:
-        return {}
-    value, consumed = _parse_block(lines, 0, lines[0].indent)
+        return {}, index
+    value, consumed = _parse_block(lines, 0, lines[0].indent, index, "")
     if consumed != len(lines):
         raise ConfigError(
             f"第 {lines[consumed].no} 行：缩进异常，无法解析（检查是否混用 Tab 或层级错位）"
         )
-    return value
+    return value, index
 
 
 # ---------------------------------------------------------------------------

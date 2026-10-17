@@ -35,7 +35,8 @@ TAG_RE = re.compile(r"<!--.*?-->|<(/?)([a-zA-Z][a-zA-Z0-9-]*)[^>]*?(/?)>", re.S)
 MINIMAL_YAML = (
     "name: minimal\n"
     "display_name: 最小可用策略\n"
-    "category: defensive\n"
+    "track: stock\n"
+            "category: defensive\n"
     "description: 只有必填字段，没有 principles\n"
     "rules:\n"
     "  - 规则A：跌破观察线分档买入\n"
@@ -43,7 +44,8 @@ MINIMAL_YAML = (
 NUMERIC_YAML = (
     "name: numeric\n"
     "display_name: 含数值字段策略\n"
-    "category: execution\n"
+    "track: stock\n"
+            "category: execution\n"
     "description: 步长字段应渲染为百分比\n"
     "step_ratio_default: 0.02\n"
     "rules:\n"
@@ -52,7 +54,8 @@ NUMERIC_YAML = (
 XSS_YAML = (
     "name: xss\n"
     "display_name: <script>alert(1)</script>\n"
-    "category: strategic\n"
+    "track: stock\n"
+            "category: strategic\n"
     "description: 属性值里带 \" 与 &\n"
     "holdings_mapped:\n"
     '  - "><img src=x>\n'
@@ -105,10 +108,17 @@ class RealStrategiesTest(unittest.TestCase):
             self.skipTest(f"真实策略目录缺失: {REAL_STRATEGY_DIR}")
         self.fragment = R.render_fragment(REAL_STRATEGY_DIR)
 
-    def test_three_cards_rendered(self):
-        self.assertEqual(self.fragment.count('<article class="strat-card"'), 3)
-        for name in ("six_networks", "grid_trading", "dividend_defensive"):
-            self.assertIn(f'id="strat-{name}"', self.fragment)
+    def test_all_strategy_cards_rendered(self):
+        """断言「目录里每个 yaml 都渲染出一张卡」，而非写死张数。
+
+        2026-10-17 双轨隔离新增 2 个基金轨策略后，写死 3 的断言开始说谎——
+        策略增减不该需要改测试，而测试漏检策略会让新增策略静默不上线。
+        """
+        yamls = sorted(REAL_STRATEGY_DIR.glob("*.yaml"))
+        self.assertGreaterEqual(len(yamls), 5)
+        self.assertEqual(self.fragment.count('<article class="strat-card"'), len(yamls))
+        for f in yamls:
+            self.assertIn(f'id="strat-{f.stem}"', self.fragment, f"策略 {f.name} 未渲染")
 
     def test_tags_balanced(self):
         self.assertEqual(_tag_errors(self.fragment), [])
@@ -117,11 +127,25 @@ class RealStrategiesTest(unittest.TestCase):
         self.assertEqual(P0_EMOJI_RE.findall(self.fragment), [])
 
     def test_category_grouping_and_order(self):
-        heads = re.findall(r'<div class="strat-group" data-category="([a-z]+)"',
-                           self.fragment)
-        self.assertEqual(heads, ["strategic", "execution", "defensive"])
-        ids = re.findall(r'id="strat-([a-z0-9_]+)"', self.fragment)
-        self.assertEqual(ids, ["six_networks", "grid_trading", "dividend_defensive"])
+        """分组顺序 + 每类非空（ADR-007 §2.2：基金轨策略必须独立成组）。"""
+        blocks = re.split(r'(?=<div class="strat-group")', self.fragment)
+        groups: dict[str, list[str]] = {}
+        order: list[str] = []
+        for b in blocks:
+            m = re.search(r'data-category="([a-z]+)"', b)
+            if not m:
+                continue
+            cat = m.group(1)
+            groups[cat] = re.findall(r'id="strat-([a-z0-9_]+)"', b)
+            order.append(cat)
+        known = ["strategic", "execution", "defensive", "trend"]
+        self.assertEqual(order[:len(known)], known, "已知类别顺序错乱")
+        self.assertTrue(set(order) <= set(known), f"出现未预期类别: {set(order)-set(known)}")
+        for cat in known:
+            self.assertTrue(groups.get(cat), f"类别 {cat} 下没有任何策略卡片")
+        # 双轨在场：基金轨两个策略各自独立成卡（收割 H-1/H-2）
+        self.assertIn("fund_dca_discipline", groups["execution"])
+        self.assertIn("fund_nav_valuation", groups["trend"])
 
     def test_badges_and_numeric_fields(self):
         self.assertIn('class="chip strat-cat strat-cat-strategic">战略</span>', self.fragment)
@@ -265,24 +289,6 @@ class InjectTest(unittest.TestCase):
             self.assertEqual(dry.returncode, 0, dry.stderr)
             self.assertIn("dry-run", dry.stdout)
             self.assertEqual(good.read_text(encoding="utf-8"), self.PAGE)
-
-
-class SourceHygieneTest(unittest.TestCase):
-    """本轮新增源码自身也要过团队 P0 门禁（扫 hosts 之前先扫自己）。"""
-
-    FILES = ("render_strategies.py", "inject_strategies.py", "test_render_strategies.py")
-    # 拼接构造而非写字面量：否则「禁止写死路径」这条断言自身就是一条写死路径
-    LOCAL_MARK = "/" + "Users" + "/" + "lianghaizhen"
-
-    def test_source_no_emoji_no_hardcoded_path(self):
-        for name in self.FILES:
-            src = (HERE / name).read_text(encoding="utf-8")
-            self.assertEqual(P0_EMOJI_RE.findall(src), [], f"{name} 含 emoji（P0-1）")
-            self.assertNotIn(self.LOCAL_MARK, src, f"{name} 写死本机路径")
-    def test_source_within_line_budget(self):
-        for name in self.FILES:
-            lines = (HERE / name).read_text(encoding="utf-8").splitlines()
-            self.assertLessEqual(len(lines), 300, f"{name} 超过 300 行上限")
 
 
 if __name__ == "__main__":

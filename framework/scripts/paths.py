@@ -53,6 +53,12 @@ EVIDENCE = PROJECT_ROOT / "evidence"
 SCRIPTS = PROJECT_ROOT / "scripts"
 SANITIZER = SCRIPTS / "sanitizer"
 
+# 统一持仓数据仓（A-1 / ADR-007 U6）。真实数据本地保存、不进仓；
+# 仓库只提交 config/portfolio.example.yaml。换人复用时只替换这一个文件。
+# 覆盖：PULSE_CONFIG（定时任务与校验器统一读这一个变量，避免各脚本各写一份路径）
+PORTFOLIO = Path(os.environ.get("PULSE_CONFIG",
+                                str(PROJECT_ROOT / "config" / "portfolio.yaml")))
+
 # 托管 Python 解释器（默认按本机 ~/.workbuddy 推导，可覆盖；不写死用户名）
 MANAGED_PY = os.environ.get(
     "PULSE_MANAGED_PY",

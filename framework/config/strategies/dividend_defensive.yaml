@@ -1,5 +1,6 @@
 name: dividend_defensive
 display_name: 高股息防御与收息底仓
+track: stock
 category: defensive
 description: 深度破净、股息率>4%、现金流充沛的防御收息压舱石。
 holdings_mapped:

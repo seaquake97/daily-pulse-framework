@@ -40,12 +40,16 @@ TEST_SUITES = (
     "framework/scripts/test_validate_config.py",
     "framework/scripts/test_strategies.py",
     "framework/scripts/test_render_strategies.py",
+    "framework/scripts/test_render_source_hygiene.py",
     "framework/engine/signals/test_technical.py",
     "framework/engine/signals/test_signals.py",
     "framework/engine/signals/test_compute_signals.py",
     "framework/engine/collect/test_merge_fallback.py",
     "framework/engine/collect/test_primary_health.py",
     "framework/engine/collect/test_fetch_fallback_data.py",
+    "framework/engine/journal/test_journal.py",
+    "framework/engine/journal/test_journal_cases.py",
+    "framework/engine/journal/test_journal_quality.py",
     "scripts/test_ci_verify.py",
 )
 

@@ -114,7 +114,7 @@ python3 scripts/verify_published.py   # 构建暂存与线上仓逐字节一致�
 | 变量 | 用途 | 默认 |
 |---|---|---|
 | `PULSE_WORKBUDDY_ROOT` | 任务产物根（各任务日期目录） | `~/WorkBuddy` |
-| `PULSE_CONFIG` | `holdings.yaml` 路径 | 无（必填） |
+| `PULSE_CONFIG` | 统一持仓数据仓 `portfolio.yaml` 路径 | `<项目根>/config/portfolio.yaml` |
 | `DECISION_ENGINE_MEMORY` | 迁移期持仓记忆文件 | 无（缺省即报错，不读隐式默认） |
 | `GH_TOKEN_FILE` | GitHub 发布令牌文件 | `~/.config/gh-ip/token` |
 | `PULSE_FIXTURE_ROOT` / `PULSE_FIXTURE_DAY` | 集成测试产物注入（未设则 skip 不失败） | 无 |

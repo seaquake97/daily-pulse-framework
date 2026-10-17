@@ -2,6 +2,12 @@
 # 铁律：注释必须独立成行——行内 # 在 gitignore 语法里不是注释，
 # 会导致整行成为永不匹配的 pattern（2026-10-17 实测修复的静默失效）。
 
+# 持仓数据仓：真实持仓绝不入仓（ADR-007 §4）。
+# 仓库只保留 config/portfolio.example.yaml 模板；换人复用时替换这一个文件。
+config/portfolio.yaml
+config/portfolio.*.yaml
+!config/portfolio.example.yaml
+
 # 内容产物仓（独立 git 仓，镜像到 GitHub Pages）
 _git_pulse/
 # daily-decision-engine 技能副本（独立 git 仓，不纳入）

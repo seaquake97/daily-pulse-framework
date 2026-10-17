@@ -1,0 +1,178 @@
+# =============================================================================
+# portfolio.example.yaml — daily-pulse-framework 统一持仓数据仓（契约 v2）
+#
+# 用法：
+#   cp config/portfolio.example.yaml config/portfolio.yaml   # 然后只改数据
+#   python3 framework/scripts/validate_config.py --config config/portfolio.yaml --strict
+#
+# 设计契约（改前必读）：
+#
+#   1. 本文件是唯一事实源。持仓、网格、定投——禁止写进任何脚本、提示词、
+#      定时任务配置。所有任务只读这一个文件。
+#   2. 双轨隔离（ADR-007 §2.2）。归属由 listing 字段决定，不由代码硬编码：
+#        listing: exchange  场内可挂单 → holdings.stock，可网格可做 T
+#        listing: otc      场外申赎   → holdings.fund，禁网格键
+#      用户前提「基金没有挂单/条件单」只对场外基金成立。场内 ETF 有挂单，
+#      因此留在股票轨。校验器会拒绝 otc 标的出现在 grid 段、拒绝基金段出现网格键。
+#   3. 黄金单列 holdings.gold。黄金不是基金，混入 fund.positions 会污染
+#      基金轨的统计口径与赎回窗口判断。
+#   4. 本文件不要提交到公开仓。仓库只提交本 example 文件。
+#
+# 与 MEMORY.md 的关系（一次性迁移，之后单向）：
+#   MEMORY.md 三表 --migrate_memory_to_portfolio.py--> portfolio.yaml --> 引擎
+#   MEMORY.md 降级为「人工编辑的源文档」，yaml 为引擎唯一事实源（ADR-007 §4）。
+# =============================================================================
+
+version: 2
+
+profile:
+  owner: "your-name"
+  base_currency: CNY
+  # personal    = 个人自用存档
+  # publishing = 对外发布研判内容（需完整免责）
+  mode: personal
+  note: "示例配置，请替换为真实持仓"
+
+# =============================================================================
+# 风控参数（ADR-007 §2.3：风控不撤，改为随每条建议下发）
+# 全部必填：没有上限就等于没有风控。
+# =============================================================================
+risk:
+  max_single_position_pct: 20     # 单标的市值占总资产上限（%），超过禁止加仓
+  max_total_drawdown_pct: 15      # 组合总回撤上限（%），触及则建议降仓
+  grid_step_pct_cap: 5            # 网格步长上限（%），防止过密网格
+  fund_holding_days_min: 7        # 场外赎回费免收窗口下限（天）
+
+cash:
+  currency: CNY
+  amount: 50000
+  note: "可用现金，加仓建议受此约束"
+
+holdings:
+  # ===========================================================================
+  # 股票轨：场内可交易标的（个股 + 场内 ETF/LOF）
+  # 列映射（MEMORY.md 股票持仓表 → 本段）：
+  #   标的→name 代码→code 持仓→shares 可用→available 成本→cost
+  #   状态/方向→note  现价/市值/盈亏额/盈亏率/当日盈亏→（不填，取数实时重算）
+  # ===========================================================================
+  stock:
+    positions:
+      - code: "600919"
+        name: "示例银行"
+        listing: exchange
+        shares: 100
+        available: 100
+        cost: 1.696
+        note: "高位止盈后留底仓收息"
+
+      - code: "003816"
+        name: "示例核电"
+        listing: exchange
+        shares: 100
+        available: 100
+        cost: 1.511
+        note: "留底仓观望"
+
+      - code: "600312"
+        name: "示例电气"
+        listing: exchange
+        shares: 500
+        available: 400          # 有 T+1 冻结时可用 < 持仓
+        cost: 18.323
+        note: "特高压龙头，加仓至500股"
+
+      # 场内 ETF 同段填写，代码走 6 位（解析器按前缀补市场）。
+      # 注意：场内 ETF 属于股票轨，不属于基金轨——它可挂单、可网格。
+      - code: "563230"
+        name: "示例ETF"
+        listing: exchange
+        shares: 20000
+        available: 19000
+        cost: 1.385
+        note: "低吸加仓，成本摊薄"
+
+    # ------------------------------------------------------------------------
+    # 网格参数。只允许 listing: exchange。
+    # 非网格标的用 enabled: false 表达并保留底仓上下限，**不要删行**——
+    # 底仓信息要留档，删掉就丢了 min_position / max_position。
+    # ------------------------------------------------------------------------
+    grid:
+      - code: "600312"
+        name: "示例电气"
+        listing: exchange
+        enabled: true
+        base_price: 20.40
+        range_low: 18.50
+        range_high: 24.50
+        step_pct: 2.5
+        per_trade: 100
+        min_position: 300
+        max_position: 1000
+        guide: "持仓500股，可用400股，21.00以上分批高抛做T"
+
+      - code: "003816"
+        name: "示例核电"
+        listing: exchange
+        enabled: false
+        min_position: 100
+        max_position: 1000
+        guide: "仅剩100股底仓，长线持有"
+
+  # ===========================================================================
+  # 基金轨：场外基金（联接基金 / 场外指数 / QDII / 主动权益）
+  #
+  # **禁止任何网格键**（base_price / range_low / range_high / step_pct /
+  #   per_trade / min_position / max_position）——写了校验器直接报错。
+  # 场外基金没有挂单与条件单，不存在日内中间态。
+  # 动作只有三种：买入 / 卖出 / 调整定投。
+  #
+  # 列映射（MEMORY.md 基金持仓表 → 本段）：
+  #   标的→name 代码→code 金额→amount 备注→note 定投方式→plan
+  #   持有收益 / 昨日收益 / 占纯基金比 →（不填，每日变量属 snapshot）
+  # ------------------------------------------------------------------------
+  fund:
+    positions:
+      - code: "000979"
+        name: "示例沪港深精选A"
+        listing: otc
+        amount: 15080.21
+        holding_period_days: 7      # 赎回费免收窗口，按该基金条款填；不确定留空
+        plan: smart
+        note: "智慧定投"
+
+      - code: "017641"
+        name: "示例标普500指数A"
+        listing: otc
+        amount: 5562.90
+        holding_period_days: 7
+        plan: regular
+        note: "QDII"
+
+      - code: "007466"
+        name: "示例红利低波联接C"
+        listing: otc
+        amount: 4000.16
+        plan: holding
+
+    # 定投计划。基金轨的节奏由定投日历驱动，替代股票轨的日内网格。
+    # day_of_month 上界 28：短月没有 30/31 号，定投日必须可实现。
+    plans:
+      - code: "000979"
+        type: smart
+        amount_per_period: 60
+        day_of_month: 10
+
+      - code: "017641"
+        type: regular
+        amount_per_period: 100
+        day_of_month: 5
+
+  # --------------------------------------------------------------------------
+  # 实物 / 积存金。黄金不是基金，单列统计，不并入 fund_amount。
+  # MEMORY.md 时代黄金靠「代码列为 - 且名称含黄金」被启发式识别，
+  # 那是隐式契约；v2 把它显式化。无黄金写 []。
+  # --------------------------------------------------------------------------
+  gold:
+    - name: "黄金（实物/积存金）"
+      amount: 3907.41
+      note: "宏观防御，不参与定投计算"
