@@ -194,6 +194,52 @@
 
 ---
 
+## 一之补、2026-10-17 下午轮（GitHub 治理常态化 + 产品/框架债销账）
+
+> 权威总账：`docs/BACKLOG-MASTER.md`（本文只记落点与验收，不复制总账）。
+
+### M-01 框架仓上线（用户指令「上传 GitHub 整个引擎和页面的管理」）
+- 落点：`seaquake97/daily-pulse-framework`（public/MIT），HEAD `0dc49b3`，tag `v1.0.0` + Release
+- 内容：199+ 文件全量源码（scripts/ framework/ site/ docs/ _engine_stage/ + 门面四件套）
+- 修复两处 .gitignore 静默失效（行内注释致 pattern 永不匹配；framework 下 *.json 误吞
+  slug_stage.json 与 market_data.schema.json 两份契约文件）
+- 补齐此前漏追踪 22 个源码文件；paths.py 默认值改 ~/WorkBuddy（clone 到任意路径可跑）
+- 验收：全新克隆跑 25 套件全绿（test_render_md 补 A-07 skip 守卫）；本地 ci_verify 28/28
+
+### M-02 引擎仓同步与发布
+- `seaquake97/daily-decision-engine`：commit `c11d8ef`（v1.4.0），tag v1.3/v1.4.0 + Release
+- S4 复合动量 + parse_holdings 路径参数化（A-05）进入仓，SKILL.md version 0→1.4.0
+
+### M-03 GitHub 常见模式维护体系
+- README.md（三仓架构/快速开始/仓库地图/环境变量/文档索引）/ CONTRIBUTING.md /
+  CHANGELOG.md / MIT LICENSE / Issue 模板 ×2 / PR 模板 / ci.yml（单测层 + 假绿灯判定）
+- ⚠️ 两个 workflow 文件（ci.yml / daily_pulse.yml）**暂存本地未入仓**：PAT 缺
+  `workflow` scope。令牌升级后一条命令补入：`git add .github/workflows && git commit && git push`
+
+### M-04 产品 P0 三项上线（前端 贾思敏，总监实测复核）
+- P-1 首页「今日一屏」：`scripts/site_today.py`；P-2 RSS 条目级：`scripts/site_feed.py`
+  （24 items == entries 总和）；P-3 PWA 三件套：`scripts/gen_app_icon.py`（纯标准库
+  手写 PNG，字节确定）+ manifest + theme-color 双 meta
+- 顺手修复 publish 管线二进制 bug（manifest read_bytes，P-13）
+
+### M-05 P-6 历史路径泄漏清零
+- 10-15 stock_review.md 源句按 PM-17 裁决改中性表述并重发布（commit e2c4f81）；
+  三载体 `/Users/` 扫描 = 0
+
+### M-06 P-4/F-3 周月报真聚合（后端 贝洛奇）
+- `scripts/site_aggregate.py`：周/月 KPI 实算（迁移次数/Σ 方向/防守天数/矛盾天数/条目数）
+- 总监裁决：废止「相似度 < 0.9」代理指标（被 58KB 共享 CSS 支配，详 BACKLOG §1.2）
+
+### M-07 F-1 引擎四脚本迁入 framework/engine/signals/（架构师 高见远）
+- compute_signals/parse_holdings/settle_viewpoints/validate_market_data + v1.4.0 回合
+- A-10 前缀收敛：full_code 委托 codes.py 单一实现（3527 例语料零差异）
+- README 声明单一事实源：framework canonical → _engine_stage → GitHub 单向同步
+- ci_verify 27→28 项；字节级回归与引擎仓 v1.4.0 一致
+
+### 本轮门禁实测（全部通过）
+ci_verify 28/28 ｜ scan_compliance 全 0 ｜ probe_responsive 0/192 ｜ verify_published 漂移 0 ｜
+连续两次构建字节一致 ｜ 发布三连推（10-15 修路径 / 10-16 ×2）
+
 ## 二、进行中任务（active）
 
 *当前手机端排版与视觉减负专项已 100% 全部完成并推送上线！*
