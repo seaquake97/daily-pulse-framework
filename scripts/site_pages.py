@@ -3,10 +3,11 @@
 """site_pages.py — 页面层（整页组合 + sitemap；feed 实现在 site_feed.py）
 
 只做「把 site_render 的片段组装成整页」，不引入新的样式或数据判断。
-依赖方向：site_pages → site_render / site_today / site_feed → site_content → site_theme（只向下）。
+依赖方向：site_pages → site_render / site_today / site_feed / site_aggregate → site_content → site_theme（只向下）。
 """
 from __future__ import annotations
 
+import site_aggregate as AG
 import site_content as C
 import site_render as R
 import site_theme as T
@@ -73,85 +74,20 @@ def home(metas: list[dict]) -> str:
                    "./", body, "index")
 
 
-# ---------------------------------------------------------------------------
-# 订阅页
-# ---------------------------------------------------------------------------
+# 订阅页 / JSON Feed 薄委托（实现已外迁，build_site 调用点与 SITE_FILE 协议不变）
 def subscribe(metas: list[dict], base_url: str) -> str:
-    """订阅页：RSS 的产品化落点——地址 + 阅读器三步 + 订阅流内容说明。零 JS。
-
-    为什么不做成裸 feed.xml 直出：读者点进来看到 XML 源码没有任何引导，
-    订阅转化率为零。本页给人看，feed.xml 给阅读器读，两者分工。
-    """
-    feed_url = f"{base_url}feed.xml"
-    latest = metas[0].get("date", "") if metas else ""
-    docs = sum(len(m.get("entries", [])) for m in metas)
-    task_rows = "".join(
-        f'<tr><th scope="row" class="rowkey">{C.esc(name)}</th>'
-        f'<td class="num">{C.esc(time)}</td>'
-        f'<td>{C.esc(blurb)}</td></tr>'
-        for name, time, blurb, _ico in C.TASK_META.values())
-    body = f"""  <header class="page-head">
-    <p class="eyebrow t-footnote">{T.icon("rss")}订阅 / Subscribe</p>
-    <h1 class="t-title1">订阅每日更新</h1>
-    <p class="lede t-callout">每个交易时点的研判归档后即可订阅。无需注册、免费、全文送达。</p>
-    <p class="lede-en t-subhead">Subscribe to every trading-session verdict — no account, no cost, full text.</p>
-    <p class="meta">{T.icon("calendar")}每交易日更新 · 已归档 {len(metas)} 期 / {docs} 篇{(' · 最近一期 ' + C.esc(latest)) if latest else ''}</p>
-  </header>
-  <section aria-labelledby="sec-url">
-    <div class="sec-head">
-      <h2 class="t-title3" id="sec-url">订阅地址</h2>
-      <span class="spacer"></span>
-      <span class="aside">{T.icon("rss")}RSS 2.0 · 全文</span>
-    </div>
-    <p class="sub-lede t-callout">在任意 RSS 阅读器中选择「添加订阅」，粘贴以下地址即可。使用支持 RSS 的浏览器访问本站时，地址栏的订阅图标也可一键添加。</p>
-    <code class="sub-url">{C.esc(feed_url)}</code>
-    <p class="sub-hint t-footnote">{T.icon("lightbulb")}订阅内容为研判全文，不是摘要——阅读器里即可读完，无需再点回网站。</p>
-    <p class="sub-legal t-footnote">{T.icon("alert")}{C.esc(C.I18N["ai_notice"])}
-      {C.esc(C.I18N["publisher_note"])}</p>
-  </section>
-  <section aria-labelledby="sec-how" style="margin-top:var(--space-16)">
-    <div class="sec-head">
-      <h2 class="t-title3" id="sec-how">三步完成订阅</h2>
-      <span class="spacer"></span>
-      <span class="aside">{T.icon("clock")}约一分钟</span>
-    </div>
-    <ol class="sub-steps">
-      <li><b>复制订阅地址</b>——全选上方地址复制，或手动抄录。</li>
-      <li><b>打开 RSS 阅读器</b>——Feedly、Inoreader、Reeder、NetNewsWire 等均可，浏览器亦可。</li>
-      <li><b>添加订阅源</b>——粘贴地址并确认。之后每个交易时点的新研判会自动送达。</li>
-    </ol>
-  </section>
-  <section aria-labelledby="sec-what" style="margin-top:var(--space-16)">
-    <div class="sec-head">
-      <h2 class="t-title3" id="sec-what">订阅流里每篇是什么</h2>
-      <span class="spacer"></span>
-      <span class="aside">{T.icon("timer")}每交易时点调度</span>
-    </div>
-    <div class="tbl-wrap">
-      <table class="tbl">
-        <caption>各任务产出按调度时点排序，全部进入同一订阅流</caption>
-        <thead><tr>
-          <th scope="col">任务</th><th scope="col" class="num">时点</th><th scope="col">内容</th>
-        </tr></thead>
-        <tbody>{task_rows}</tbody>
-      </table>
-    </div>
-    <div class="btn-row" style="margin-top:var(--space-8)">
-      <a class="btn btn-quiet" href="../index.html">{T.icon("archive")}浏览全部归档</a>
-      <a class="btn btn-quiet" href="../methodology/">{T.icon("book")}研判方法论</a>
-    </div>
-  </section>"""
-    # depth="../"：本页在 docs/subscribe/ 子目录，用 "./" 会让导航的
-    # index.html 解析成 /subscribe/index.html（本页自己）、methodology/
-    # 解析成 /subscribe/methodology/（404）——用户实锤「进订阅页后哪都点不动」
-    return R.shell("订阅更新 · Subscribe | 每日市场脉搏",
-                   "订阅每日市场脉搏：每交易时点的 A 股 / 基金研判全文 RSS，无需注册、免费。",
-                   "../", body, "subscribe")
+    """订阅页实现迁至 site_subscribe.py（单文件 ≤300 行纪律）。"""
+    import site_subscribe
+    return site_subscribe.subscribe(metas, base_url)
 
 
-# ---------------------------------------------------------------------------
+def json_feed(metas: list[dict], base_url: str) -> str:
+    """JSON Feed 实现迁至 site_feed.py（与 feed.xml 同属机器可读馈送）。"""
+    import site_feed
+    return site_feed.json_feed(metas, base_url)
+
+
 # 日期页
-# ---------------------------------------------------------------------------
 def _verdict_overview(entries: list[dict]) -> str:
     """当日结论速览：按时点分组横排 Σ，让「同口径可比、跨口径不可比」结构可见。
 
@@ -246,9 +182,7 @@ def day(m: dict) -> str:
                    m.get("summary_zh", ""), "../../", body)
 
 
-# ---------------------------------------------------------------------------
-# 周 / 月归档页
-# ---------------------------------------------------------------------------
+# 周 / 月归档页（总览索引 + 周期页；周期聚合在 site_aggregate.py）
 def _trajectory_table(metas: list[dict]) -> str:
     """评级轨迹总览：全部来自 meta.json 真实值，无任何虚构数字。"""
     rows = []
@@ -320,12 +254,16 @@ def group(title: str, subtitle: str, metas: list[dict], depth: str, current: str
     issues = "\n".join(R.issue_block(m, depth, default_open=(i == 0)) for i, m in enumerate(metas)) or (
         f'  <div class="empty">{T.icon("inbox", "ic-24")}<h3>暂无归档数据</h3>'
         '<p>该区间尚无已入库的交易日。</p></div>')
+    # 周/月真聚合（P-4/F-3）：同一套渲染函数，粒度参数区分周/月；
+    # 置于页头之后、评级轨迹总览之前——先给周期结论，再给逐日明细。
+    aggregate = AG.section(metas, "week" if current == "weekly" else "month")
     body = f"""  {_crumb(depth, crumb_tail)}
   <header class="page-head" style="padding-top:var(--space-6)">
     <h1 class="t-title1">{C.esc(title)}</h1>
     <p class="lede t-callout">{C.esc(subtitle)}</p>
     <p class="meta">{T.icon("layers")}{len(metas)} 期 · {docs} 篇产出</p>
   </header>
+{aggregate}
   <section aria-labelledby="sec-traj">
     <div class="sec-head">
       <h2 class="t-title3" id="sec-traj">评级轨迹总览</h2>
@@ -341,77 +279,12 @@ def group(title: str, subtitle: str, metas: list[dict], depth: str, current: str
     return R.shell(f"{title} · 每日市场脉搏", subtitle, depth, body, current)
 
 
-# ---------------------------------------------------------------------------
-# feed.xml / sitemap.xml
-# ---------------------------------------------------------------------------
+# feed.xml / sitemap.xml（均为薄委托或纯组装）
 def feed(metas: list[dict], base_url: str) -> str:
     """RSS 2.0 条目级（P-2）。实现迁至 site_feed.py（单文件 ≤300 行纪律），
     此处保留委托：build_site.py 的调用点与 SITE_FILE 协议不变。"""
     import site_feed
     return site_feed.feed(metas, base_url)
-
-
-def json_feed(metas: list[dict], base_url: str) -> str:
-    """JSON Feed（ARCH-R6-MINIPROGRAM §3.1）：小程序 / PWA 的机器可读数据源。
-
-    与 RSS 的分工：feed.xml 给人看（订阅器），feed.json 给机器读（客户端）。
-    数据全部来自 entries.json（发布层唯一时间线事实源），零编造。
-
-    设计取舍（待架构师评审）：**不含 detail 页数组**——详情内容量大且已是
-    静态 HTML，客户端按需拉页面即可；JSON 只承载「列表 + 结论」这一层，
-    避免同一份内容维护两遍（双份即漂移）。
-    """
-    import json
-
-    def entry_json(e: dict) -> dict:
-        # 降级态不得输出方向值（架构师 A-04）：客户端会二次解读 rating/sigma，
-        # 若此处仍带「进攻 +0.510」，第三方应用会拿着不可信数据算出动作。
-        degraded = bool(e.get("degraded"))
-        gap = degraded or e.get("sigma") is None
-        return {
-            "slug": e.get("slug"),
-            "name": e.get("name"),
-            "time": e.get("time"),
-            "runTime": e.get("run_time"),
-            "title": e.get("title"),
-            "conclusion": e.get("conclusion"),
-            "rating": None if degraded else e.get("rating"),
-            "sigma": None if degraded else e.get("sigma"),
-            "stage": e.get("stage"),
-            "degraded": degraded,
-            "dataGap": gap,
-            "comparable": False if degraded else bool(e.get("comparable", False)),
-            "url": f"{base_url}daily/{e.get('_date', '')}/{e.get('slug')}.html"
-                   if e.get("html") else None,
-        }
-
-    days = []
-    for m in metas:
-        date = m.get("date", "")
-        entries = [dict(e, _date=date) for e in m.get("entries", [])]
-        days.append({
-            "date": date,
-            "title": m.get("title_zh"),
-            "summary": m.get("summary_zh"),
-            "rating": m.get("rating"),
-            "sigma": m.get("sigma"),
-            "stage": m.get("data_stage"),
-            "entryCount": len(entries),
-            "url": f"{base_url}daily/{date}/",
-            "entries": [entry_json(e) for e in entries],
-        })
-
-    payload = {
-        "version": "1.0",
-        "generator": "daily-decision-engine",
-        "site": {"title": C.I18N["site_title"], "url": base_url},
-        "disclaimer": C.I18N["disclaimer_zh"],
-        "ratingScale": ["进攻", "均衡", "信号矛盾", "防守", "回避"],
-        "stageScale": [{"key": k, "label": v[0], "labelEn": v[1]}
-                       for k, v in C.STAGE_MAP.items()],
-        "days": days,
-    }
-    return json.dumps(payload, ensure_ascii=False, indent=1) + "\n"
 
 
 def sitemap(metas: list[dict], base_url: str, extras: list[str]) -> str:

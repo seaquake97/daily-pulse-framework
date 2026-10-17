@@ -152,19 +152,21 @@ PyYAML 不是标准库。要求「clone 完就能跑」，就不能依赖用户�
 ## 自测
 
 ```bash
-python3 scripts/test_validate_config.py        # 29 例（配置层）
-python3 engine/collect/test_market_data_contract.py   # 19 例（取数契约层）
-python3 engine/report/test_report_contract.py          # 25 例（报告契约层）
-python3 engine/test_run_pipeline.py                    # 17 例（三步编排）
+python3 scripts/test_validate_config.py              # 29 例（配置层）
+python3 engine/collect/test_market_data_contract.py  # 19 例（取数契约层）
+python3 engine/report/test_report_contract.py        # 27 例（报告契约层）
+python3 engine/test_run_pipeline.py                  # 17 例（三步编排）
+python3 engine/signals/test_signals.py               # 24 例（引擎四脚本，A-09 迁入）
+python3 engine/signals/test_technical.py             # 13 例（技术指标库）
 ```
 
-当前合计 **4 套件 90 例全绿**。
+当前合计 **6 套件 129 例全绿**。一键总门禁：`python3 scripts/ci_verify.py`。
 
 ## 环境变量（全部路径可覆盖，零硬编码）
 
 | 变量 | 含义 | 默认 |
 |------|------|------|
-| `PULSE_WORKBUDDY_ROOT` | 工作区根（含各任务日期目录） | `/Users/lianghaizhen/WorkBuddy` |
+| `PULSE_WORKBUDDY_ROOT` | 工作区根（含各任务日期目录） | `$HOME/WorkBuddy`（由 paths.py 推导，不写死用户名） |
 | `PULSE_SITE_ROOT` | 站点根（含 `scripts/publish_to_github.py`） | framework 的上一级 |
 | `PULSE_ENGINE_SCRIPTS` | 引擎脚本目录 | `~/.workbuddy/skills/daily-decision-engine/scripts` |
 | `PULSE_PYTHON` | Python 解释器 | `sys.executable` |
@@ -184,16 +186,31 @@ python3 engine/test_run_pipeline.py                    # 17 例（三步编排�
 ## 代码结构
 
 ```
+engine/
+  signals/
+    compute_signals.py       步骤5：S1-S6 信号评分与四档评级（代码计算，LLM 禁改）
+    validate_market_data.py  步骤3：market_data.json 硬校验
+    settle_viewpoints.py     步骤7：观点台账四态结算
+    parse_holdings.py        步骤4：MEMORY.md 持仓解析（full_code 委托 codes.py，A-10）
+    technical.py             个股技术指标库（MA/BIAS/Wilder RSI/MACD）
+    test_signals.py          引擎四脚本回归（24 例）
+    test_technical.py        技术指标库单测（13 例）
+  collect/ report/ run_pipeline.py   取数 / 报告 / 三步编排
 scripts/
-  yaml_min.py         YAML 子集解析（无内部依赖）
-  codes.py            证券代码规范化（无内部依赖，与 parse_holdings.py 对齐）
-  rules.py            校验规则集  -> codes
+  paths.py          路径唯一入口（所有 PULSE_* 环境变量在此定义一次）
+  yaml_min.py       YAML 子集解析（无内部依赖）
+  codes.py          证券代码规范化（前缀推断单一实现，parse_holdings 与之对齐）
+  rules.py          校验规则集  -> codes
   validate_config.py  CLI 门面      -> codes / rules / yaml_min
   test_validate_config.py
 ```
 
-依赖图无环，每层均 ≤300 行。若要修改市场前缀规则，**只改 `codes.py`**，
-并同步 `parse_holdings.py` 的 `full_code()`——规则两份实现必然漂移。
+依赖图无环，每层均 ≤300 行。若要修改市场前缀规则，**只改 `codes.py`**——
+`parse_holdings.py` 的 `full_code()` 已委托 `normalize_code()`（A-10 收敛），
+不再有第二份可漂移的实现。
+
+引擎四脚本与 `daily-decision-engine` 仓的归属与同步方向，见
+`engine/signals/README.md` 的单一事实源声明。
 
 ## 许可
 

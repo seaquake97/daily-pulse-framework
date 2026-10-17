@@ -1,4 +1,4 @@
-响应式断点矩阵实测 2026-10-17 15:34:28
+响应式断点矩阵实测 2026-10-17 16:42:15
 宽度档位: [320, 360, 390, 414, 640, 720, 768, 834, 980, 1024, 1152, 1280, 1440, 1920, 2149, 2560]
 页面数: 12  组合数: 192
 ------------------------------------------------------------------------------
@@ -34,10 +34,10 @@ day                 1440px  sw=1440  cw=1440  ok
 day                 1920px  sw=1920  cw=1920  ok
 day                 2149px  sw=2149  cw=2149  ok
 day                 2560px  sw=2560  cw=2560  ok
-weekly               320px  sw=320   cw=320   ok  bad=table.tbl@478,caption.@478,thead.@478,tr.@478,th.num@338,th.num@387,th.@478,tbody.@478
-weekly               360px  sw=360   cw=360   ok  bad=table.tbl@478,caption.@478,thead.@478,tr.@478,th.num@387,th.@478,tbody.@478,tr.@478
-weekly               390px  sw=390   cw=390   ok  bad=table.tbl@478,caption.@478,thead.@478,tr.@478,th.@478,tbody.@478,tr.@478,td.num@478
-weekly               414px  sw=414   cw=414   ok  bad=table.tbl@478,caption.@478,thead.@478,tr.@478,th.@478,tbody.@478,tr.@478,td.num@478
+weekly               320px  sw=320   cw=320   ok  bad=table.tbl@533,caption.@533,thead.@533,tr.@533,th.num@338,th.num@387,th.num@460,th.num@533
+weekly               360px  sw=360   cw=360   ok  bad=table.tbl@533,caption.@533,thead.@533,tr.@533,th.num@387,th.num@460,th.num@533,tbody.@533
+weekly               390px  sw=390   cw=390   ok  bad=table.tbl@533,caption.@533,thead.@533,tr.@533,th.num@460,th.num@533,tbody.@533,tr.@533
+weekly               414px  sw=414   cw=414   ok  bad=table.tbl@533,caption.@533,thead.@533,tr.@533,th.num@460,th.num@533,tbody.@533,tr.@533
 weekly               640px  sw=640   cw=640   ok
 weekly               720px  sw=720   cw=720   ok
 weekly               768px  sw=768   cw=768   ok
@@ -50,10 +50,10 @@ weekly              1440px  sw=1440  cw=1440  ok
 weekly              1920px  sw=1920  cw=1920  ok
 weekly              2149px  sw=2149  cw=2149  ok
 weekly              2560px  sw=2560  cw=2560  ok
-monthly              320px  sw=320   cw=320   ok  bad=table.tbl@478,caption.@478,thead.@478,tr.@478,th.num@338,th.num@387,th.@478,tbody.@478
-monthly              360px  sw=360   cw=360   ok  bad=table.tbl@478,caption.@478,thead.@478,tr.@478,th.num@387,th.@478,tbody.@478,tr.@478
-monthly              390px  sw=390   cw=390   ok  bad=table.tbl@478,caption.@478,thead.@478,tr.@478,th.@478,tbody.@478,tr.@478,td.num@478
-monthly              414px  sw=414   cw=414   ok  bad=table.tbl@478,caption.@478,thead.@478,tr.@478,th.@478,tbody.@478,tr.@478,td.num@478
+monthly              320px  sw=320   cw=320   ok  bad=table.tbl@533,caption.@533,thead.@533,tr.@533,th.num@338,th.num@387,th.num@460,th.num@533
+monthly              360px  sw=360   cw=360   ok  bad=table.tbl@533,caption.@533,thead.@533,tr.@533,th.num@387,th.num@460,th.num@533,tbody.@533
+monthly              390px  sw=390   cw=390   ok  bad=table.tbl@533,caption.@533,thead.@533,tr.@533,th.num@460,th.num@533,tbody.@533,tr.@533
+monthly              414px  sw=414   cw=414   ok  bad=table.tbl@533,caption.@533,thead.@533,tr.@533,th.num@460,th.num@533,tbody.@533,tr.@533
 monthly              640px  sw=640   cw=640   ok
 monthly              720px  sw=720   cw=720   ok
 monthly              768px  sw=768   cw=768   ok

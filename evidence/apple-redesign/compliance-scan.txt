@@ -1,4 +1,4 @@
-# 合规扫描 2026-10-17 15:34:28
+# 合规扫描 2026-10-17 16:43:52
 生成页面数: 11
 上游详情页数: 24（daily/*/ 下非 index.html）
 ── 2. GRADIENT ──
@@ -14,9 +14,9 @@
       310 scripts/site_theme.py
       238 scripts/site_content.py
       362 scripts/site_render.py
-      424 scripts/site_pages.py
+      297 scripts/site_pages.py
       162 scripts/site_components.css
-      1704 total
+      1577 total
 ── 5. 禁用项 ──
    弹跳缓动:                0
    紫粉渐变/靛蓝:            0
@@ -42,12 +42,12 @@
    .tl-item[data-time][data-slug]:        96
    .dp-card[data-date/-rating/-sigma]:     18
    tag gap 双类（Σ 数据缺口）:81
-   tag-warn（统计口径不同）:      11
+   tag-warn（统计口径不同）:      14
    chip-pending（网页版待补齐）:  11
    Σ 0.000 兜底(应为 0):        0
-   评级箭头冗余编码:            78
+   评级箭头冗余编码:            84
    SVG symbol sprite:          502
-   内联 <use> 引用:            907
+   内联 <use> 引用:            940
 ── 9. 无信息量链接标签（应为 0）──
    '阅读网页版': 0
    'HTML 版': 0
@@ -58,8 +58,8 @@
    _stage/docs/sitemap.xml: 1158 bytes
    _stage/docs/index.html: 137744 bytes
    _stage/docs/methodology/index.html: 107882 bytes
-   _stage/docs/weekly/2026-W42/index.html: 127518 bytes
-   _stage/docs/monthly/2026-10/index.html: 132440 bytes
+   _stage/docs/weekly/2026-W42/index.html: 131971 bytes
+   _stage/docs/monthly/2026-10/index.html: 137142 bytes
 ── 11. 上游详情页（daily 详情页，消毒前后对比基准）──
    详情页数:                  24
    <script 数:                0
@@ -67,10 +67,10 @@
    emoji 数（P0 口径）:        0
    emoji 数（sanitizer 口径）: 0
    sanitizer 漏检字符数:       0（P0 口径命中但 sanitizer EMOJI_PATTERN 未覆盖）码点: 无
-   裸 hex 数:                 2528
-     其中 <style> 层内:       1613（Token 定义层 + 注释；declaration 级非 #fff/#000 字面量须为 0，由组件/框架层分别度量）
-   <use> 引用数:              534
-   <symbol> 定义数:           1118
+   裸 hex 数:                 2570
+     其中 <style> 层内:       1655（Token 定义层 + 注释；declaration 级非 #fff/#000 字面量须为 0，由组件/框架层分别度量）
+   <use> 引用数:              543
+   <symbol> 定义数:           1127
    <use> 悬空引用数:          0（引用无对应 symbol 定义）
    逐页明细:  file | script | gradient | emoji(P0/san/gap) | hex | use/symbol | dangling
      _stage/docs/daily/2026-10-11/fund-guide.html: 0 | 0 | 0/0/0 | 87 | 24/46 | 0
@@ -87,11 +87,11 @@
      _stage/docs/daily/2026-10-14/fund-market.html: 0 | 0 | 0/0/0 | 87 | 18/46 | 0
      _stage/docs/daily/2026-10-14/stock-assistant.html: 0 | 0 | 0/0/0 | 87 | 16/46 | 0
      _stage/docs/daily/2026-10-14/stock-review.html: 0 | 0 | 0/0/0 | 87 | 16/46 | 0
-     _stage/docs/daily/2026-10-15/daily-review.html: 0 | 0 | 0/0/0 | 178 | 29/47 | 0
-     _stage/docs/daily/2026-10-15/fund-guide.html: 0 | 0 | 0/0/0 | 87 | 21/46 | 0
-     _stage/docs/daily/2026-10-15/fund-market.html: 0 | 0 | 0/0/0 | 87 | 18/46 | 0
-     _stage/docs/daily/2026-10-15/stock-assistant.html: 0 | 0 | 0/0/0 | 87 | 15/46 | 0
-     _stage/docs/daily/2026-10-15/stock-review.html: 0 | 0 | 0/0/0 | 87 | 21/46 | 0
+     _stage/docs/daily/2026-10-15/daily-review.html: 0 | 0 | 0/0/0 | 178 | 29/48 | 0
+     _stage/docs/daily/2026-10-15/fund-guide.html: 0 | 0 | 0/0/0 | 87 | 21/48 | 0
+     _stage/docs/daily/2026-10-15/fund-market.html: 0 | 0 | 0/0/0 | 110 | 27/48 | 0
+     _stage/docs/daily/2026-10-15/stock-assistant.html: 0 | 0 | 0/0/0 | 106 | 15/48 | 0
+     _stage/docs/daily/2026-10-15/stock-review.html: 0 | 0 | 0/0/0 | 87 | 21/48 | 0
      _stage/docs/daily/2026-10-16/daily-review.html: 0 | 0 | 0/0/0 | 181 | 29/48 | 0
      _stage/docs/daily/2026-10-16/fund-guide.html: 0 | 0 | 0/0/0 | 87 | 21/48 | 0
      _stage/docs/daily/2026-10-16/fund-market.html: 0 | 0 | 0/0/0 | 110 | 27/48 | 0
@@ -103,5 +103,5 @@
      gradient: 基线 63 → 当前 0（-63）
      emoji(P0): 基线 98 → 当前 0（-98）
      sanitizer 漏检: 基线 2 → 当前 0（-2）
-     裸 hex: 基线 695 → 当前 2528（+1833）
+     裸 hex: 基线 695 → 当前 2570（+1875）
      悬空 use: 基线 0 → 当前 0（0）

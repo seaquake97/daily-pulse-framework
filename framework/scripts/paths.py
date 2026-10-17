@@ -5,7 +5,7 @@
 所有路径由此文件导出，默认值从 __file__ 推导（相对定位，不写死用户名/项目路径），
 均支持环境变量覆盖。脚本与 framework 模块统一 `from paths import ...` 取值。
 
-覆盖点（原 scripts/*.py 与 framework/ 共 20 处 /Users/lianghaizhen 硬编码）：
+覆盖点（原 scripts/*.py 与 framework/ 共 20 处本机用户级绝对路径硬编码）：
   PROJECT_ROOT      项目根（github-ip-plan）           覆盖：PULSE_ROOT
   WORKBUDDY_ROOT    工作区根（WorkBuddy）             覆盖：PULSE_WORKBUDDY_ROOT
   STAGE             _stage（构建暂存）                = PROJECT_ROOT/_stage

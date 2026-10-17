@@ -71,9 +71,10 @@ class ManifestTest(unittest.TestCase):
         self.assertEqual(missing, [], "非预留项文件缺失（漏测风险）")
 
     def test_reserved_items_are_flagged(self):
+        # 2026-10-17：test_compute_signals.py 随 A-09/F-1 迁入 framework 后
+        # 由 reserved 升为正式套件，reserved 仅剩 fallback_fetcher（依赖网络）。
         reserved = {it["name"] for it in ci_verify.build_manifest() if it["reserved"]}
-        self.assertEqual(reserved, {"framework/engine/collect/test_fallback_fetcher.py",
-                                    "_git_engine/scripts/test_compute_signals.py"})
+        self.assertEqual(reserved, {"framework/engine/collect/test_fallback_fetcher.py"})
 
     def test_source_is_clean_and_within_budget(self):
         for name in ("ci_verify.py", "test_ci_verify.py"):

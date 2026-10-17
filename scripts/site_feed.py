@@ -107,3 +107,70 @@ def feed(metas: list[dict], base_url: str) -> str:
 </channel>
 </rss>
 """
+
+
+def json_feed(metas: list[dict], base_url: str) -> str:
+    """JSON Feed（ARCH-R6-MINIPROGRAM §3.1）：小程序 / PWA 的机器可读数据源。
+
+    与 RSS 的分工：feed.xml 给人看（订阅器），feed.json 给机器读（客户端）。
+    数据全部来自 entries.json（发布层唯一时间线事实源），零编造。
+
+    设计取舍（待架构师评审）：**不含 detail 页数组**——详情内容量大且已是
+    静态 HTML，客户端按需拉页面即可；JSON 只承载「列表 + 结论」这一层，
+    避免同一份内容维护两遍（双份即漂移）。
+
+    2026-10-17 由 site_pages.py 迁入本模块（单文件 ≤300 行纪律）：
+    feed.xml / feed.json 同属机器可读馈送，迁后 site_pages.json_feed()
+    保留薄委托（build_site 调用点不变）。
+    """
+    import json
+
+    def entry_json(e: dict) -> dict:
+        # 降级态不得输出方向值（架构师 A-04）：客户端会二次解读 rating/sigma，
+        # 若此处仍带「进攻 +0.510」，第三方应用会拿着不可信数据算出动作。
+        degraded = bool(e.get("degraded"))
+        gap = degraded or e.get("sigma") is None
+        return {
+            "slug": e.get("slug"),
+            "name": e.get("name"),
+            "time": e.get("time"),
+            "runTime": e.get("run_time"),
+            "title": e.get("title"),
+            "conclusion": e.get("conclusion"),
+            "rating": None if degraded else e.get("rating"),
+            "sigma": None if degraded else e.get("sigma"),
+            "stage": e.get("stage"),
+            "degraded": degraded,
+            "dataGap": gap,
+            "comparable": False if degraded else bool(e.get("comparable", False)),
+            "url": f"{base_url}daily/{e.get('_date', '')}/{e.get('slug')}.html"
+                   if e.get("html") else None,
+        }
+
+    days = []
+    for m in metas:
+        date = m.get("date", "")
+        entries = [dict(e, _date=date) for e in m.get("entries", [])]
+        days.append({
+            "date": date,
+            "title": m.get("title_zh"),
+            "summary": m.get("summary_zh"),
+            "rating": m.get("rating"),
+            "sigma": m.get("sigma"),
+            "stage": m.get("data_stage"),
+            "entryCount": len(entries),
+            "url": f"{base_url}daily/{date}/",
+            "entries": [entry_json(e) for e in entries],
+        })
+
+    payload = {
+        "version": "1.0",
+        "generator": "daily-decision-engine",
+        "site": {"title": C.I18N["site_title"], "url": base_url},
+        "disclaimer": C.I18N["disclaimer_zh"],
+        "ratingScale": ["进攻", "均衡", "信号矛盾", "防守", "回避"],
+        "stageScale": [{"key": k, "label": v[0], "labelEn": v[1]}
+                       for k, v in C.STAGE_MAP.items()],
+        "days": days,
+    }
+    return json.dumps(payload, ensure_ascii=False, indent=1) + "\n"
