@@ -1,0 +1,139 @@
+# 双轨三层日研判 · 槽位契约（ADR-007 §2.2）
+# 本文件是槽位的唯一机器可读契约。校验器 validate_slots.py 是它的执行者；
+# 定时任务书只引用 slot_id，不再各自复述纪律（复述即漂移）。
+#
+# 轨道语义：
+#   stock = 场内标的（个股 + 场内 ETF/LOF）。允许挂单/条件单/网格/分批做 T。
+#   fund  = 场外基金。无中间态：买就是买、卖就是卖，动作只有买入/卖出/调整定投额。
+#   判定依据是能否二级市场挂单成交，不是「是不是基金」——场内 ETF 属 stock 轨。
+
+version: 2
+
+# 时点口径（A股交易时段：09:15-09:25 集合竞价 / 09:30-11:30 / 13:00-15:00）
+slots:
+  - slot_id: stock_open
+    time: "09:28"
+    track: stock
+    name: 集合竞价观察与操作建议
+    data_stage: pre_open
+    inputs:
+      - auction_gap_pct
+      - auction_volume_ratio
+      - holdings_snapshot
+    required_outputs:
+      - stance
+      - actions
+      - invalidation_conditions
+    allow_mechanisms:
+      - 挂单
+      - 条件单
+      - 网格
+      - 做T
+      - 限价
+      - 分批
+    notes: 竞价观察只输出条件化预案，不在竞价窗口下单（09:20-09:25 不可撤单）
+
+  - slot_id: stock_morning_close
+    time: "11:30"
+    track: stock
+    name: 上午收盘观察与下午操作建议
+    data_stage: morning_close
+    inputs:
+      - intraday_quote
+      - holdings_snapshot
+      - grid_state
+    required_outputs:
+      - stance
+      - actions
+      - invalidation_conditions
+    allow_mechanisms:
+      - 挂单
+      - 条件单
+      - 网格
+      - 做T
+      - 限价
+      - 分批
+    notes: 场外基金无分时净值，本槽不覆盖 fund 轨任何标的
+
+  - slot_id: stock_pm_close
+    time: "15:05"
+    track: stock
+    name: 下午收盘观察与次日预案
+    data_stage: close
+    inputs:
+      - daily_ohlc
+      - holdings_snapshot
+      - grid_state
+    required_outputs:
+      - stance
+      - actions
+      - next_day_plan
+      - invalidation_conditions
+    allow_mechanisms:
+      - 挂单
+      - 条件单
+      - 网格
+      - 做T
+      - 限价
+      - 分批
+    notes: 次日预案不得包含 14:57-15:00 收盘集合竞价的不可撤单决策
+
+  - slot_id: fund_morning
+    time: "11:00"
+    track: fund
+    name: 场外基金上午观察
+    data_stage: intraday
+    inputs:
+      - proxy_index_quote
+      - fund_holdings_disclosure
+      - dca_plan_state
+    required_outputs:
+      - stance
+      - actions
+      - invalidation_conditions
+    allow_mechanisms: []
+    notes: 11:00 无场外净值，只能用重仓股/跟踪指数代理，且必须标注代理性质
+
+  - slot_id: fund_action
+    time: "14:30"
+    track: fund
+    name: 场外基金申赎操作意见
+    data_stage: intraday
+    inputs:
+      - proxy_index_quote
+      - fund_holdings_disclosure
+      - nav_deviation_band
+      - dca_plan_state
+    required_outputs:
+      - stance
+      - actions
+      - amount_unit
+      - invalidation_conditions
+    allow_mechanisms: []
+    notes: 唯一执行槽；动作必须带 amount_unit（money|shares），15:00 前提交按当日收盘净值成交
+
+  - slot_id: fund_wrap
+    time: "15:30"
+    track: fund
+    name: 场外基金盘后总结与当日结算
+    data_stage: close
+    inputs:
+      - fund_nav_latest
+      - dca_plan_state
+      - action_log
+    required_outputs:
+      - stance
+      - actions
+      - settlement_note
+      - invalidation_conditions
+    allow_mechanisms: []
+    notes: 净值 T+1 才公布，本槽只能结算场外轨，股票轨结算由 stock_pm_close 承担
+
+# 跨槽契约：任何槽都不得把「意图/计划」写成「已执行」
+narrative_time_rules:
+  - lag_status: plan
+    usable_for_action: true
+  - lag_status: done
+    usable_for_action: false
+  - lag_status: superseded
+    usable_for_action: false

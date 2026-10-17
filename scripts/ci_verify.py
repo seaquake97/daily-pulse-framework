@@ -41,6 +41,7 @@ TEST_SUITES = (
     "framework/scripts/test_strategies.py",
     "framework/scripts/test_render_strategies.py",
     "framework/scripts/test_render_source_hygiene.py",
+    "framework/scripts/test_validate_slots.py",
     "framework/engine/signals/test_technical.py",
     "framework/engine/signals/test_signals.py",
     "framework/engine/signals/test_compute_signals.py",
