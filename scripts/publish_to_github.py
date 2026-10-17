@@ -861,12 +861,15 @@ def main() -> int:
         if not p.exists():
             print(f"❌ manifest 文件缺失: {rel}")
             return 4
-        content = p.read_text(encoding="utf-8")
-        if not content.strip():
+        # 站点文件自 P-3 起含二进制产物（apple-touch-icon / icon-192 / icon-512
+        # 三个 PNG）：必须按字节读。read_text(utf-8) 会在 PNG 魔数 0x89 处抛
+        # UnicodeDecodeError，把整条发布管线炸掉（2026-10-17 实测）。
+        raw = p.read_bytes()
+        if not raw.strip():
             print(f"❌ manifest 文件为空: {rel}")
             return 4
-        files_meta.append({"path": rel, "bytes": len(content.encode("utf-8")),
-                           "sha256_16": sha256(content)})
+        files_meta.append({"path": rel, "bytes": len(raw),
+                           "sha256_16": _sha256_file(p)})
     manifest = {
         "date": date,
         "owner": args.owner,

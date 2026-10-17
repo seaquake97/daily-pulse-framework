@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""site_pages.py — 页面层（整页组合 + feed / sitemap）
+"""site_pages.py — 页面层（整页组合 + sitemap；feed 实现在 site_feed.py）
 
 只做「把 site_render 的片段组装成整页」，不引入新的样式或数据判断。
-依赖方向：site_pages → site_render → site_content → site_theme（只向下）。
+依赖方向：site_pages → site_render / site_today / site_feed → site_content → site_theme（只向下）。
 """
 from __future__ import annotations
-
-from datetime import datetime, timezone
 
 import site_content as C
 import site_render as R
 import site_theme as T
+import site_today as TD
 
 
 def _crumb(depth: str, tail: str) -> str:
@@ -59,6 +58,7 @@ def home(metas: list[dict]) -> str:
       {f'· 最近更新 {C.esc(date)}（{C.esc(zh)} · {C.esc(en)}）' if date else ''}</p>
   </header>
   {strip}
+{TD.today_section(metas, "./")}
   <section aria-labelledby="sec-timeline" style="margin-top:var(--space-16)">
     <div class="sec-head">
       <h2 class="t-title2" id="sec-timeline">判断轨迹</h2>
@@ -344,41 +344,11 @@ def group(title: str, subtitle: str, metas: list[dict], depth: str, current: str
 # ---------------------------------------------------------------------------
 # feed.xml / sitemap.xml
 # ---------------------------------------------------------------------------
-def _rfc822(date_str: str) -> str:
-    return datetime.strptime(date_str, "%Y-%m-%d").replace(
-        tzinfo=timezone.utc).strftime("%a, %d %b %Y 00:00:00 +0000")
-
-
 def feed(metas: list[dict], base_url: str) -> str:
-    """RSS 2.0。description 用当日结论（评级·Σ + 任务数），不用标题重复。"""
-    items = []
-    for m in metas[:20]:
-        date = m.get("date", "")
-        link = f"{base_url}daily/{date}/"
-        n = len(m.get("entries", []))
-        rating = m.get("rating")
-        sigma = C.sigma_txt(m.get("sigma"))
-        desc = (f"Σ 评级【{rating}】" if rating else "Σ 评级未标注")
-        desc += f"（{sigma}）" if sigma else "（数据缺口）"
-        desc += f"，覆盖 {n} 项任务产出。{C.I18N['ai_notice']}"
-        items.append(f"""  <item>
-    <title>{C.esc(m.get('title_zh', date))}</title>
-    <link>{C.esc(link)}</link>
-    <guid isPermaLink="true">{C.esc(link)}</guid>
-    <description>{C.esc(desc)}</description>
-    <pubDate>{_rfc822(date)}</pubDate>
-  </item>""")
-    return f"""<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
-<channel>
-  <title>{C.esc(C.I18N['site_title'])}</title>
-  <link>{C.esc(base_url)}</link>
-  <description>数据驱动的 A 股/基金每日研判档案 / Data-driven daily research archive</description>
-  <language>zh-CN</language>
-{chr(10).join(items)}
-</channel>
-</rss>
-"""
+    """RSS 2.0 条目级（P-2）。实现迁至 site_feed.py（单文件 ≤300 行纪律），
+    此处保留委托：build_site.py 的调用点与 SITE_FILE 协议不变。"""
+    import site_feed
+    return site_feed.feed(metas, base_url)
 
 
 def json_feed(metas: list[dict], base_url: str) -> str:

@@ -17,11 +17,14 @@ r"""build_site.py — 站点结构层生成器（编排入口，只做装配）
   docs/daily/<date>/index.html   日期页
   docs/weekly/<YYYY-Www>/index.html   周归档页
   docs/monthly/<YYYY-MM>/index.html   月归档页
-  docs/feed.xml                  RSS 2.0（最新 20 期）
+  docs/feed.xml                  RSS 2.0（条目级：每个任务条目一个 item，P-2）
   docs/rss.xml                   RSS 别名（兼容默认 rss.xml 路径的阅读器）
   docs/subscribe/index.html     订阅页（RSS 产品化入口：地址 + 阅读器指引）
   docs/sitemap.xml               全量 URL
   docs/methodology/index.html    方法论页
+  docs/manifest.webmanifest     PWA 清单（P-3）
+  docs/apple-touch-icon.png     iOS 主屏图标 180×180（P-3，纯标准库绘制）
+  docs/icon-192.png / icon-512.png   PWA 图标两档（P-3）
 
 用法：
   python3 build_site.py --stage <_stage 目录> [--base-url <URL>] [--methodology-src <文件>] [--no-frame]
@@ -37,11 +40,38 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import frame_pass as F          # noqa: E402  详情页阅读框架注入（sanitize 之后）
+import gen_app_icon as GI       # noqa: E402  PWA 图标（纯标准库绘制，P-3）
 import site_pages as P            # noqa: E402
 import site_theme as T            # noqa: E402
 
 HERE = Path(__file__).resolve().parent
 DEFAULT_METHODOLOGY = HERE.parent / "site" / "methodology" / "index.html"
+
+
+def _pwa_manifest() -> str:
+    """PWA 清单（P-3）。background/theme 色用字面量：清单是独立 JSON 文件，
+    浏览器不对其解析 CSS 变量，var(--token) 在此无效；取值与
+    design-tokens.css 的 --ap-white(#ffffff) / --ap-blue(#0071e3) 逐字一致
+    （浅色画布 + 交互蓝），改 token 须同步此处。
+    start_url/scope 用相对 "./"：清单位于 docs/ 根，相对解析对
+    GitHub Pages 项目路径 / 自定义域名 / 本地静态服务三种部署全部成立。"""
+    return json.dumps({
+        "name": "每日市场脉搏",
+        "short_name": "市场脉搏",
+        "description": "数据驱动的 A 股 / 基金每日研判档案",
+        "lang": "zh-CN",
+        "start_url": "./",
+        "scope": "./",
+        "display": "standalone",
+        "background_color": "#ffffff",
+        "theme_color": "#0071e3",
+        "icons": [
+            {"src": "icon-192.png", "sizes": "192x192", "type": "image/png",
+             "purpose": "any maskable"},
+            {"src": "icon-512.png", "sizes": "512x512", "type": "image/png",
+             "purpose": "any maskable"},
+        ],
+    }, ensure_ascii=False, indent=2) + "\n"
 
 
 def load_dates(daily_dir: Path) -> list[dict]:
@@ -139,6 +169,11 @@ def main() -> int:
     emit("docs/rss.xml", P.feed(metas, args.base_url))
     # feed.json：机器可读数据源（小程序 / PWA / 第三方集成，ARCH-R6 §3.1）
     emit("docs/api/feed.json", P.json_feed(metas, args.base_url))
+    # PWA 三件套（P-3）：清单 + 三档图标。图标由纯标准库绘制（禁 Pillow），
+    # 同输入必得同字节；走 SITE_FILE 协议，publish 全量推送不落件。
+    emit("docs/manifest.webmanifest", _pwa_manifest())
+    for p in GI.write_all(stage / "docs"):
+        generated.append(str(p.relative_to(stage)))
     emit("docs/subscribe/index.html", P.subscribe(metas, args.base_url))
     emit("docs/sitemap.xml", P.sitemap(
         metas, args.base_url,
@@ -163,7 +198,8 @@ def main() -> int:
     gaps = sum(1 for m in metas for e in m.get("entries", []) if e.get("sigma") is None)
     print(f"站点结构层: {len(metas)} 个日期页 / {total} 条时间线条目"
           f"（其中 Σ 数据缺口 {gaps} 条）/ {len(weeks)} 周归档 / {len(months)} 月归档"
-          f" / feed / rss.xml 别名 / subscribe 订阅页 / sitemap / methodology")
+          f" / feed / rss.xml 别名 / subscribe 订阅页 / sitemap / methodology"
+          f" / PWA 三件套（manifest + 3 图标）")
     for rel in generated:
         print(f"SITE_FILE:{rel}")
     return 0

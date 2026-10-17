@@ -95,6 +95,15 @@ def shell(title: str, desc: str, depth: str, body: str, current: str = "") -> st
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
+<!-- PWA 三件套（P-3）：theme-color 双 meta + 清单/图标声明。
+     content 用字面量（P0-3 例外）：meta/清单文件不吃 CSS 变量，var(--token)
+     在浏览器外无解析环境。取值与 design-tokens.css 逐字同源——浅色画布
+     #ffffff（--ap-white）、深色画布 #000000（--ap-black，D-1 深色基准）、
+     交互蓝 #0071e3（--ap-blue，manifest theme_color）；改 token 须同步此处。 -->
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="{depth}manifest.webmanifest">
+<link rel="apple-touch-icon" href="{depth}apple-touch-icon.png">
 <link rel="alternate" type="application/rss+xml" title="每日市场脉搏 · Daily Market Pulse" href="{depth}feed.xml">
 <title>{C.esc(title)}</title>
 <meta name="description" content="{C.esc(desc)}">

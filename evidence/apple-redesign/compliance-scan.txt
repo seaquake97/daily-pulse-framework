@@ -1,4 +1,4 @@
-# 合规扫描 2026-10-17 14:30:54
+# 合规扫描 2026-10-17 15:34:28
 生成页面数: 11
 上游详情页数: 24（daily/*/ 下非 index.html）
 ── 2. GRADIENT ──
@@ -10,13 +10,13 @@
    外部 http(s):0
    javascript:      0
 ── 4. LINE COUNT ──
-      172 scripts/build_site.py
+      208 scripts/build_site.py
       310 scripts/site_theme.py
       238 scripts/site_content.py
-      353 scripts/site_render.py
-      454 scripts/site_pages.py
+      362 scripts/site_render.py
+      424 scripts/site_pages.py
       162 scripts/site_components.css
-      1689 total
+      1704 total
 ── 5. 禁用项 ──
    弹跳缓动:                0
    紫粉渐变/靛蓝:            0
@@ -24,9 +24,9 @@
    组件层彩色 border-left:    0
    font-weight 800+:         0
 ── 6. 深色模式 / 动效降级 / 断点 ──
-   prefers-color-scheme 块:  138
+   prefers-color-scheme 块:  149
    prefers-reduced-motion:   24
-   @media 总数:              264
+   @media 总数:              275
    @supports corner-shape:   33
    saturate(180%) blur(20px):11
    color-scheme meta:        11
@@ -45,21 +45,21 @@
    tag-warn（统计口径不同）:      11
    chip-pending（网页版待补齐）:  11
    Σ 0.000 兜底(应为 0):        0
-   评级箭头冗余编码:            74
+   评级箭头冗余编码:            78
    SVG symbol sprite:          502
-   内联 <use> 引用:            885
+   内联 <use> 引用:            907
 ── 9. 无信息量链接标签（应为 0）──
    '阅读网页版': 0
    'HTML 版': 0
    '阅读 Markdown': 0
    '阅读全文 / Read Full': 0
 ── 10. 产物完整性 ──
-   _stage/docs/feed.xml: 3539 bytes
+   _stage/docs/feed.xml: 12166 bytes
    _stage/docs/sitemap.xml: 1158 bytes
-   _stage/docs/index.html: 129085 bytes
-   _stage/docs/methodology/index.html: 105831 bytes
-   _stage/docs/weekly/2026-W42/index.html: 125340 bytes
-   _stage/docs/monthly/2026-10/index.html: 130262 bytes
+   _stage/docs/index.html: 137744 bytes
+   _stage/docs/methodology/index.html: 107882 bytes
+   _stage/docs/weekly/2026-W42/index.html: 127518 bytes
+   _stage/docs/monthly/2026-10/index.html: 132440 bytes
 ── 11. 上游详情页（daily 详情页，消毒前后对比基准）──
    详情页数:                  24
    <script 数:                0

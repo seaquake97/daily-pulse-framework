@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
+<!-- PWA 三件套（P-3）：theme-color 双 meta + 清单/图标声明。
+     content 字面量理由同 scripts/site_render.py 的 shell()：meta 不吃 CSS
+     变量；取值与 design-tokens.css 的 --ap-white/#0071e3/--ap-black 同源。
+     本页在 docs/methodology/ 子目录，资源引用上跳一级（../）。 -->
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
 <title>研判方法论 · Methodology | 每日市场脉搏</title>
 <meta name="description" content="每日市场脉搏的研判方法论：daily-decision-engine 决策引擎七步流水线、S1-S6 确定性信号评分、五档 Σ 评级、双重金融护栏、多源容灾与声明式策略体系。">
 <!-- 本文件为静态方法论页，样式由 scripts/build_site.py 注入 Token 层 + 组件层 -->
