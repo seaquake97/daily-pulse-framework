@@ -1,7 +1,7 @@
 """content_contract 对真实 2026-10-14 产出的契约回归测试。
 
 与 test_content_contract.py 分文件：本文件只管「真实数据 + 跨任务一致性」，
-fixture 全部指向 /Users/lianghaizhen/WorkBuddy 下的当日实际产出。
+fixture 全部指向工作区根（paths.WORKBUDDY_ROOT）下的当日实际产出。
 真实数据缺失时用例 skip 而非伪造样本。
 
 运行：python3 test_real_outputs.py
@@ -16,10 +16,12 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "framework" / "scripts"))   # A-04
+import paths
 
 import content_contract as cc
 
-BASE = Path(os.environ.get("PULSE_WORKBUDDY_ROOT", "/Users/lianghaizhen/WorkBuddy"))
+BASE = paths.WORKBUDDY_ROOT
 DAY = os.environ.get("PULSE_TEST_DAY", "2026-10-14")
 SRC = Path(__file__).resolve().parent
 
@@ -263,11 +265,21 @@ class TestSigmaConsistencyAcrossTasks(unittest.TestCase):
         dr = real_json("每日总复盘（15:30）")
         entry = by_slug.get("stock-assistant")
         self.assertIsNotNone(entry, "entries.json 缺少 stock-assistant 条目")
-        # 1) 条目 Σ 等于本任务 market_data.json 的 verdict Σ（per-slug 取数）
-        self.assertEqual(entry["sigma"], sa["verdict"]["sigma"])
-        # 2) 不得串用每日总复盘（15:30 收盘）的 Σ
-        self.assertNotEqual(entry["sigma"], dr["verdict"]["sigma"])
-        # 3) 时点字段随本任务，而非收盘
+
+        # 0) P0-1（架构师 A-04）：降级轮在**数据层**即撤下方向值。
+        # 数据不可信时给出方向本身是误导；且 entries.json 会被第三方直接消费。
+        if entry.get("degraded"):
+            self.assertIsNone(entry["sigma"],
+                              "降级条目的 Σ 必须在数据层置 null，不得外泄给消费方")
+            self.assertIsNone(entry["rating"], "降级条目的评级必须置 null")
+            self.assertFalse(entry["comparable"], "降级条目不可标记为可比")
+        else:
+            # 1) 非降级时 Σ 必须等于本任务 market_data.json 的 verdict Σ
+            #    （per-slug 取数，不得串用每日总复盘的收盘 Σ）
+            self.assertEqual(entry["sigma"], sa["verdict"]["sigma"])
+            self.assertNotEqual(entry["sigma"], dr["verdict"]["sigma"],
+                                "不得串用每日总复盘（15:30 收盘）的 Σ")
+        # 2) 时点字段随本任务，而非收盘
         self.assertEqual(entry["stage"], "pre_open",
                          "9:28 是集合竞价快照，性质为 pre_open；标成 intraday "
                          "会让读者把竞价结论当盘中结论读（PM C-11 实锤）")

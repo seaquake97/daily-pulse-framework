@@ -118,6 +118,13 @@ def main() -> int:
     for m in metas:
         emit(f"docs/daily/{m['date']}/index.html", P.day(m))
 
+    # 周报 / 月报总览页：导航的 weekly/ 与 monthly/ 入口必须真实可达。
+    # 此前只生成具体期页 → 5 个页面 × 2 入口 = 80 处死链，线上 404（PM 实测）。
+    emit("docs/weekly/index.html",
+         P.archive_index("weekly", [(w, f"周报 {w}") for w in sorted(weeks, reverse=True)]))
+    emit("docs/monthly/index.html",
+         P.archive_index("monthly", [(m, f"月报 {m}") for m in sorted(months, reverse=True)]))
+
     for wk, ms in sorted(weeks.items(), reverse=True):
         emit(f"docs/weekly/{wk}/index.html",
              P.group(f"周归档 · {wk}", f"Weekly archive {wk}", ms, "../../",

@@ -35,10 +35,11 @@ import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "framework" / "scripts"))   # A-04: 集中路径
+import paths
 OUT_DIR = HERE / "assets"
 OUT_CSS = OUT_DIR / "body-utilities.css"
-DEFAULT_SOURCE = Path("/Users/lianghaizhen/WorkBuddy/2026-10-14-10-29-45/github-ip-plan"
-                      "/_stage/docs/daily/2026-10-14/fund-market.html")
+DEFAULT_SOURCE = paths.PROJECT_ROOT / "_stage" / "docs" / "daily" / "2026-10-14" / "fund-market.html"
 
 TW_VERSION = "3.4.17"
 GRADIENT_RE = re.compile(r"(?:linear|radial|conic)-gradient\s*\(", re.I)

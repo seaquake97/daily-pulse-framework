@@ -24,6 +24,8 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(HERE.parent / "framework" / "scripts"))   # A-04
+import paths
 
 import publish_to_github as pub                                       # noqa: E402
 import site_theme as T                                                # noqa: E402
@@ -33,7 +35,7 @@ from sanitizer.token_pass import MARKER as TOKEN_MARKER               # noqa: E4
 
 PUBLISH_SRC = (HERE / "publish_to_github.py").read_text(encoding="utf-8")
 TEST_DATE = "2026-10-14"
-UPSTREAM = Path("/Users/lianghaizhen/WorkBuddy")
+UPSTREAM = paths.WORKBUDDY_ROOT
 
 # 总监指定的 emoji 正则（含变体选择符）；ADR-003 显式保留的 IP 标识包裹体
 # （emoji 归零的豁免范围）；可见文本 token（中文/拉丁词/数值/Σ/▲▼↔）
@@ -112,8 +114,12 @@ def _write_source(root: Path, html: str) -> None:
 
 
 def _run_publish(source: Path, stage: Path, *extra: str):
+    # 合成测试只提供 stock-assistant 单一任务产物；用 --task 显式收敛收集范围，
+    # 隔离消毒/护栏/范围契约与 A-03「缺失任务硬失败」逻辑（若不收敛，A-03 会把
+    # 其余 4 个未提供任务判为 dir-missing → 退出码 2，与单任务合成场景的预期不符）。
     return subprocess.run(
         [pub.MANAGED_PY, str(HERE / "publish_to_github.py"), "--date", TEST_DATE,
+         "--task", "stock-assistant",
          "--source-root", str(source), "--stage", str(stage), *extra],
         capture_output=True, text=True)
 

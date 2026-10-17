@@ -8,33 +8,41 @@ emoji_inline.py（便于独立测试与分层）。
 ## 四种处置（穷举且互斥，无第五种）
   1. MAPPED      → 内联 SVG（site_theme 锁定的 Lucide symbol）
   2. PROTECTED   → 保留原字符（ADR-003 的色盲友好方向冗余编码，禁止剥离）
-  3. IP_MARK     → 保留原字符 + ip-mark 包裹。**白名单制**：只有本文件
-                   显式登记的 IP / 品牌标识可走此路（唯一合法保留路径）
+  3. IP_MARK     → 内联 SVG + ip-mark 包裹。**白名单制**：只有本文件
+                   显式登记的 IP / 品牌标识可走此路（唯一合法保留路径）。
+                   包裹机制保留（title/aria-label/role=img 承载文字语义），
+                   但图形本体是 SVG symbol 而非 emoji 字符（PM-07，见下）。
   4. UNMAPPED    → needs-manual-review + 保守保留原字符（不包 ip-mark）。
                    包了 ip-mark 会被 P0 扫描器豁免，功能图标位 emoji
                    就此静默过闸（2026-10-15 设计师门禁实锤，见 B-5）
 
 ## 铁律：不静默删除，也不静默放行
-  映射表覆盖不到的 emoji 一律显式处置（第 4 种），绝不悄悄包个 span 混进
-  产出。「删除一个看不懂的 emoji」看起来干净，实则丢失上游语义，且违反本任务
-  「sanitize 是换皮不是阉割」的核心约束；「悄悄保留」更糟 —— 它让 P0 闸门
-  失去意义。宁可留一个 needs-manual-review 告警让人来判断，也不丢字符、
-  不闭眼。测试用「可见文本字符集子集」守住内容线，用「未映射必报
-  needs-manual-review」守住门禁线。
+映射表覆盖不到的 emoji 一律显式处置（第 4 种），绝不悄悄包个 span 混进
+产出。「删除一个看不懂的 emoji」看起来干净，实则丢失上游语义，且违反本任务
+「sanitize 是换皮不是阉割」的核心约束；「悄悄保留」更糟 —— 它让 P0 闸门
+失去意义。宁可留一个 needs-manual-review 告警让人来判断，也不丢字符、
+不闭眼。测试用「可见文本字符集子集」守住内容线，用「未映射必报
+needs-manual-review」守住门禁线。
 
-## ⚠️ 与 🍜 的设计决策（勿擅改）
-  · U+26A0 警告符承载语义（风险提示），转 alert-triangle 并加 `warn` class
-    继承所在容器的警示色 —— 可见性不降级，不是装饰性剥离。
-  · U+1F35C 是个人 IP 形象（账号标识），**不是功能图标**。已核对原型站
-    apple-prototype.html 的 36 个 i-* symbol，无面/餐/餐饮类图标；强行补一个
-    等于手绘第二套图标库，违反 P0「全站唯一样式」。故按 IP_MARK 保留原字符，
-    并加 title 说明，既守住 P0「禁止 emoji 作为功能图标」，也不丢品牌标识。
+## ⚠️ 与 ♟ 的处置变更（PM-07，2026-10-16 总监裁决，勿再漂移）
+早期决策（已作废，记录在此防反复）：U+26A0 转 alert-triangle 并加 warn
+class；U+1F35C / U+265F 以「个人 IP 形象、锁定表无对应 symbol、强行补图
+标等于手绘第二套图标库」为由保留原字符 + ip-mark 包裹。
+**裁决：团队 P0-1「禁止 emoji 作为功能图标」凌驾于上述内部决策。** ip-mark
+曾是 P0 扫描器的豁免范围，emoji 字符躲在包裹体里稳定上线（实测 30 处）。
+修法不是删品牌标识，而是把标识本体从 emoji 字符升级为项目锁定的 SVG
+symbol 体系：site_theme.SYMBOLS 新增 chess-pawn / noodle-bowl 两枚（与
+全站同一 stroke 语言，恰是统一而非分裂），ip-mark 包裹机制原样保留，
+title/aria-label 改挂文字语义（"股市棋手" / "个人 IP 形象"）—— 可访问性
+不降反升。emoji_inline 同时把历史产物里的旧形态包裹体（emoji 原字符）
+升级重写，且不再整体 stash 豁免它。本文件顶层的这段记录即裁决依据，
+后续如再有人以「内部设计决策」为由保留 emoji 字符，以本条为准驳回。
 
 ## 书写纪律
-  键一律用 \\uXXXX 转义，不写字面 emoji —— 字面 emoji 会让 P0 扫描器在源码里
-  命中，误判「emoji 仍在被使用」（与 site_content.py 同一纪律）。
-  变体选择符 U+FE0F / 零宽连接符 U+200D 在查表前统一剥离，避免「⚠️」与「⚠」
-  被当成两个 key。
+键一律用 \\uXXXX 转义，不写字面 emoji —— 字面 emoji 会让 P0 扫描器在源码里
+命中，误判「emoji 仍在被使用」（与 site_content.py 同一纪律）。
+变体选择符 U+FE0F / 零宽连接符 U+200D 在查表前统一剥离，避免「⚠️」与「⚠」
+被当成两个 key。
 """
 from __future__ import annotations
 
@@ -99,11 +107,16 @@ EMOJI_TO_SYMBOL: dict[str, tuple[str, str]] = {
     "\u2744": ("trending-down", "down"),     # ❄️ 跌停板数（冷凝=下行）
 }
 
-# ---- 处置 2：个人 IP / 品牌标识（保留原字符）----
-IP_MARK_EMOJI = frozenset({
-    "\U0001F35C",   # 热气面碗：个人 IP 形象
-    "♟",             # 黑色棋子：专栏标识
-})
+# ---- 处置 2：个人 IP / 品牌标识（SVG 图标 + ip-mark 包裹，PM-07）----
+# 键 = emoji 字符（\u 转义，守书写纪律）；值 = (symbol 名, 文字语义标签)。
+# 标签进 ip-mark 的 title/aria-label —— 屏幕阅读器拿到的是词而不是
+# 「chess pawn emoji」，语义不丢反升。symbol 必须在 site_theme.SYMBOLS
+# 定义（verify_symbols 构建期校验，含本表）。
+IP_MARK_SYMBOL: dict[str, tuple[str, str]] = {
+    "\U0001F35C": ("noodle-bowl", "个人 IP 形象"),   # 热气面碗：账号标识
+    "\u265f": ("chess-pawn", "股市棋手"),            # 黑色棋子：专栏标识
+}
+IP_MARK_EMOJI = frozenset(IP_MARK_SYMBOL)
 
 # ---- 处置 3：ADR-003 色盲友好方向冗余编码（保留原字符，禁止剥离）----
 PROTECTED_ARROWS = frozenset({"▲", "▼", "↔", "▲▲", "▼▼"})
@@ -142,8 +155,13 @@ def is_protected(emoji: str) -> bool:
 
 
 def mapped_symbols() -> set[str]:
-    """映射表引用到的全部 symbol 名（供 verify_symbols 校验）。"""
-    return {sym for sym, _ in EMOJI_TO_SYMBOL.values()}
+    """映射表引用到的全部 symbol 名（供 verify_symbols 校验）。
+
+    含 IP_MARK_SYMBOL 的品牌图形 —— 漏定义同样要在构建期炸，而不是等
+    渲染某页才 KeyError。
+    """
+    return ({sym for sym, _ in EMOJI_TO_SYMBOL.values()}
+            | {sym for sym, _ in IP_MARK_SYMBOL.values()})
 
 
 def verify_symbols(known: set[str]) -> list[str]:

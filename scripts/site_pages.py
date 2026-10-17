@@ -42,7 +42,7 @@ def home(metas: list[dict]) -> str:
         ("数据源", '<span class="txt">腾讯自选股 MCP</span>'),
     ])
 
-    issues = "\n".join(R.issue_block(m, "./") for m in metas) or (
+    issues = "\n".join(R.issue_block(m, "./", default_open=(i == 0)) for i, m in enumerate(metas)) or (
         f'  <div class="empty">{T.icon("inbox", "ic-24")}'
         '<h3>暂无归档数据</h3><p>尚无已入库的交易日。空数据不做补零，避免生成虚假结论。</p>'
         f'<div class="btn-row" style="justify-content:center">'
@@ -279,10 +279,45 @@ def _trajectory_table(metas: list[dict]) -> str:
     </div>"""
 
 
+def archive_index(kind: str, groups: list[tuple[str, str]]) -> str:
+    """周报 / 月报总览页（PM 缺陷 P0-1：导航指向 weekly/ 但该页从未生成 → 线上 404）。
+
+    产品判断：导航里既然有「周报 / 月报」两个入口，就得真的有这两个页面。
+    早前只生成 `weekly/<YYYY-Www>/` 具体周页，却让导航指向 `weekly/`，
+    结果 5 个页面 × 2 入口 = 全站 80 处死链、线上 404。
+    与其把导航入口撤掉（信息更少），不如补齐总览页——它是「有哪些周报可读」
+    的索引页，本身就该存在。
+    """
+    zh, en = (("周报", "Weekly") if kind == "weekly" else ("月报", "Monthly"))
+    rows = "".join(
+        f'    <li><a href="./{key}/">{C.esc(label)}</a></li>' for key, label in groups)
+    body = f"""  <header class="page-head">
+    <p class="eyebrow t-footnote">{T.icon("archive")}{C.esc(zh)} / {C.esc(en)}</p>
+    <h1 class="t-title1">{C.esc(zh)}归档</h1>
+    <p class="lede">按{zh[:-1] if zh.endswith('报') else zh}期浏览全部历史研判，共 {len(groups)} 期。</p>
+  </header>
+  <section aria-labelledby="sec-list">
+    <div class="sec-head">
+      <h2 class="t-title3" id="sec-list">全部{zh}期</h2>
+      <span class="spacer"></span>
+      <span class="aside">{T.icon("calendar")}最近在前</span>
+    </div>
+    <ul class="archive-list">
+{rows}
+    </ul>
+  </section>"""
+    current = "weekly" if kind == "weekly" else "monthly"
+    # depth="../"：本页在 docs/weekly/（或 monthly/）子目录，
+    # 用 "" 会让导航的 index.html 解析成 /weekly/index.html（本页自己）。
+    return R.shell(f"{zh}归档 · 每日市场脉搏",
+                   f"按期浏览全部{en}归档，共 {len(groups)} 期。",
+                   "../", body, current)
+
+
 def group(title: str, subtitle: str, metas: list[dict], depth: str, current: str,
           crumb_tail: str) -> str:
     docs = sum(len(m.get("entries", [])) for m in metas)
-    issues = "\n".join(R.issue_block(m, depth) for m in metas) or (
+    issues = "\n".join(R.issue_block(m, depth, default_open=(i == 0)) for i, m in enumerate(metas)) or (
         f'  <div class="empty">{T.icon("inbox", "ic-24")}<h3>暂无归档数据</h3>'
         '<p>该区间尚无已入库的交易日。</p></div>')
     body = f"""  {_crumb(depth, crumb_tail)}
@@ -359,6 +394,10 @@ def json_feed(metas: list[dict], base_url: str) -> str:
     import json
 
     def entry_json(e: dict) -> dict:
+        # 降级态不得输出方向值（架构师 A-04）：客户端会二次解读 rating/sigma，
+        # 若此处仍带「进攻 +0.510」，第三方应用会拿着不可信数据算出动作。
+        degraded = bool(e.get("degraded"))
+        gap = degraded or e.get("sigma") is None
         return {
             "slug": e.get("slug"),
             "name": e.get("name"),
@@ -366,12 +405,12 @@ def json_feed(metas: list[dict], base_url: str) -> str:
             "runTime": e.get("run_time"),
             "title": e.get("title"),
             "conclusion": e.get("conclusion"),
-            "rating": e.get("rating"),
-            "sigma": e.get("sigma"),
+            "rating": None if degraded else e.get("rating"),
+            "sigma": None if degraded else e.get("sigma"),
             "stage": e.get("stage"),
-            "degraded": bool(e.get("degraded")),
-            "dataGap": e.get("sigma") is None,
-            "comparable": bool(e.get("comparable", False)),
+            "degraded": degraded,
+            "dataGap": gap,
+            "comparable": False if degraded else bool(e.get("comparable", False)),
             "url": f"{base_url}daily/{e.get('_date', '')}/{e.get('slug')}.html"
                    if e.get("html") else None,
         }

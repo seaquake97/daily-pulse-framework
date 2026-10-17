@@ -1,0 +1,35 @@
+name: Feature request
+description: 提议新功能或方法论扩展
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 解决什么问题
+      description: 用户视角的痛点，不是实现方案
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 提议方案
+    validations:
+      required: false
+  - type: dropdown
+    id: area
+    attributes:
+      label: 所属领域
+      options:
+        - 决策引擎（信号/评级/台账）
+        - 数据采集与容灾
+        - 渲染与呈现
+        - 站点与分发
+        - 配置与框架资产化
+        - 工程化（测试/CI/可观测）
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 验收标准（EARS 格式优先）
+      placeholder: "While 用户填写合法注册信息，系统必须创建账户并返回 JWT"

@@ -169,6 +169,21 @@ FAMILY_ROLE_TOKEN: dict[str, dict[str, str]] = {
     "accent": {"text": "--accent", "bg": "--surface-alt", "border": "--border"},
 }
 
+# bg 角色专用：语义色族（warn/up/down/accent）的色值落在「背景位」时，改走
+# FAMILY_ROLE_TOKEN 的 bg 列等价物（淡化 wash 底或表面色），**不可沿用文字
+# token**——直接作背景会让色块与文字同色，浅色模式下语义错位（沉默逻辑错误）。
+# A-02 修复点：#f59e0b 背景位曾错落 --warn，现 → --rating-balanced-wash。
+# 中性文字 --fg*/--fg-on-inverse 故意不入表：它们是模式反转文字色，落背景位时
+# 沿用 --fg 在浅色模式反得「深色块」，改投 --surface-alt 会翻成浅块，越俎代庖且
+# 超 A-02 范围，故原样透传。wash/表面/描边类 Token 本就适配背景位，亦不入表。
+# 与「文字角色命中 wash 族返回 None」对称——颜色有方向，角色错配绝不静默吞下。
+_BG_WASH_FOR_TEXT_TOKEN: dict[str, str] = {
+    "--warn": "--rating-balanced-wash",
+    "--accent": "--surface-alt",
+    "--quote-up": "--rating-offensive-wash",
+    "--quote-down": "--rating-defensive-wash",
+}
+
 # 说明：带透明度后缀的底色类（bg-amber-400/20）按「有透明度 = 弱化底色」
 # 处理，统一收敛到 --surface-alt；透明度层级差异在视觉上远小于色相差异，
 # 保留它会让弱化层级与语义层级继续分裂。
@@ -236,6 +251,11 @@ def token_for_hex(hex_value: str, role: str = "bg") -> str | None:
         tok = override[role]
     else:
         tok = HEX_TO_TOKEN.get(key)
+    # bg 角色：文字 / 行情类色值落在背景位 → 改走 wash/表面底。
+    # 见 _BG_WASH_FOR_TEXT_TOKEN：与 FAMILY_ROLE_TOKEN 的 bg 列同源，不臆造。
+    # 已在背景位的 wash/表面/描边 Token 不在该表，原样透传。
+    if role == "bg" and tok in _BG_WASH_FOR_TEXT_TOKEN:
+        return _BG_WASH_FOR_TEXT_TOKEN[tok]
     # 铁律：--rating-*-wash 只作背景，禁作文字色。文字角色命中 wash 族时
     # 不猜、不静默换错，返回 None 让调用方记 unmapped-color 显式报告。
     if role == "text" and tok and tok.endswith("-wash"):

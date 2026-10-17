@@ -15,17 +15,16 @@ import re
 import sys
 
 
-def _default_memory_path() -> str:
-    """持仓记忆文件默认路径：优先环境变量 DECISION_ENGINE_MEMORY（开源部署用），
-    否则回退到本机用户级 MEMORY.md（生产定时任务依赖此默认值，勿改）。"""
-    # 开源版默认值：请通过环境变量或 --memory 指定你的持仓记忆文件
-    return os.environ.get(
-        "DECISION_ENGINE_MEMORY",
-        "./holdings-memory.md",
-    )
+def _resolve_memory_path(cli_value: str | None) -> str | None:
+    """持仓记忆文件解析（A-05）：仅接受显式来源，无隐式默认。
 
-
-DEFAULT_MEMORY = _default_memory_path()
+    优先级：--memory 命令行参数 > DECISION_ENGINE_MEMORY 环境变量。
+    两者皆空即返回 None，由 main() 报错退出——绝不静默读取任何私人
+    记忆文件（旧实现回退 ./holdings-memory.md，仍属隐式默认，已移除）。
+    """
+    if cli_value:
+        return cli_value
+    return os.environ.get("DECISION_ENGINE_MEMORY")
 
 
 def to_float(s):
@@ -169,16 +168,25 @@ def parse_funds(rows):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--memory", default=DEFAULT_MEMORY)
+    ap.add_argument("--memory", default=None,
+                   help="持仓记忆文件（MEMORY.md）路径；亦可用环境变量 "
+                        "DECISION_ENGINE_MEMORY 指定。二者皆缺则报错退出，"
+                        "不读取任何隐式默认文件（A-05）。")
     ap.add_argument("-o", "--output", default=None)
     ap.add_argument("--codes-only", action="store_true", help="只输出需要行情的代码清单")
     args = ap.parse_args()
 
+    memory = _resolve_memory_path(args.memory)
+    if not memory:
+        print("❌ 未指定持仓记忆文件：请通过 --memory <路径> 显式传入，"
+              "或设置环境变量 DECISION_ENGINE_MEMORY。不读取任何隐式默认文件（A-05）。",
+              file=sys.stderr)
+        sys.exit(2)
     try:
-        with open(args.memory, "r", encoding="utf-8") as f:
+        with open(memory, "r", encoding="utf-8") as f:
             text = f.read()
     except FileNotFoundError:
-        print(f"❌ 记忆文件不存在: {args.memory}", file=sys.stderr)
+        print(f"❌ 记忆文件不存在: {memory}", file=sys.stderr)
         sys.exit(2)
 
     tables = parse_tables(text)

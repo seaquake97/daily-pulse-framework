@@ -3,9 +3,12 @@ holdings.yaml
 holdings.*.yaml
 !holdings.example.yaml
 
-# 产物
+# 产物（*.json 默认忽略——用户数据产物不进仓）
+# 白名单仅列框架自有的契约文件：缺任何一个，clone 后的流水线即断
 *.json
 !config/schema.json
+!config/slug_stage.json
+!engine/collect/market_data.schema.json
 _stage/
 dist/
 *.log

@@ -1,0 +1,43 @@
+name: Bug report
+description: 报告缺陷（尤其是页面结论自相矛盾、降级态可执行动作、数据缺口被填 0 三类 P0）
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提交前请确认：已跑 `python3 scripts/ci_verify.py` 与 `python3 scripts/scan_compliance.py`，并附上输出。
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 现象
+      description: 实际看到什么？附截图或产物路径
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望行为
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: 严重度自评
+      options:
+        - P0 — 结论自相矛盾 / 降级态可执行动作 / 数据被伪造
+        - P1 — 功能缺陷但有诚实降级
+        - P2 — 体验或文案问题
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: 复现步骤与证据
+      description: 命令、日期目录、页面 URL；涉及数据的请附 market_data.json 相关字段
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: 环境
+      placeholder: "Python 3.13.12 / macOS / 无第三方依赖"

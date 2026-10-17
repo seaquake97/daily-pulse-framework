@@ -36,7 +36,7 @@ TASK_NAMES: dict[str, str] = {
 }
 
 SLUG_STAGE: dict[str, str] = {
-    "stock-assistant": "intraday",
+    "stock-assistant": "pre_open",
     "fund-market": "intraday",
     "fund-guide": "intraday",
     "stock-review": "close",

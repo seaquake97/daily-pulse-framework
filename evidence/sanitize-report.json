@@ -4,8 +4,7 @@
       "source": "/Users/lianghaizhen/WorkBuddy/2026-10-14-10-29-45/github-ip-plan/_stage/docs/daily/2026-10-16/daily-review.html",
       "total": 112,
       "counts": {
-        "emoji": 11,
-        "emoji-kept": 2,
+        "emoji": 13,
         "gradient": 18,
         "heading": 1,
         "icon": 2,
@@ -106,7 +105,7 @@
         },
         {
           "kind": "style",
-          "detail": "style属性 → background:var(--rating-offensive-wash);color:var(--quote-up);border:1",
+          "detail": "style属性 → background:var(--rating-offensive-wash);color:var(--rating-offensive-w",
           "count": 1
         },
         {
@@ -136,7 +135,7 @@
         },
         {
           "kind": "style",
-          "detail": "<style>: background → var(--warn)",
+          "detail": "<style>: background → var(--rating-balanced-wash)",
           "count": 1
         },
         {
@@ -495,8 +494,8 @@
           "count": 1
         },
         {
-          "kind": "emoji-kept",
-          "detail": "♟️ (个人 IP 标识，白名单保留)",
+          "kind": "emoji",
+          "detail": "♟️ → #i-chess-pawn（IP 标识：股市棋手）",
           "count": 1
         },
         {
@@ -530,8 +529,8 @@
           "count": 1
         },
         {
-          "kind": "emoji-kept",
-          "detail": "♟️ (个人 IP 标识，白名单保留)",
+          "kind": "emoji",
+          "detail": "♟️ → #i-chess-pawn（IP 标识：股市棋手）",
           "count": 1
         },
         {
@@ -561,7 +560,7 @@
         },
         {
           "kind": "icon",
-          "detail": "注入 symbol 子集 9 个: alert-triangle, bar-chart, check, eye, repeat, scale, star, trending-down, trending-up",
+          "detail": "注入 symbol 子集 10 个: alert-triangle, bar-chart, check, chess-pawn, eye, repeat, scale, star, trending-down, trending-up",
           "count": 1
         },
         {
@@ -600,8 +599,7 @@
       "total": 61,
       "counts": {
         "chart-static": 1,
-        "emoji": 9,
-        "emoji-kept": 1,
+        "emoji": 10,
         "gradient": 2,
         "heading": 7,
         "icon": 2,
@@ -654,52 +652,52 @@
         },
         {
           "kind": "style",
-          "detail": "style属性 → background-color: var(--quote-up)",
+          "detail": "style属性 → background-color: var(--rating-offensive-wash)",
           "count": 1
         },
         {
           "kind": "style",
-          "detail": "style属性 → width: 27.41%; background-color: var(--quote-up)",
+          "detail": "style属性 → width: 27.41%; background-color: var(--rating-offensive-wash)",
           "count": 1
         },
         {
           "kind": "style",
-          "detail": "style属性 → background-color: var(--warn)",
+          "detail": "style属性 → background-color: var(--rating-balanced-wash)",
           "count": 1
         },
         {
           "kind": "style",
-          "detail": "style属性 → width: 7.33%; background-color: var(--warn)",
+          "detail": "style属性 → width: 7.33%; background-color: var(--rating-balanced-wash)",
           "count": 1
         },
         {
           "kind": "style",
-          "detail": "style属性 → background-color: var(--accent)",
+          "detail": "style属性 → background-color: var(--surface-alt)",
           "count": 1
         },
         {
           "kind": "style",
-          "detail": "style属性 → width: 9.36%; background-color: var(--accent)",
+          "detail": "style属性 → width: 9.36%; background-color: var(--surface-alt)",
           "count": 1
         },
         {
           "kind": "style",
-          "detail": "style属性 → background-color: var(--quote-down)",
+          "detail": "style属性 → background-color: var(--rating-defensive-wash)",
           "count": 1
         },
         {
           "kind": "style",
-          "detail": "style属性 → width: 6.73%; background-color: var(--quote-down)",
+          "detail": "style属性 → width: 6.73%; background-color: var(--rating-defensive-wash)",
           "count": 1
         },
         {
           "kind": "style",
-          "detail": "style属性 → background-color: var(--accent)",
+          "detail": "style属性 → background-color: var(--surface-alt)",
           "count": 1
         },
         {
           "kind": "style",
-          "detail": "style属性 → width: 5.35%; background-color: var(--accent)",
+          "detail": "style属性 → width: 5.35%; background-color: var(--surface-alt)",
           "count": 1
         },
         {
@@ -828,8 +826,8 @@
           "count": 1
         },
         {
-          "kind": "emoji-kept",
-          "detail": "🍜 (个人 IP 标识，白名单保留)",
+          "kind": "emoji",
+          "detail": "🍜 → #i-noodle-bowl（IP 标识：个人 IP 形象）",
           "count": 1
         },
         {
@@ -899,7 +897,7 @@
         },
         {
           "kind": "icon",
-          "detail": "注入 symbol 子集 7 个: alert-triangle, award, ban, calendar, lightbulb, target, user",
+          "detail": "注入 symbol 子集 8 个: alert-triangle, award, ban, calendar, lightbulb, noodle-bowl, target, user",
           "count": 1
         },
         {
@@ -914,7 +912,7 @@
         },
         {
           "kind": "token",
-          "detail": "注入缺失 Token 22 个: --accent, --ap-black, --ap-blue, --ap-canvas, --ap-dark-1, --ap-dark-2, --ap-dark-ink, --ap-dark-ink-3, --ap-dark-sep, --ap-hairline, --ap-ink, --ap-ink-tertiary, --ap-surface-alt, --border, --fg, --fg-3, --quote-down, --quote-up, --surface, --surface-alt, --surface-inverse, --warn",
+          "detail": "注入缺失 Token 20 个: --ap-black, --ap-canvas, --ap-dark-1, --ap-dark-2, --ap-dark-ink, --ap-dark-ink-3, --ap-dark-sep, --ap-hairline, --ap-ink, --ap-ink-tertiary, --ap-surface-alt, --border, --fg, --fg-3, --rating-balanced-wash, --rating-defensive-wash, --rating-offensive-wash, --surface, --surface-alt, --surface-inverse",
           "count": 1
         }
       ]
@@ -1134,6 +1132,25 @@
         {
           "kind": "token",
           "detail": "注入缺失 Token 21 个: --ap-black, --ap-canvas, --ap-dark-1, --ap-dark-ink, --ap-dark-ink-3, --ap-dark-sep, --ap-hairline, --ap-ink, --ap-ink-tertiary, --ap-surface-alt, --border, --fg, --fg-3, --quote-down, --quote-up, --rating-balanced-wash, --rating-defensive-wash, --rating-offensive-wash, --surface, --surface-alt, --warn",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "source": "/Users/lianghaizhen/WorkBuddy/2026-10-14-10-29-45/github-ip-plan/_stage/docs/daily/2026-10-16/stock-review.html",
+      "total": 2,
+      "counts": {
+        "icon": 2
+      },
+      "changes": [
+        {
+          "kind": "icon",
+          "detail": "注入 symbol 子集 4 个: alert-triangle, ban, check, x",
+          "count": 1
+        },
+        {
+          "kind": "icon",
+          "detail": "注入图标 CSS（.ic/.ic-20/.ic-24 尺寸 + .ic-wrap 行内对齐 + currentColor 描边）",
           "count": 1
         }
       ]

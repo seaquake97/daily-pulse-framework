@@ -19,15 +19,19 @@ FRAMEWORK-DESIGN §2.1 规范标题与（评级, 数据时点）元信息。
     L3 market_data.json verdict（--market-data 传入）
     全缺 → rating=None / source="none"：渲染层出「数据缺口」徽章，**禁编造**。
 
-TASK_NAMES / SLUG_STAGE 与 publish_to_github.py 同源同值（复制而非 import：
-编排器是 CLI 入口，反向 import 会把整条发布管线拖进渲染进程）。一致性由
-test_render_md.py 的 test_all_slugs（精确标题串）+ TASK_NAMES 相等断言守住，
-防静默漂移。
+TASK_NAMES 与 publish_to_github.py 同源（复制而非 import：编排器是 CLI 入口，
+反向 import 会把整条发布管线拖进渲染进程）。SLUG_STAGE 自 A-19 起收敛为
+单一数据源 framework/config/slug_stage.json，本模块与 publish_to_github.py
+同读一份文件，杜绝两处漂移（实测 meta.py 曾漂到 stock-assistant=intraday，
+与编排器的 pre_open 不一致）。一致性由 test_render_md.py 的 test_all_slugs
+（精确标题串）+ TASK_NAMES 相等断言守住，SLUG_STAGE 由 JSON 单一来源保证。
 """
 from __future__ import annotations
 
+import json
 import re
 from datetime import datetime
+from pathlib import Path
 
 # ---- 与 publish_to_github.py 同源的映射（一致性有测试断言）----
 TASK_NAMES: dict[str, str] = {
@@ -36,13 +40,15 @@ TASK_NAMES: dict[str, str] = {
     "daily-review": "每日总复盘",
 }
 
-SLUG_STAGE: dict[str, str] = {
-    "stock-assistant": "intraday",
-    "fund-market": "intraday",
-    "fund-guide": "intraday",
-    "stock-review": "close",
-    "daily-review": "close",
-}
+# A-19 单一数据源：SLUG_STAGE 收敛到 framework/config/slug_stage.json，
+# 与 publish_to_github.py 同读一份，杜绝两处定义漂移（stock-assistant 的
+# 正确值为 pre_open，曾因 meta.py 独立副本漂成 intraday）。纯函数层在此加载
+# JSON（无进程内 IO 副作用；路径由 __file__ 推导，不写死用户名/项目路径）。
+def _load_slug_stage() -> dict[str, str]:
+    cfg = Path(__file__).resolve().parents[2] / "framework" / "config" / "slug_stage.json"
+    return json.loads(cfg.read_text(encoding="utf-8"))
+
+SLUG_STAGE: dict[str, str] = _load_slug_stage()
 
 # 阶段标签（FRAMEWORK-DESIGN §2.1 表）：按任务调度窗口固定，不随提取值漂移
 STAGE_LABEL: dict[str, str] = {

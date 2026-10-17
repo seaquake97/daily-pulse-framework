@@ -11,6 +11,7 @@
 """
 from __future__ import annotations
 
+import re
 import site_content as C
 import site_theme as T
 
@@ -147,7 +148,7 @@ def sigma_badge(sigma) -> str:
 
 def stage_chip(stage: str | None) -> str:
     zh, en, variant, ico = C.stage_of(stage)
-    return f'<span class="chip {variant}">{T.icon(ico)}{C.esc(zh)} / {C.esc(en)}</span>'
+    return f'<span class="chip {variant}">{T.icon(ico)}{C.esc(zh)}<span class="chip-en"> / {C.esc(en)}</span></span>'
 
 
 # ---------------------------------------------------------------------------
@@ -219,8 +220,20 @@ def detail_footer(depth: str, entry: dict | None, date: str) -> str:
     return _footer(depth, f"<p>本页信息：{' · '.join(segs)}</p>")
 
 
+def _clean_title(raw_title: str, default_name: str) -> str:
+    """精炼标题：剥离重复的年月日（YYYY-MM-DD）与星期，提取紧凑业务标题。"""
+    if not raw_title:
+        return default_name
+    t = re.sub(r"\b\d{4}-\d{2}-\d{2}\b", "", raw_title)
+    t = re.sub(r"[\(（]?周[一二三四五六日][\)）]?", "", t)
+    parts = [p.strip() for p in re.split(r"[\s·\-_/]+", t) if p.strip()]
+    if not parts:
+        return default_name
+    return " · ".join(parts)
+
+
 def timeline(m: dict, depth: str) -> str:
-    """当日时间线：调度时点 / 真实生成时刻 / 任务名 / 真实标题 / 摘要 / 徽章 / Σ / 时点。"""
+    """当日时间线（三级手风琴 Level 2）：可折叠时点卡片列表。"""
     entries = sorted(m.get("entries", []), key=lambda e: e.get("time") or "99:99")
     if not entries:
         return ('  <div class="empty">'
@@ -240,81 +253,91 @@ def timeline(m: dict, depth: str) -> str:
         title = e.get("title") or name
         rating, sigma = e.get("rating"), e.get("sigma")
         html = e.get("html")
-        # 摘要走结论先行契约（一致性契约 C-2）：评级·Σ ｜ 标准动作 ｜ 关键事实。
-        # 老 entries.json 无 conclusion 字段时回落 blurb，向后兼容。
         conclusion = e.get("conclusion")
         summary = conclusion if conclusion else (e.get("summary") or blurb)
 
-        # 调度时点是承诺，生成时刻是事实；两者都显示，延迟本身是内容
         run = e.get("run_time") or ""
         run_cell = (f'<span class="tl-run">{T.icon("timer")}生成 {C.esc(run)}</span>'
                     if run and run[:5] != sched else "")
 
-        # 链接文案 = 报告真实标题。无 html 时不点，挂 chip-pending 如实说明状态
+        clean_title = _clean_title(title, name)
         if html:
             head = (f'<a href="{depth}daily/{C.esc(date)}/{C.esc(slug)}.html">'
-                    f'{C.esc(title)}<span class="go">{T.icon("arrow-right")}</span></a>')
+                    f'{C.esc(clean_title)}<span class="go">{T.icon("arrow-right")}</span></a>')
         else:
-            head = f'<span>{C.esc(title)}</span>'
+            head = f'<span>{C.esc(clean_title)}</span>'
 
-        # P0：Σ / 评级缺失必须显式呈现为缺口，严禁回落 0.000 或借用他任务数值
-        if sigma is None:
-            quality = [f'<span class="tag gap">{T.icon("alert")}Σ 数据缺口</span>']
+        # 单一状态药丸原则：降级优先，无降级看评级，无评级标缺口（绝不堆叠 5 个同义标签）
+        degraded_now = bool(e.get("degraded"))
+        if degraded_now:
+            status_pill = f'<span class="tag tag-degraded">{T.icon("alert-triangle")}数据降级</span>'
+        elif rating is not None:
+            status_pill = rating_badge(rating)
         else:
-            quality = [sigma_badge(sigma)]
-        if rating is None:
-            quality.append(f'<span class="tag gap">{T.icon("minus")}评级未标注</span>')
-        # 宽度口径不同 → Σ 不可跨时点比较，明确标注避免误读
-        if not e.get("comparable", True):
-            quality.append(f'<span class="tag tag-warn">{T.icon("alert")}{C.I18N["caliber_tag"]}</span>')
+            status_pill = f'<span class="tag gap">{T.icon("minus")}未标注</span>'
 
-        meta = [stage_chip(e.get("stage") or m.get("data_stage"))]
-        if not html:
-            meta.append(f'<span class="chip chip-pending">{T.icon("file-text")}网页版待补齐</span>')
-        if e.get("degraded"):
-            # 数据源降级/缺口如实标出——不让降级产出看起来与正常产出一样
-            meta.append(f'<span class="tag gap">{T.icon("alert-triangle")}数据源降级</span>')
-        if rating is not None:
-            meta.insert(0, rating_badge(rating))
+        stage_p = stage_chip(e.get("stage") or m.get("data_stage"))
+        pending_chip = f'<span class="chip chip-pending">{T.icon("file-text")}待补齐</span>' if not html else ""
+
+        # 内部展开区辅助信息（Σ 值仅在非降级态呈现，避免给出虚假方向）
+        foot_items = []
+        if not degraded_now and sigma is not None:
+            foot_items.append(sigma_badge(sigma))
+        if run_cell:
+            foot_items.append(run_cell)
+        foot_bar = f'<div class="slot-foot">{"".join(foot_items)}</div>' if foot_items else ""
 
         rows.append(f"""    <li class="tl-item" data-time="{C.esc(sched)}" data-slug="{C.esc(slug)}">
-      <div class="tl-time">
-        <span class="tl-sched"><span class="dot"></span>{C.esc(sched)}</span>
-        {run_cell}
-      </div>
-      <div class="tl-body">
-        <p class="tl-kicker">{T.icon(ico)}{C.esc(name)}</p>
-        <h3 class="tl-title">{head}</h3>
-        <p class="tl-sum">{C.conclusion_html(summary, T.icon) if conclusion
-           else C.summary_html(summary, T.icon)}</p>
-      </div>
-      <div class="tl-meta">
-        {"".join(meta)}
-        {"".join(quality)}
-      </div>
+      <details class="slot-accordion" open>
+        <summary class="slot-head">
+          <div class="slot-head-left">
+            <span class="slot-time"><span class="dot"></span>{C.esc(sched)}</span>
+            <span class="slot-name">{C.esc(clean_title)}</span>
+          </div>
+          <div class="slot-head-right">
+            {stage_p}{pending_chip}{status_pill}
+            <span class="accordion-chevron slot-chevron">{T.icon("chevron-down")}</span>
+          </div>
+        </summary>
+        <div class="slot-body">
+          <h3 class="tl-title">{head}</h3>
+          <p class="tl-sum">{C.conclusion_html(summary, T.icon) if conclusion
+             else C.summary_html(summary, T.icon)}</p>
+          {foot_bar}
+        </div>
+      </details>
     </li>""")
     return "\n".join(rows)
 
 
-def issue_block(m: dict, depth: str) -> str:
-    """日期分组：日期 + 星期 + 当日评级 + Σ + 该日时间线。"""
+def issue_block(m: dict, depth: str, default_open: bool = False) -> str:
+    """日期分组（三级手风琴 Level 1）：日期 + 星期 + 当日评级 + Σ + 该日时间线。"""
     date = m.get("date", "")
     zh, en = C.dow_label(date)
     rating, sigma = m.get("rating"), m.get("sigma")
     sig = C.sigma_txt(sigma)
     sig_cell = (f'<span class="tl-sigma">{T.icon("sigma")}{C.esc(sig)}</span>' if sig
                 else f'<span class="tag gap">{T.icon("alert")}Σ 数据缺口</span>')
-    return f"""  <article class="issue dp-card" data-date="{C.esc(date)}" data-rating="{C.esc(rating or "")}" data-sigma="{C.sigma_raw(sigma)}">
-    <div class="issue-head">
-      <time class="issue-date" datetime="{C.esc(date)}">{C.esc(date)}</time>
-      <span class="issue-dow">{C.esc(zh)} · {C.esc(en)}</span>
+    open_attr = " open" if default_open else ""
+    return f"""  <details class="issue dp-card" data-date="{C.esc(date)}" data-rating="{C.esc(rating or "")}" data-sigma="{C.sigma_raw(sigma)}"{open_attr}>
+    <summary class="issue-head day-summary">
+      <span class="issue-date-group">
+        <time class="issue-date" datetime="{C.esc(date)}">{C.esc(date)}</time>
+        <span class="issue-dow">{C.esc(zh)} · {C.esc(en)}</span>
+      </span>
       <span class="spacer"></span>
-      <span class="issue-summary">{rating_badge(rating, "lg") if rating else ""}{sig_cell}</span>
-    </div>
-    <ul class="tl">
+      <span class="issue-summary">
+        {rating_badge(rating, "lg") if rating else ""}
+        {sig_cell}
+        <span class="accordion-chevron day-chevron">{T.icon("chevron-down")}</span>
+      </span>
+    </summary>
+    <div class="day-content">
+      <ul class="tl">
 {timeline(m, depth)}
-    </ul>
-  </article>"""
+      </ul>
+    </div>
+  </details>"""
 
 
 def kpi_row(items: list[tuple[str, str, str]]) -> str:

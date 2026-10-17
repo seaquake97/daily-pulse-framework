@@ -28,11 +28,13 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(HERE.parent / "framework" / "scripts"))   # A-04
+import paths
 
 import frame_pass as F                                          # noqa: E402
 from sanitizer.core import load_utilities_css, sanitize_html    # noqa: E402
 
-REAL_SRC = Path("/Users/lianghaizhen/WorkBuddy/股票助手/2026-10-16/stock_assistant.html")
+REAL_SRC = paths.WORKBUDDY_ROOT / "股票助手" / "2026-10-16" / "stock_assistant.html"
 REAL_ENTRIES = HERE.parent / "_stage" / "docs" / "daily" / "2026-10-16" / "entries.json"
 
 # 上游固件：带 h1（sanitize 降级 h3 + data-sb-h="1->3"，frame 再提升回 h1）、

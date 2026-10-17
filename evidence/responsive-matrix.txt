@@ -1,6 +1,6 @@
-响应式断点矩阵实测 2026-10-16 20:17:34
+响应式断点矩阵实测 2026-10-17 14:30:08
 宽度档位: [320, 360, 390, 414, 640, 720, 768, 834, 980, 1024, 1152, 1280, 1440, 1920, 2149, 2560]
-页面数: 12  组合数: 176
+页面数: 12  组合数: 192
 ------------------------------------------------------------------------------
 home                 320px  sw=320   cw=320   ok
 home                 360px  sw=360   cw=360   ok
@@ -66,12 +66,12 @@ monthly             1440px  sw=1440  cw=1440  ok
 monthly             1920px  sw=1920  cw=1920  ok
 monthly             2149px  sw=2149  cw=2149  ok
 monthly             2560px  sw=2560  cw=2560  ok
-method               320px  sw=320   cw=320   ok  bad=table.tbl@664,caption.@664,thead.@664,tr.@664,th.@372,th.@664,tbody.@664,tr.@664
-method               360px  sw=360   cw=360   ok  bad=table.tbl@664,caption.@664,thead.@664,tr.@664,th.@372,th.@664,tbody.@664,tr.@664
-method               390px  sw=390   cw=390   ok  bad=table.tbl@664,caption.@664,thead.@664,tr.@664,th.@664,tbody.@664,tr.@664,td.num@664
-method               414px  sw=414   cw=414   ok  bad=table.tbl@664,caption.@664,thead.@664,tr.@664,th.@664,tbody.@664,tr.@664,td.num@664
-method               640px  sw=640   cw=640   ok  bad=table.tbl@664,caption.@664,thead.@664,tr.@664,th.@664,tbody.@664,tr.@664,td.num@664
-method               720px  sw=720   cw=720   ok
+method               320px  sw=320   cw=320   ok  bad=a.mp-pill@341,a.mp-pill@427,a.mp-pill@512,a.mp-pill@597,a.mp-pill@683,a.mp-pill@756,table.tbl@670,caption.@670
+method               360px  sw=360   cw=360   ok  bad=a.mp-pill@427,a.mp-pill@512,a.mp-pill@597,a.mp-pill@683,a.mp-pill@756,table.tbl@670,caption.@670,thead.@670
+method               390px  sw=390   cw=390   ok  bad=a.mp-pill@427,a.mp-pill@512,a.mp-pill@597,a.mp-pill@683,a.mp-pill@756,table.tbl@670,caption.@670,thead.@670
+method               414px  sw=414   cw=414   ok  bad=a.mp-pill@427,a.mp-pill@512,a.mp-pill@597,a.mp-pill@683,a.mp-pill@756,table.tbl@670,caption.@670,thead.@670
+method               640px  sw=640   cw=640   ok  bad=a.mp-pill@683,a.mp-pill@756,table.tbl@670,caption.@670,thead.@670,tr.@670,th.@670,tbody.@670
+method               720px  sw=720   cw=720   ok  bad=a.mp-pill@760
 method               768px  sw=768   cw=768   ok
 method               834px  sw=834   cw=834   ok
 method               980px  sw=980   cw=980   ok
@@ -102,7 +102,7 @@ d-stock-assistant    320px  sw=320   cw=320   ok  bad=table.tbl@438,thead.@438,t
 d-stock-assistant    360px  sw=360   cw=360   ok  bad=table.tbl@438,thead.@438,tr.@438,th.@438,tbody.@438,tr.@438,td.@438,tr.@438
 d-stock-assistant    390px  sw=390   cw=390   ok  bad=table.tbl@438,thead.@438,tr.@438,th.@438,tbody.@438,tr.@438,td.@438,tr.@438
 d-stock-assistant    414px  sw=414   cw=414   ok  bad=table.tbl@438,thead.@438,tr.@438,th.@438,tbody.@438,tr.@438,td.@438,tr.@438
-d-stock-assistant    640px  sw=640   cw=640   ok  bad=table.tbl@678,thead.@678,tr.@678,th.@678,tbody.@678,tr.@678,td.@678,b.@651
+d-stock-assistant    640px  sw=640   cw=640   ok  bad=table.tbl@678,thead.@678,tr.@678,th.@678,tbody.@678,tr.@678,td.@678,b.@652
 d-stock-assistant    720px  sw=720   cw=720   ok
 d-stock-assistant    768px  sw=768   cw=768   ok
 d-stock-assistant    834px  sw=834   cw=834   ok
@@ -146,7 +146,22 @@ d-fund-guide        1440px  sw=1440  cw=1440  ok
 d-fund-guide        1920px  sw=1920  cw=1920  ok
 d-fund-guide        2149px  sw=2149  cw=2149  ok
 d-fund-guide        2560px  sw=2560  cw=2560  ok
-[skip] d-stock-review: 文件缺失 _stage/docs/daily/2026-10-16/stock-review.html
+d-stock-review       320px  sw=320   cw=320   ok  bad=table.tbl@395,thead.@395,tr.@395,th.@395,tbody.@395,tr.@395,td.@395,tr.@395
+d-stock-review       360px  sw=360   cw=360   ok  bad=table.tbl@395,thead.@395,tr.@395,th.@395,tbody.@395,tr.@395,td.@395,tr.@395
+d-stock-review       390px  sw=390   cw=390   ok  bad=table.tbl@395,thead.@395,tr.@395,th.@395,tbody.@395,tr.@395,td.@395,tr.@395
+d-stock-review       414px  sw=414   cw=414   ok
+d-stock-review       640px  sw=640   cw=640   ok
+d-stock-review       720px  sw=720   cw=720   ok
+d-stock-review       768px  sw=768   cw=768   ok
+d-stock-review       834px  sw=834   cw=834   ok
+d-stock-review       980px  sw=980   cw=980   ok
+d-stock-review      1024px  sw=1024  cw=1024  ok
+d-stock-review      1152px  sw=1152  cw=1152  ok
+d-stock-review      1280px  sw=1280  cw=1280  ok
+d-stock-review      1440px  sw=1440  cw=1440  ok
+d-stock-review      1920px  sw=1920  cw=1920  ok
+d-stock-review      2149px  sw=2149  cw=2149  ok
+d-stock-review      2560px  sw=2560  cw=2560  ok
 d-daily-review       320px  sw=320   cw=320   ok  bad=table.tbl@363,tbody.@362,tr.@362,th.@362,tr.@362,td.@362,tr.@362,td.@362
 d-daily-review       360px  sw=360   cw=360   ok  bad=table.tbl@363,tbody.@362,tr.@362,th.@362,tr.@362,td.@362,tr.@362,td.@362
 d-daily-review       390px  sw=390   cw=390   ok  bad=table.tbl@470,tbody.@469,tr.@469,th.@469,tr.@469,td.@469,tr.@469,td.@469
@@ -180,4 +195,4 @@ d-old-fund-guide    1920px  sw=1920  cw=1920  ok
 d-old-fund-guide    2149px  sw=2149  cw=2149  ok
 d-old-fund-guide    2560px  sw=2560  cw=2560  ok
 ------------------------------------------------------------------------------
-横向滚动组合数: 0 / 176
+横向滚动组合数: 0 / 192

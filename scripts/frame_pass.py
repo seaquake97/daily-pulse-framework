@@ -62,6 +62,7 @@ ACCEPTED_VARIANCE = {
     "nav-links": "10-13 旧模板页内锚点导航同名；框架规则为 flex 横排，文字色由 .doc a 后置胜出",
     "foot-brand": "上游文章级署名行；框架 .foot-brand 仅限 max-width:38ch，不破版",
     "sub": "封面副标题；框架 .sub 规则均后代限定，裸 .sub 零命中",
+    "ic-20": "图标子 sprite 尺寸工具类（site_theme.ICON_SIZES 已定义 .ic/.ic-20/.ic-24），上游 <svg class=\"ic ic-20\"> 合法使用；框架图标系统成员，非冲突类",
 }
 DESIGN_APPLIED = {"tbl": "A-9 主动施加：上游表格升格框架 Apple 表格 .tbl"}
 

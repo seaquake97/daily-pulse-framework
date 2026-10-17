@@ -161,7 +161,8 @@ def render_block(b: dict, log: list[str]) -> str:
     if kind == "html":
         return b["text"]                        # HTML 注释 verbatim
     if kind == "code":
-        return f"<pre><code>{I.convert_emoji(I.esc(b['text']), log)}</code></pre>"
+        # 代码块同样脱敏本机路径——结算日志/命令回显常含绝对路径（PM-17）
+        return f"<pre><code>{I.convert_emoji(I.esc(I._scrub_home_path(b['text'])), log)}</code></pre>"
     if kind == "table":
         return _render_table(b, log)
     if kind == "list":

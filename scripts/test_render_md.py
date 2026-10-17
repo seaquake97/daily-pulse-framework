@@ -14,17 +14,28 @@ import unittest
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-PY = "/Users/lianghaizhen/.workbuddy/binaries/python/envs/default/bin/python3"
 sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(HERE.parent / "framework" / "scripts"))   # A-04
+import paths
 
+PY = paths.MANAGED_PY
 import render_md as RM  # noqa: E402
 
-SRC = Path("/Users/lianghaizhen/WorkBuddy")
+SRC = paths.WORKBUDDY_ROOT
 REAL_MD = [
     ("fund-guide", SRC / "基金每日操作指引（14:30）/2026-10-16/fund_operation_guide.md"),
     ("stock-assistant", SRC / "股票助手/2026-10-16/stock_assistant.md"),
     ("fund-market", SRC / "基金每日盘面分析（11:00）/2026-10-16/fund_market_analysis.md"),
 ]
+# 集成层守卫（A-07）：真实产物缺失时跳过而非报错——换机器/CI 无产物是
+# 正常状态，不是失败。判断依据是「文件存在」，不猜、不伪造样本。
+REAL_MD_MISSING = [str(p) for _, p in REAL_MD if not p.exists()]
+
+
+def _require_real_md():
+    if REAL_MD_MISSING:
+        raise unittest.SkipTest(
+            f"真实产物缺失（设置 PULSE_WORKBUDDY_ROOT 指向产物根）：{REAL_MD_MISSING}")
 P0_EMOJI = re.compile("[\U0001F300-\U0001F9FF\u2600-\u26FF\u2700-\u27BF\uFE00-\uFE0F]")
 
 
@@ -43,6 +54,9 @@ def _render(slug, date, md_path, market_data=None):
 
 class TestRealOutputs(unittest.TestCase):
     """三份真实 md：合规性 + meta 兜底路径。"""
+
+    def setUp(self):
+        _require_real_md()
 
     def test_real_md_render_compliant(self):
         for slug, path in REAL_MD:
@@ -202,6 +216,9 @@ class TestStructures(unittest.TestCase):
 
 class TestContract(unittest.TestCase):
     """幂等 / 正文无损 / sanitize 固定点。"""
+
+    def setUp(self):
+        _require_real_md()
 
     def test_idempotent(self):
         for slug, path in REAL_MD:

@@ -27,11 +27,12 @@ import subprocess
 import sys
 from pathlib import Path
 
-TOKEN_FILE = Path(os.environ.get("GH_IP_TOKEN_FILE",
-                                 Path.home() / ".config/gh-ip/token"))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "framework" / "scripts"))   # A-04
+import paths
+
+TOKEN_FILE = paths.GH_IP_TOKEN_PATH
 # 本地工作副本（与 _stage 分离，避免把构建产物当git 仓库）
-WORK_ROOT = Path("/Users/lianghaizhen/WorkBuddy/2026-10-14-10-29-45"
-                  "/github-ip-plan/_git_pulse")
+WORK_ROOT = paths.PROJECT_ROOT / "_git_pulse"
 COMMIT_AUTHOR_NAME = "seaquake97"
 COMMIT_AUTHOR_EMAIL = "seaquake97@users.noreply.github.com"
 

@@ -1,9 +1,18 @@
 # 站点源码仓忽略项
-_git_pulse/          # 内容产物仓（独立 git 仓，镜像到 GitHub Pages）
-_git_engine/         # daily-decision-engine 技能副本（独立 git 仓，不纳入）
-_stage/              # 构建暂存（可由 publish_to_github.py 重建）
-_stage_v2check/      # 临时校验目录
-evidence/*.png       # 截图证据（体积大，按需保留少量）
+# 铁律：注释必须独立成行——行内 # 在 gitignore 语法里不是注释，
+# 会导致整行成为永不匹配的 pattern（2026-10-17 实测修复的静默失效）。
+
+# 内容产物仓（独立 git 仓，镜像到 GitHub Pages）
+_git_pulse/
+# daily-decision-engine 技能副本（独立 git 仓，不纳入）
+_git_engine/
+# 构建暂存（可由 publish_to_github.py 重建）
+_stage/
+# 临时校验目录
+_stage_v2check/
+# 截图证据（体积大，按需保留少量）
+*.png
+# 本地环境
 __pycache__/
 *.pyc
 .DS_Store

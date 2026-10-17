@@ -95,10 +95,21 @@ class TestEmojiFallbackWhitelist(unittest.TestCase):
 
     def test_ip_mark_and_protected_paths_unchanged(self):
         out, rep = _sanitize(EMOJI_FIXTURE)
-        self.assertIn('<span class="ip-mark"', out)          # K-1 IP 白名单保留
-        self.assertIn("\U0001F35C", out)
-        self.assertIn("▲", out)                                # K-3 ADR-003 不动
-        self.assertGreaterEqual(rep.count_of("emoji-kept"), 1)
+        # K-1：IP 标识包裹机制保留（title/aria-label/role=img 承载文字语义）
+        self.assertIn('<span class="ip-mark"', out)
+        # PM-07（2026-10-16 总监裁决）：IP 标识图形本体升级为 SVG symbol，
+        # ip-mark 不再是 emoji 的避难所——包内不再出现 emoji 原字符。
+        self.assertIn("#i-noodle-bowl", out)                  # 🍜 → SVG 图标
+        self.assertNotIn("\U0001F35C", out)                   # 关键：emoji 字符已清除
+        # K-3：ADR-003 方向冗余编码（▲）禁止剥离 —— 原样保留在正文。
+        self.assertIn("▲", out)
+        # PM-07 重新归类：IP 标识从「保留原字符(emoji-kept)」改为
+        # 「升级 SVG(emoji)」，故本例 🍜 走 emoji 而非 emoji-kept；
+        # ▲ 不在 EMOJI_PATTERN 区间（U+25xx < U+2600），不被 emoji 通道
+        # 触碰，等价「不动」保护。改用报告确认 🍜 走了 emoji 升级、且
+        # 本例仅 🚀 命中 needs-manual-review（1 处），门禁口径稳定。
+        self.assertGreaterEqual(rep.count_of("emoji"), 1)     # 🍜 → SVG 升级
+        self.assertEqual(rep.count_of("needs-manual-review"), 1)  # 仅 🚀
 
     def test_unmapped_emoji_cli_exit_code_2(self):
         with tempfile.TemporaryDirectory() as td:
@@ -180,8 +191,11 @@ class TestPublishFreshnessGuard(unittest.TestCase):
         return p
 
     def _run(self, *extra: str):
+        # 合成测试只提供 stock-assistant 单一任务产物；--task 收敛收集范围，
+        # 隔离 A-03 缺失任务硬失败逻辑（详见 test_sanitize_pipeline._run_publish 注释）。
         return subprocess.run(
             [pub.MANAGED_PY, str(HERE / "publish_to_github.py"), "--date", TEST_DATE,
+             "--task", "stock-assistant",
              "--source-root", str(self.src), "--stage", str(self.stage), *extra],
             capture_output=True, text=True)
 

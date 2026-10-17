@@ -1,0 +1,7 @@
+{
+  "stock-assistant": "pre_open",
+  "fund-market": "intraday",
+  "fund-guide": "intraday",
+  "stock-review": "close",
+  "daily-review": "close"
+}

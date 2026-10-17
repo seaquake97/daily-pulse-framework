@@ -21,7 +21,11 @@ import subprocess
 import sys
 from datetime import datetime
 
-os.chdir('/Users/lianghaizhen/WorkBuddy/2026-10-14-10-29-45/github-ip-plan')
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                 "framework", "scripts"))   # A-04: 集中路径
+import paths
+
+os.chdir(str(paths.PROJECT_ROOT))
 
 EVIDENCE = 'evidence/apple-redesign/compliance-scan.txt'
 BASELINE = 'evidence/apple-redesign/detail-pages-baseline.json'
@@ -54,8 +58,21 @@ def say(s=''):
     _lines.append(s)
 
 
+def strip_comments(text: str) -> str:
+    """剥离 HTML/CSS 注释，避免规范说明文字被扫描器误判为代码违规（PM-15 / OPEN-006）。"""
+    t = re.sub(r'<!--.*?-->', '', text, flags=re.S)
+    return re.sub(r'/\*.*?\*/', '', t, flags=re.S)
+
+
+blob_clean = strip_comments(blob)
+
+
 def n(pat, flags=0):
     return len(re.findall(pat, blob, flags))
+
+
+def n_clean(pat, flags=0):
+    return len(re.findall(pat, blob_clean, flags))
 
 
 def measure(path):
@@ -106,7 +123,7 @@ wc = subprocess.run(
 for line in wc.stdout.strip().splitlines():
     say('      ' + line.strip())
 say("── 5. 禁用项 ──")
-say(f"   弹跳缓动:                {n(r'0\.68,\s*-0\.55,\s*0\.265,\s*1\.55')}")
+say(f"   弹跳缓动:                {n_clean(r'0\.68,\s*-0\.55,\s*0\.265,\s*1\.55')}")
 say(f"   紫粉渐变/靛蓝:            {n(r'#7C3AED|#A855F7|#EC4899|from-purple|from-pink|#6366f1', re.I)}")
 say(f"   组件层裸 hex:            {len(re.findall(r'#[0-9a-fA-F]{3,8}', open('scripts/site_components.css', encoding='utf-8').read()))}")
 say(f"   组件层彩色 border-left:    {len(re.findall(r'border-left:\s*[2-9]px solid', open('scripts/site_components.css', encoding='utf-8').read()))}")

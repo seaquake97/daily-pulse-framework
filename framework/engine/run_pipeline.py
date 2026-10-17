@@ -27,7 +27,7 @@
 这是本框架的核心取舍。
 
 ## 环境变量（全部可覆盖，无硬编码）
-  PULSE_WORKBUDDY_ROOT   工作区根（默认 /Users/lianghaizhen/WorkBuddy）
+  PULSE_WORKBUDDY_ROOT   工作区根（默认由 paths.WORKBUDDY_ROOT 推导，不写死用户名）
   PULSE_FRAMEWORK_ROOT  框架根（默认本文件的上上级）
   PULSE_SITE_ROOT       站点根（含 scripts/publish_to_github.py）
   PULSE_ENGINE_SCRIPTS  引擎脚本目录（默认 daily-decision-engine/scripts）
@@ -45,12 +45,13 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent          # <site>/framework/engine/
+sys.path.insert(0, str(HERE.parent / "scripts"))   # A-04: framework/scripts 集中路径
+import paths
 FRAMEWORK = HERE.parent                          # <site>/framework/
 # 站点根 = framework 的上一级（publish_to_github.py 在 <site>/scripts/ 下）
 SITE_DEFAULT = FRAMEWORK.parent
 SITE_ROOT = Path(os.environ.get("PULSE_SITE_ROOT", str(SITE_DEFAULT)))
-WORKBUDDY = Path(os.environ.get(
-    "PULSE_WORKBUDDY_ROOT", "/Users/lianghaizhen/WorkBuddy"))
+WORKBUDDY = paths.WORKBUDDY_ROOT
 PYTHON = os.environ.get("PULSE_PYTHON", sys.executable)
 ENGINE = Path(os.environ.get(
     "PULSE_ENGINE_SCRIPTS",

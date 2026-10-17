@@ -1,0 +1,112 @@
+{
+  "$schema": "market_data.json 权威契约（daily-decision-engine）",
+  "version": "1.0",
+  "authored": "2026-10-16",
+  "basis": "基于 22 份真实产物交叉统计（5 日期 × 5 任务），字段并集非人工想象",
+  "notes": [
+    "chg_pct 与 change_percent 双写法是历史漂移（v1.3 起统一 change_percent）",
+    "schema 允许 chg_pct 存在但要求两者不得同时出现且值必须一致",
+    "data_stage 缺失是已知缺口（早期产物），组装器必须补齐"
+  ],
+
+  "required": ["date", "indices", "total_amount_yi", "market_breadth", "holdings", "data_stage"],
+  "optional": ["foreign", "sector_flows", "sector_ranking", "verdict", "data_gaps", "kline"],
+
+  "fields": {
+    "date":              {"type": "string", "format": "YYYY-MM-DD", "desc": "数据日期"},
+    "data_stage":        {"type": "enum", "values": ["pre_open", "intraday", "close"],
+                          "desc": "数据时点；竞价快照=pre_open，盘中=intraday，收盘定格=close"},
+    "total_amount_yi":   {"type": "number", "unit": "亿元", "desc": "两市+北交所总成交额"},
+    "data_gaps":         {"type": "array", "items": "string",
+                          "desc": "数据缺口声明；非空表示本轮存在降级/缺口，必须如实填写"},
+
+    "indices": {
+      "type": "object", "desc": "指数快照，key 为带市场前缀的代码",
+      "required_item_fields": ["price", "change_percent"],
+      "item_fields": {
+        "name":           {"type": "string"},
+        "price":          {"type": "number", "desc": "最新点位"},
+        "change_percent": {"type": "number", "unit": "%", "desc": "涨跌幅（v1.3 契约字段）"},
+        "chg_pct":        {"type": "number", "unit": "%", "deprecated": true,
+                          "desc": "旧字段；与 change_percent 不得并存且值须一致"},
+        "amount":         {"type": "number", "unit": "元", "desc": "成交额原始单位为元"},
+        "time":           {"type": "string", "format": "YYYY-MM-DD", "desc": "报价日期"},
+        "pe_ratio":       {"type": "number"},
+        "volume_ratio":   {"type": "number", "desc": "量比（同时段归一化）"},
+        "chg_5d":         {"type": "number", "unit": "%"},
+        "chg_10d":        {"type": "number", "unit": "%"},
+        "chg_20d":        {"type": "number", "unit": "%"},
+        "chg_60d":        {"type": "number", "unit": "%"},
+        "chg_ytd":        {"type": "number", "unit": "%"}
+      }
+    },
+
+    "holdings": {
+      "type": "object", "desc": "持仓快照（个股/ETF/基金），key 为 full_code",
+      "required_item_fields": ["name", "price"],
+      "item_fields": {
+        "name":           {"type": "string"},
+        "price":          {"type": "number"},
+        "change_percent": {"type": "number", "unit": "%"},
+        "chg_pct":        {"type": "number", "unit": "%", "deprecated": true},
+        "amount":         {"type": "number", "unit": "元"},
+        "weight":         {"type": "number", "unit": "%", "desc": "组合权重（可选）"},
+        "market_value":   {"type": "number", "unit": "元", "desc": "持仓市值（可选）"},
+        "cost":           {"type": "number", "desc": "成本价（可选）"}
+      }
+    },
+
+    "market_breadth": {
+      "type": "object", "desc": "全市场涨跌分布",
+      "required_fields": ["up", "down", "flat"],
+      "fields": {
+        "up":            {"type": "integer", "desc": "上涨家数"},
+        "down":          {"type": "integer", "desc": "下跌家数"},
+        "flat":          {"type": "integer", "desc": "平盘家数"},
+        "limit_up":      {"type": "integer", "desc": "涨停家数"},
+        "limit_down":    {"type": "integer", "desc": "跌停家数"},
+        "total_amount":  {"type": "number", "unit": "元"},
+        "scope":         {"type": "string", "enum": ["含北交所", "仅A股"],
+                          "desc": "宽度口径；不同口径的 Σ 不可直接比较"}
+      }
+    },
+
+    "foreign":  {"type": "object", "desc": "外盘指数（usIXIC/usNVDA 等）"},
+    "sector_flows":  {"type": "array", "desc": "板块主力资金流"},
+    "sector_ranking": {
+      "type": "object",
+      "desc": "板块涨跌排名（v1.3 契约；旧字段 sector_reps 已废弃）",
+      "fields": {
+        "gainers": {"type": "array", "items": {"sector": "string", "name": "string", "chg_pct": "number"}},
+        "losers":  {"type": "array", "items": {"sector": "string", "name": "string", "chg_pct": "number"}}
+      }
+    },
+    "sector_reps": {"type": "array", "deprecated": true, "desc": "旧板块字段，已由 sector_ranking 取代"},
+
+    "verdict": {
+      "type": "object", "desc": "信号评分结果（由 compute_signals.py 写入，禁止 LLM 修改）",
+      "required_fields": ["rating", "sigma", "signals", "weights", "valid_weight"],
+      "fields": {
+        "rating":            {"type": "string", "enum": ["进攻", "均衡", "信号矛盾", "防守", "回避"]},
+        "sigma":             {"type": "number", "desc": "六维加权综合评分"},
+        "signals":           {"type": "object", "desc": "S1-S6 各维度得分"},
+        "weights":           {"type": "object", "desc": "各维度权重"},
+        "valid_weight":      {"type": "number", "desc": "有效权重；<0.50 时评级强制信号矛盾"},
+        "data_insufficient": {"type": "boolean", "desc": "数据不足标记"},
+        "degraded":          {"type": "boolean", "desc": "数据源降级标记"},
+        "notes":             {"type": "object", "desc": "各维度评分依据（人可读）"}
+      }
+    },
+
+    "kline": {"type": "object", "desc": "指数日K（升序），供 S1/S3 均线与量能计算"}
+  },
+
+  "invariants": [
+    "verdict.sigma 必须由 compute_signals.py 计算，LLM 禁止写入或修改",
+    "verdict.valid_weight < 0.50 时 verdict.rating 必须是 信号矛盾",
+    "indices[*].change_percent 与 chg_pct 不得同时存在",
+    "indices[*].time 必须等于 date",
+    "total_amount_yi = (indices.sh000001.amount + indices.sz399001.amount + indices.bj899050.amount) / 1e8（缺失北交所时须在 data_gaps 声明）",
+    "data_gaps 非空时，下游不得输出可执行动作（结论层降级）"
+  ]
+}

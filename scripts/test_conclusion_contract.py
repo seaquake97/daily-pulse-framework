@@ -184,6 +184,37 @@ class TestConclusionContract(unittest.TestCase):
         self.assertEqual(missing, [], f"PC-1 评级徽章契约：{missing[:5]}")
 
 
+    def test_degraded_entry_never_shows_direction(self):
+        """P0-1（架构师 A-04 实测）：降级条目不得同时呈现方向值。
+
+        卡片同现「数据源降级」与「进攻 +0.510」= 两个互相矛盾的结论，
+        读者不知道该信哪个；数据不可信时给出方向本身就是误导。
+        """
+        bad = []
+        for date, e in self.data:
+            if not e.get("degraded"):
+                continue
+            if e.get("rating") is not None:
+                bad.append(f"{date}/{e.get('slug')}: 降级仍带 rating={e['rating']}")
+            if e.get("sigma") is not None:
+                bad.append(f"{date}/{e.get('slug')}: 降级仍带 sigma={e['sigma']}")
+        self.assertEqual(bad, [], f"降级条目不得呈现方向值：{bad}")
+
+    def test_json_feed_degraded_nulls_direction(self):
+        """P0-1 延伸：feed.json 客户端会二次解读，降级项必须置 null。"""
+        import json as _json
+        p = STAGE.parent / "api" / "feed.json"
+        if not p.exists():
+            self.skipTest(f"feed.json 未生成：{p}")
+        d = _json.loads(p.read_text(encoding="utf-8"))
+        bad = []
+        for day in d["days"]:
+            for e in day["entries"]:
+                if e.get("degraded") and (e.get("rating") or e.get("sigma") is not None):
+                    bad.append(f"{day['date']}/{e['slug']}: "
+                               f"rating={e.get('rating')} sigma={e.get('sigma')}")
+        self.assertEqual(bad, [], f"feed.json 降级项须置空方向值：{bad}")
+
     def test_json_feed_contract(self):
         """L-7：机器可读数据源 /api/feed.json 的契约（ARCH-R6 §3.1）。
 

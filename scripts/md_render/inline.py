@@ -64,8 +64,25 @@ _MATH_SPACE_CMD = frozenset({"quad", "qquad", ";", ",", ":", "!", " "})
 _MATH_DROP_CMD = frozenset({"left", "right", "displaystyle", "limits"})
 
 
+# 本机绝对路径脱敏（PM-17 / 安全 P0）：上游报告正文里偶尔会出现
+# 「数据源：/Users/<用户名>/WorkBuddy/.../settlement.json」这类原始路径。
+# 公开站直接暴露它 = 泄漏本机用户名与目录结构，且对读者毫无信息价值。
+# 只保留文件名（读者要的是"用了哪个文件"，不是"存在哪个目录"）。
+#
+# ⚠ 正则与 sanitizer/path_pass.py **必须逐字一致**：两层都在发布链路上
+#   （本层覆盖经 render_md 的产物，path_pass 覆盖上游直传 html），
+#   行为不一致就会留下绕过其中一层的泄漏路径。test_path_scrub.py 断言两者相等。
+_HOME_PATH_RE = re.compile(
+    r"/Users/[^/\s\"'<>]+(?:/[^/\s\"'<>]+)*/([^/\s\"'<>]+\.(?:json|md|html|htm|csv|py|sh|yaml|yml|txt))")
+
+
+def _scrub_home_path(s: str) -> str:
+    """把绝对路径里的家目录段剥掉，只留文件名。"""
+    return _HOME_PATH_RE.sub(r"…/\1", str(s))
+
+
 def esc(s) -> str:
-    """HTML 文本转义（与 site_content.esc 同口径）。"""
+    """HTML 文本转义（与 site_content.esc 同口径）+ 本机路径脱敏。"""
     return (str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
             .replace('"', "&quot;").replace("'", "&#39;"))
 
@@ -160,6 +177,7 @@ def inline(text: str, state_badge: bool = True, log: list[str] | None = None) ->
         return f"\x00{len(store) - 1}\x00"
 
     work = _RAW_TAG_RE.sub(lambda m: keep(m.group(0)), text)
+    work = _scrub_home_path(work)   # 本机绝对路径脱敏（PM-17 安全 P0）
     work = _IMG_RE.sub(lambda m: keep(_render_img(m)), work)
     work = _LINK_RE.sub(lambda m: keep(_render_link(m)), work)
     work = _CODE_RE.sub(lambda m: keep(_render_code(m, state_badge)), work)

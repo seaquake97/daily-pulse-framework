@@ -14,11 +14,13 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "framework" / "scripts"))   # A-04
+import paths
 
 import content_contract as cc
 from content_dictionary import BANNED_DIMENSIONS, DIMENSIONS, ICONS
 
-BASE = Path("/Users/lianghaizhen/WorkBuddy")
+BASE = paths.WORKBUDDY_ROOT
 DAY = "2026-10-14"
 SRC = Path(__file__).resolve().parent
 
@@ -142,6 +144,46 @@ class TestRenderSigma(unittest.TestCase):
         self.assertIn("breadth_scope", why)
         ok2, _ = cc.comparable([a, dict(a)])
         self.assertTrue(ok2)
+
+
+class TestDegradedActionGate(unittest.TestCase):
+    """降级态可执行动作门禁测试（L-4 / 金融高危红线）。"""
+
+    def test_degraded_flags_actionable_directive(self):
+        """降级态出现挂单买卖指令必须被拦截。"""
+        md = (
+            "# 股票助手 · 2026-10-16 早盘集合竞价研判\n"
+            "> 数据源：A股实时数据（westock-mcp 未连接降级）\n\n"
+            "## 01. 结论卡\n"
+            "探底回升。操作指引：盘中冲高 7.15-7.25 元挂单卖出 500 股做T锁盈。\n"
+        )
+        lines = md.splitlines()
+        v = cc._validate_degraded_no_action(md, lines, {"degraded": True})
+        self.assertTrue(any(x.rule == "DEGRADED_ACTION_PROHIBITED" for x in v))
+
+    def test_degraded_allows_observation_and_distance(self):
+        """降级态允许中性距离陈述与观察卡。"""
+        md = (
+            "# 股票助手 · 2026-10-15 早盘集合竞价研判\n"
+            "> 数据源：数据源降级\n\n"
+            "## 01. 结论卡\n"
+            "观察卡：距加仓线 13.15-13.20 元仍有空间，不到不动作。\n"
+        )
+        lines = md.splitlines()
+        v = cc._validate_degraded_no_action(md, lines, {"degraded": True})
+        self.assertEqual(v, [])
+
+    def test_degraded_exempts_historical_review(self):
+        """降级态豁免昨日回顾语境。"""
+        md = (
+            "# 股票助手 · 2026-10-15 早盘集合竞价研判\n"
+            "> 数据源：数据源降级\n\n"
+            "## 01. 结论卡\n"
+            "昨日观点：在 6.75 元挂买 500 股未触发。\n"
+        )
+        lines = md.splitlines()
+        v = cc._validate_degraded_no_action(md, lines, {"degraded": True})
+        self.assertEqual(v, [])
 
 
 if __name__ == "__main__":

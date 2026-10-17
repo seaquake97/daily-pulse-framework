@@ -99,3 +99,24 @@ verdict 存在，顺序颠倒必挂（已多次实证）。
 | `fetch_data.py`（新浪 HTTP）/ 14:30 同名脚本（东财 HTTP） | 违反 MCP 直采铁律；已归档至 `_legacy_http/` |
 | LLM 手写 market_data.json | 字段漂移（已实证 chg_pct 双写法），改为脚本组装 |
 | 关闭 SSL 校验抓金融数据 | 中间人风险 + 数据不可信 |
+| HTTP 直抓当**主链路** | 违反 MCP 直采铁律；历史 `fetch_data.py`（新浪）/ 14:30 东财脚本已归档 `_legacy_http/` |
+
+> 例外：HTTP 直抓在**MCP 不可达作为降级源**时允许，见下节，且必须留降级痕迹。
+
+---
+
+## 备用抓取器 fallback_fetcher（仅限降级，非主链路）
+
+2026-10-16 落地，解决「MCP 挂了就只拿到空快照 / 旧数据」的缺口。它不是上表禁用脚本的复活：
+主链路仍是 MCP 直采，本模块**只在 MCP 不可达时**被调用，把「取不到数据」改成带证据的降级事件。
+
+- 文件：`framework/engine/collect/fallback_fetcher.py`（编排 + CLI，163 行）、
+  `quote_sources.py`（腾讯/新浪 GBK 方言解析，254 行），均为纯标准库零依赖
+- 用法：`python3 fallback_fetcher.py --json` ／ `--code sh000001` ／ `--codes sh000001,sh000688`
+- 退出码：0 成功｜2 全部源失败｜3 参数错误（部分缺失仍 0，消费方须检查 `missing`）
+- 单位口径与本文一致：`amount` 元、`change_percent` %（带符号）、`volume` 手
+- 容错：腾讯主 → 新浪备；单源连续失败 3 次熔断、冷却 300s；脏数据（现价<=0、
+  \|涨跌幅\|>20%、源返回空记录）直接丢弃并告警；全部源失败抛 AllSourcesFailed（不静默返回空）
+- **降级纪律**：即便备用源取到数据，也必须照常写 `data_gaps` 声明「本轮走备用源」，
+  下游按「降级轮不出动作」执行；不声明 = 把降级数据冒充 MCP 数据，属 P0
+- 测试：`python3 test_fallback_fetcher.py` 纯离线；联网用例仅在 `PULSE_NET_TEST=1` 时运行

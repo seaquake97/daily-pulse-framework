@@ -50,11 +50,18 @@ r"""publish_to_github.py — 每日产出 → GitHub 自动发布编排器（dry
 退出码规范：
   0  成功（dry-run 完成 / 推送完成）
   1  保留（历史脱敏门禁退出码，已废弃）
-  2  无产出 / 参数错误
+  2  任务产物缺失（部分或全部：stdout 列出缺失任务名、缺失原因与预期
+     目录）/ 无产出 / 参数错误
   3  站点生成失败（build_site）/ 正文消毒失败（sanitize）/ 时点护栏阻断（B-8）
   4  manifest 写入失败
   5  结构或幂等校验失败
   6  推送失败
+
+缺失即中止（A-03，ADR-005 决策四）：collect() 逐条记录缺失任务，
+main() 在缺失非空时于 manifest 写入前返回 2。缺席口的产物不进
+_stage——「发布 4 条、看起来像成功」正是 2026-10-16 事故的形态
+（15:05 stock-review 整条消失而退出码 0，读者无任何告警）。
+上一轮的 manifest 是推送侧契约，失败轮不覆盖它（取舍见 ADR-006）。
 """
 from __future__ import annotations
 
@@ -69,21 +76,29 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(HERE.parent / "framework" / "scripts"))   # A-04: 集中路径
+import paths                                                       # noqa: E402
 
 from sanitizer.freshness import sanitizer_code_mtime, stale_artifacts  # noqa: E402
 import site_content as SC                                  # noqa: E402  结论先行摘要契约
+import path_scrub as PS                                    # noqa: E402  .md 绝对路径脱敏
 
-SOURCE_ROOT = Path("/Users/lianghaizhen/WorkBuddy")
-STAGE = HERE.parent / "_stage"
-MANAGED_PY = "/Users/lianghaizhen/.workbuddy/binaries/python/envs/default/bin/python3"
+SOURCE_ROOT = paths.WORKBUDDY_ROOT
+STAGE = paths.STAGE
+MANAGED_PY = paths.MANAGED_PY
 
 # 任务 slug → (任务目录, [候选文件名])；发布路径 docs/daily/<date>/<slug>.<ext>
 TASK_SOURCES = {
     "fund-market": ("基金每日盘面分析（11:00）", ["fund_market_analysis.md", "fund_market_analysis.html"]),
     "stock-assistant": ("股票助手", ["stock_assistant.md", "stock_assistant.html"]),
     "fund-guide": ("基金每日操作指引（14:30）", ["fund_operation_guide.md", "fund_operation_guide.html"]),
-    "stock-review": ("股票复盘", ["stock_review.md", "stock_review.html"]),
-    # 总复盘的 md 即 stock_review.md（与股票复盘同文件，MD5 相同），只发布 html
+    # ADR-005 决策一（GAP-PM §3.1 决策 1，与 A-03 同链）：stock-review 改指
+    # 15:30 目录——实测 4/4 交易日有 stock_review.md；15:05 目录降级为可选
+    # 副本（2026-10-16 该目录整条无 md/html，即 A-03 事故日）。只取 md，
+    # 详情页由步骤 4.1 统一渲染，不再直搬上游 html。
+    "stock-review": ("每日总复盘（15:30）", ["stock_review.md"]),
+    # daily-review 与 stock-review 同读 15:30 目录但不同文件（md 与 html
+    # 各归其位）。总复盘只发布 html，md 即同目录的 stock_review.md。
     "daily-review": ("每日总复盘（15:30）", ["daily_review.html"]),
 }
 
@@ -122,17 +137,15 @@ SLUG_DATA_DIR = {
     "daily-review": "每日总复盘（15:30）",
 }
 
-# 各任务数据时点（架构师 SLUG_STAGE 扩展：fund-market/ stock-review 的
-# JSON 可能缺失，此时用此表兜底，保证站点标注与产物性质一致）
+# 各任务数据时点（SLUG_STAGE）：自 A-19 起收敛为单一数据源
+# framework/config/slug_stage.json，与 md_render/meta.py 同读一份，杜绝两处漂移。
 # 09:28 是集合竞价快照，性质是 pre_open 而非 intraday —— 标错会让读者
 # 把竞价结论当盘中结论读（PM PC-7 / C-11 实锤，裁决 OPEN-004）。
-SLUG_STAGE = {
-    "stock-assistant": "pre_open",
-    "fund-market": "intraday",
-    "fund-guide": "intraday",
-    "stock-review": "close",
-    "daily-review": "close",
-}
+def _load_slug_stage() -> dict[str, str]:
+    cfg = HERE.parent / "framework" / "config" / "slug_stage.json"
+    return json.loads(cfg.read_text(encoding="utf-8"))
+
+SLUG_STAGE = _load_slug_stage()
 
 STAGE_MAP = {"pre_open": ("竞价时点", "Pre-open"), "intraday": ("盘中时点", "Intraday"),
              "close": ("收盘时点", "Close")}
@@ -182,14 +195,25 @@ def load_market_data_for_slug(src_root: Path, date: str, slug: str) -> dict | No
         return None
 
 
-def collect(src_root: Path, date: str, only_task: str | None) -> dict:
-    """收集 <date> 的任务产出。返回 {slug: {ext: Path}}。"""
-    outputs = {}
+def collect(src_root: Path, date: str, only_task: str | None) -> tuple[dict, list[dict]]:
+    """收集 <date> 的任务产出。返回 ({slug: {ext: Path}}, [缺失任务记录])。
+
+    A-03：缺失不再静默。每个被请求（未被 --task 过滤）但没收集到产物的
+    slug 都进 missing，带 reason 供调用方区分两种缺失语义
+    （ADR-005 决策四）：
+      dir-missing   任务目录不存在——当日未运行
+      no-artifacts  目录存在但候选文件全缺——运行了但没写出报告
+    返回 (outputs, missing) 而非只回 outputs：缺一个 slug 与缺五个 slug
+    在旧签名里长得一模一样（都是「少几项」），调用方无法如实上报。
+    """
+    outputs: dict[str, dict] = {}
+    missing: list[dict] = []
     for slug, (dir_name, candidates) in TASK_SOURCES.items():
         if only_task and slug != only_task:
             continue
         d = src_root / dir_name / date
         if not d.is_dir():
+            missing.append({"slug": slug, "dir": str(d), "reason": "dir-missing"})
             continue
         entry = {}
         for fname in candidates:
@@ -198,7 +222,22 @@ def collect(src_root: Path, date: str, only_task: str | None) -> dict:
                 entry[p.suffix.lstrip(".")] = p
         if entry:
             outputs[slug] = entry
-    return outputs
+        else:
+            missing.append({"slug": slug, "dir": str(d), "reason": "no-artifacts"})
+    return outputs, missing
+
+
+def report_missing(missing: list[dict], got: int) -> None:
+    """A-03：stdout 显式列出缺失任务。全部缺失与部分缺失同码（2）但可区分：
+    行首标「全部/部分」，并给出每个任务的缺失原因与预期目录。"""
+    total = got + len(missing)
+    kind = "全部" if got == 0 else "部分"
+    print(f"❌ {kind}任务产物缺失（实收 {got}/{total}）——发布中止（退出码 2）")
+    for m in missing:
+        why = ("任务目录不存在（当日未运行？）" if m["reason"] == "dir-missing"
+               else "目录存在但无 md/html 产物（运行了但没写出报告？）")
+        print(f"  - {TASK_NAMES[m['slug']]}（{m['slug']}）: {why}")
+        print(f"    预期目录: {m['dir']}")
 
 
 # 标题里的装饰性 emoji（📊📈🔍 等）——保留 1 个以内纯视觉符号意义不大，统一剥离
@@ -623,7 +662,15 @@ def main() -> int:
     daily_stage.mkdir(parents=True, exist_ok=True)
 
     # ---- 1+2. 收集与提取 ----
-    outputs = collect(src_root, date, args.task)
+    outputs, missing = collect(src_root, date, args.task)
+    if missing:
+        # A-03：缺失即中止，且中止在 manifest 写入之前——缺席口的产物不进
+        # _stage（「发布 4 条、看起来像成功」正是 2026-10-16 事故形态：
+        # 15:05 stock-review 整条消失而退出码 0，读者无任何告警）；
+        # 上一轮 manifest 也不被失败轮覆盖（它是推送侧契约，取舍见 ADR-006）。
+        report_missing(missing, len(outputs))
+        print("❌ 发布中止：当日产物不完整（修复缺失任务后可用同一命令重跑，幂等）")
+        return 2
     if not outputs:
         print(f"❌ {date} 无任何任务产出（检查目录: {src_root}/<任务名>/{date}/）")
         return 2
@@ -638,16 +685,30 @@ def main() -> int:
     # fund-market 等上游模板带 124 处 Tailwind 类，套框架壳后仍与其它任务
     # 视觉分裂；统一渲染后全部任务共用同一套 md→HTML 语义结构）。
     published = []
+    path_scrubbed_total = 0
     for slug, entry in outputs.items():
         for ext, src in sorted(entry.items()):
             if args.unified_render and ext == "html" and "md" in entry:
                 print(f"  [跳过] {slug}.html: 统一渲染模式（由 md 经 render_md 生成）")
                 continue
             raw = src.read_text(encoding="utf-8")
+            # .md 是**被发布**的产物（GitHub Pages 可直接访问），上游正文里的
+            # `/Users/<用户名>/WorkBuddy/.../settlement.json` 等于在公开站点上
+            # 暴露本机路径。HTML 侧由 md_render.inline._scrub_home_path 覆盖，
+            # 但 md 自身不经那条链路（它只被当作渲染输入读一遍），故在此脱敏。
+            # 2026-10-16 实测：脱敏前全站 1 处命中（stock-review.md），
+            # 脱敏后 0。HTML 侧同期命中数也是 0，两条链路都要守。
+            n_scrubbed = 0
+            if ext == "md":
+                raw, n_scrubbed = PS.scrub_text(raw)
+                path_scrubbed_total += n_scrubbed
             dst = daily_stage / f"{slug}.{ext}"
             dst.write_text(raw, encoding="utf-8")
-            print(f"  [写入] {slug}.{ext}: {len(raw)} 字节（原样，未脱敏）")
+            note = f"，脱敏 {n_scrubbed} 处绝对路径" if n_scrubbed else ""
+            print(f"  [写入] {slug}.{ext}: {len(raw)} 字节{note}")
             published.append(f"{slug}.{ext}")
+    if path_scrubbed_total:
+        print(f"  [脱敏] 本次发布共处理 {path_scrubbed_total} 处本机绝对路径")
     # ---- 4.1 统一渲染（FRAMEWORK-DESIGN v2.0 §2.2）----
     # md-only 任务（如 14:30 基金指引，任务书只产 md）此前永远无详情页——
     # 用户实锤「14:30 推送是空的」。现由统一渲染器补 HTML：上游五套 HTML
@@ -700,6 +761,41 @@ def main() -> int:
     # 这是内容的天然先后；run_time 另存真实生成时刻，不参与排序。
     entries.sort(key=lambda x: (TASK_META.get(x["slug"], ("", "99:99", ""))[1],
                                  x.get("run_time", "")))
+    # C-9（PM 实测缺陷）：不同 slug 最终产出**同一份内容** → 时间线出现两条
+    # 完全相同的条目，用户把一次研判数成两次（实测 3/3 天 stock_review.md 被
+    # 15:05 与 15:30 同时消费，逐字节相同）。
+    #
+    # 去重键必须是**内容指纹**而非文件名：15:30 的 md 名为 daily_review.md，
+    # 但它是 15:05 文件的副本；反过来 daily-review 的 md 字段为 null、
+    # 内容来自上游 html——按路径去重永远抓不到这类重复（实测踩过）。
+    seen_fp: dict[str, str] = {}
+    deduped: list[dict] = []
+    for en in entries:
+        cands = [daily_stage / (en["md"] or ""), daily_stage / (en["html"] or "")]
+        src = next((c for c in cands if c and c.exists()), None)
+        if src is None:
+            deduped.append(en)
+            continue
+        try:
+            fp = hashlib.sha256(src.read_bytes()).hexdigest()
+        except OSError:
+            deduped.append(en)
+            continue
+        if fp in seen_fp:
+            print(f"  ⚠️ 内容重复: {en['slug']} 与 {seen_fp[fp]} 内容指纹相同"
+                  f"（{src.name}），时间线只保留先出现者")
+            continue
+        seen_fp[fp] = en["slug"]
+        deduped.append(en)
+    entries = deduped
+    # P0-1（架构师 A-04 实测）：降级条目在**数据层**撤下方向值。
+    # 只在渲染层撤是不够的——entries.json 与 feed.json 会被第三方直接消费，
+    # 带着「进攻 +0.510」的降级数据会让应用层自己算出动作。源头置 null。
+    for en in entries:
+        if en.get("degraded"):
+            en["rating"] = None
+            en["sigma"] = None
+            en["comparable"] = False
     (daily_stage / "entries.json").write_text(
         json.dumps(entries, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"  [meta] rating={meta['rating']} tasks={len(meta['tasks'])}"

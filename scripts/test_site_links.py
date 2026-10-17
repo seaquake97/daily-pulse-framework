@@ -71,8 +71,9 @@ class TestInternalLinksResolve(unittest.TestCase):
                     continue
                 resolved = (page.parent / target).resolve()
                 ok = resolved.exists()
-                # 目录式链接（结尾 /）落到 index.html 也算有效
-                if not ok and href.endswith("/"):
+                if ok and resolved.is_dir():
+                    # 目录不算可访问目标：GitHub Pages 只认 index.html。
+                    # 本缺陷曾实证：/weekly/ 目录存在 → 本地全绿 → 线上 404。
                     ok = (resolved / "index.html").exists()
                 if not ok:
                     broken.append(f"{page.relative_to(DOCS)} -> {href}")
@@ -106,6 +107,21 @@ class TestInternalLinksResolve(unittest.TestCase):
             if hit:
                 bad.append(f"{page.relative_to(DOCS)}: {len(hit)} 个 {hit[:3]}")
         self.assertEqual(bad, [], f"head 内 emoji 泄漏（分享卡片会露出来）：{bad}")
+
+    def test_no_local_absolute_path_leak(self):
+        """S-1 安全（PM-17 实测）：公开站不得出现本机绝对路径。
+
+        上游报告正文里出现过「数据源：/Users/<用户名>/WorkBuddy/.../settlement.json」，
+        直接渲染出去等于向全网泄漏本机用户名与目录结构，且对读者零信息价值。
+        只保留文件名即可（「用了哪个文件」是信息，「存在哪个目录」不是）。
+        """
+        bad = []
+        pat = re.compile(r"/Users/[^/\s\"'<>]+")
+        for page in _pages():
+            hits = pat.findall(page.read_text(encoding="utf-8"))
+            if hits:
+                bad.append(f"{page.relative_to(DOCS)}: {len(hits)} 处 {hits[:2]}")
+        self.assertEqual(bad, [], f"站点泄漏本机绝对路径：{bad[:5]}")
 
     def test_meta_description_present_and_bounded(self):
         """L-5：每页有 description，且 og:description 不超 200 字（超了社交平台截断）。"""

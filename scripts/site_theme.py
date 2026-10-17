@@ -195,6 +195,16 @@ SYMBOLS: dict[str, str] = {
     "calendar": '<rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>'
                 '<line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
     "check": '<polyline points="20 6 9 17 4 12"/>',
+    # 以下两枚是个人 IP / 专栏品牌标识（PM-07，2026-10-16 总监裁决）：原以
+    # emoji 字符（U+265F 棋子 / U+1F35C 面碗）经 ip-mark 保留，违反团队
+    # P0-1「禁止 emoji 作为功能图标」。裁决：品牌标识不删除、不降级，升级
+    # 为锁定 symbol 表内的专用图形 —— 与全站同一 stroke 语言（viewBox 24 /
+    # stroke-width 1.75 / round cap-join / fill none，由 .ic CSS 统一施加，
+    # symbol 内只放几何路径）。语义由 ip-mark 的 title/aria-label 承载
+    # （emoji_map.IP_MARK_SYMBOL），图形与文字分离，可访问性不降级。
+    "chess-pawn": '<circle cx="12" cy="7" r="3"/>'
+                  '<path d="M10.2 10.2c0 1.5-.7 2.2-1.6 3.4-.8 1.1-1.3 2-1.7 2.9h10.2'
+                  'c-.4-.9-.9-1.8-1.7-2.9-.9-1.2-1.6-1.9-1.6-3.4"/>',
     "chevron-down": '<polyline points="6 9 12 15 18 9"/>',
     "chevron-right": '<polyline points="9 18 15 12 9 6"/>',
     "chevrons-down": '<polyline points="7 13 12 18 17 13"/><polyline points="7 6 12 11 17 6"/>',
@@ -225,6 +235,10 @@ SYMBOLS: dict[str, str] = {
     "line-chart": '<line x1="3" y1="3" x2="3" y2="21"/><line x1="3" y1="21" x2="21" y2="21"/>'
                   '<polyline points="7 16 11 10 15 13 20 6"/>',
     "minus": '<line x1="5" y1="12" x2="19" y2="12"/>',
+    # 面碗（账号 IP 形象，PM-07）：碗沿 + 弧底 + 两缕蒸汽，描边语言同上。
+    "noodle-bowl": '<path d="M9 9.2c-1.2-1-1.2-2.2 0-3.2 1.2-1 1.2-2.2 0-3.2"/>'
+                   '<path d="M15 9.2c-1.2-1-1.2-2.2 0-3.2 1.2-1 1.2-2.2 0-3.2"/>'
+                   '<path d="M4 11.5h16a8 8 0 0 1-16 0"/>',
     "radio": '<path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2a6 6 0 0 1 0-8.5"/>'
              '<circle cx="12" cy="12" r="2"/><path d="M16.2 7.8a6 6 0 0 1 0 8.5"/>'
              '<path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/>',

@@ -27,11 +27,12 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(HERE.parent / "framework" / "scripts"))   # A-04
+import paths
 
 from sanitizer.core import sanitize_html  # noqa: E402
 
-REAL_STOCK_REVIEW = Path(
-    "/Users/lianghaizhen/WorkBuddy/股票复盘/2026-10-15/stock_review.html")
+REAL_STOCK_REVIEW = paths.WORKBUDDY_ROOT / "股票复盘" / "2026-10-15" / "stock_review.html"
 
 # B-3 构造例：深色封面渐变 + 白字（stage 产物 fg-on-fg 缺陷的最小复现）
 INVERSE_FIXTURE = (

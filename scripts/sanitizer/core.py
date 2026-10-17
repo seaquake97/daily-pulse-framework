@@ -32,7 +32,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from . import (emoji_inline, gradient_pass, heading_pass, icon_pass,  # noqa: F401
-               script_pass, style_pass, token_pass)
+               path_pass, script_pass, style_pass, token_pass)
 from .report import SanitizeReport
 
 # 预编译工具类 CSS 的默认位置（由 build_body_css.py 生成并随仓库提交）
@@ -59,6 +59,7 @@ def sanitize_html(html: str, source: str = "",
     """
     report = SanitizeReport(source=source)
     out = html
+    out = path_pass.scrub_paths(out, report)      # 安全 P0：脱敏本机绝对路径
     out = script_pass.handle_scripts(out, report, utilities_css=utilities_css)
     out = gradient_pass.strip_gradients(out, report)
     out = style_pass.map_inline_styles(out, report)

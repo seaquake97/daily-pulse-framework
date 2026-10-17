@@ -564,8 +564,31 @@ Python 3.13.12（`dev-architecture.md:167` 记录的解释器版本）
 | A-16 | `_git_engine` / `_git_pulse` 归档到 `_archive/`，写入 `.gitignore` | **P2** | 0.5 人日 | A-01 | `git -C github-ip-plan ls-files \| grep -c "_git_"` == 0 |
 | A-17 | `README` 写明 Python ≥ 3.10（受 `X \| None` 语法约束）、零第三方依赖、4 类 PULSE_* 环境变量 | **P2** | 0.5 人日 | A-04, A-09 | `grep -c "PULSE_" github-ip-plan/README.md` ≥ 4 |
 | A-18 | `scripts/_archive/`（11 个 py）与 `test_sanitize_gate_visual.py` 的 fixture 日期治理 | **P2** | 1 人日 | A-06 | 全站 `grep -rn "2026-10-1[0-9]" --include="*.py" \| grep -v fixtures/` 命中仅注释 |
+| A-19 | **`SLUG_STAGE` 三处定义收敛为单一数据源**：`publish_to_github.py:129`（`pre_open`）与 `md_render/meta.py:40`（`intraday`）已实测漂移，`render_md.py:43` 再导出一次。下沉为 JSON/YAML 供两侧读取 | **P1** | 1 人日 | A-09 | `grep -rn '"stock-assistant": "intraday"' scripts/ \| wc -l` == 0；`python3 -c "import json;d=json.load(open('framework/config/slug_stage.json'));assert d['stock-assistant']=='pre_open'"` |
+| A-20 | **补 `settlement.schema.json` + 校验器**：`settlement.json` 结构实测稳定（`status`/`counts`/`hits`/`evaluable`/`hit_rate`/`by_type`/`viewpoints[]`），但 `framework/engine/collect/` 与 `report/` 下**零引用**，无任何契约。无契约 JSON 直接接发布层 = 上游格式变更直接变线上故障 | **P1** | 0.5 人日 | A-09 | `python3 framework/engine/collect/check_settlement.py <path>` 退出码 0；缺 `status` 或 `viewpoints` 非 list 即非 0 |
+| A-21 | **`_stage` 与 `_git_pulse` 同步校验入 CI**（PM 补充的 CAP-03 验收项）：实测当前 15 个文件不同步，`_git_pulse` 是上一版产物——3 个 degraded 条目的 `rating`/`sigma`/`dataGap` 仍是修复前的值。线上真实产物是 `_git_pulse`，只测 `_stage` 等于没测线上 | **P1** | 0.5 人日 | A-04 | `diff -rq _stage/docs _git_pulse/docs` 输出为空 |
+| A-22 | **修站点正文的本机绝对路径泄漏**：实测 `_stage/docs/daily/2026-10-15/stock-review.html:1939` 与同名 `.md` 渲染出 `依据 /Users/lianghaizhen/WorkBuddy/股票复盘/2026-10-15/settlement.json 自动结算结果`。GitHub Pages 是公开站点，暴露用户名与目录结构。改为中性表述（如「依据引擎自动结算结果」），路径信息留 HTML 注释或删除。**这是 15:05 停产 md 的前置条件**（ADR-005 决策二之二） | **P0** | 0.5 人日 | 无 | `grep -rl "/Users/lianghaizhen" _stage/docs/ \| wc -l` == 0 |
 
-**统计：18 条，其中 P0 = 5 条、P1 = 6 条、P2 = 7 条。**
+**补充：A-19 的实测证据（2026-10-16 第二轮审计发现）**
+
+`SLUG_STAGE` 与 A-10 的 `codes.py` / `parse_holdings.py` 是**完全同型**的问题——
+用注释维系两份可独立漂移的实现，且已经漂移：
+
+| 位置 | `stock-assistant` 取值 | 后果 |
+|---|---|---|
+| `publish_to_github.py:130` | `pre_open` | 正确（`:127-128` 注释引用裁决 OPEN-004） |
+| `md_render/meta.py:40` | `intraday` | 与发布层相反 |
+
+**当前恰好未显形的原因**：`meta.py` 的 `extract_meta()` 走 L2 启发式，
+上游 `stock_assistant.md` 第 3 行自带 `data_stage: pre_open`，
+实测返回 `{'rating':'进攻','stage':'pre_open','source':'heuristic'}`，
+绕过了 `SLUG_STAGE`。一旦 md 缺该声明，L2 落空即回落到错误的 `intraday`。
+
+`meta.py:22` 自陈「复制而非 import：反向 import 会把整条发布管线拖进渲染进程」——
+顾虑成立，但代价是两处独立漂移。裁决见 `docs/decisions/ADR-004.md` 决策三。
+归口建议：并入 A-09 一并处理，避免与 PM 侧同时改 `md_render/meta.py`。
+
+**统计：22 条，其中 P0 = 6 条、P1 = 9 条、P2 = 7 条。**
 
 P0 五条的执行顺序建议：A-01（入 Git）必须最先做，它是所有改动的回滚能力保障；
 A-02 / A-03 是已在线上产物里显形的正确性缺陷，与 A-01 无依赖可并行；

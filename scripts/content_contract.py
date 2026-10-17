@@ -246,7 +246,41 @@ def validate_contract(path: Path, market_data: dict | None = None) -> list[Viola
 
     if market_data:
         out.extend(_validate_sigma_value(text, market_data))
+    out.extend(_validate_degraded_no_action(text, lines, market_data))
     return out
+
+
+RE_DEGRADED_TEXT = re.compile(r"(?:数据源降级|未连接降级|数据缺口|取数非实时|连接器未连接)")
+_REVIEW_CONTEXT = re.compile(r"(?:昨日|观点|历史|已过|前一|上期|回顾|V\d|【昨日|昨日观点)")
+RE_ACTION_CMD = re.compile(
+    r"(?:挂单|分批|盘中|逢低)?(?:高抛|低吸|卖出|买入|加仓|减仓)\s*\d+\s*(?:股|份|成)|"
+    r"挂单(?:卖出|买入)|预设买单|预设卖单|设买单|设卖单|挂买|挂卖"
+)
+
+
+def _validate_degraded_no_action(text: str, lines: list[str], market_data: dict | None) -> list[Violation]:
+    """降级态报告禁止输出具体执行动作（L-4 / 金融高危红线）。"""
+    is_degraded = False
+    if market_data:
+        if market_data.get("degraded") or (isinstance(market_data.get("data_gaps"), list) and market_data.get("data_gaps")):
+            is_degraded = True
+    if not is_degraded and RE_DEGRADED_TEXT.search(text[:3000]):
+        is_degraded = True
+
+    if not is_degraded:
+        return []
+
+    violations: list[Violation] = []
+    for i, line in enumerate(lines, start=1):
+        s = line.strip()
+        if not s or _REVIEW_CONTEXT.search(s):
+            continue
+        if RE_ACTION_CMD.search(s):
+            violations.append(Violation(
+                "DEGRADED_ACTION_PROHIBITED", i,
+                f"降级态报告禁止输出可执行交易动作（L-4）：{s[:60]}"
+            ))
+    return violations
 
 
 def _validate_sigma_value(text: str, market_data: dict) -> list[Violation]:

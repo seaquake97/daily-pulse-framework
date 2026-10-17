@@ -783,14 +783,14 @@
   "overflow": false,
   "flags": [],
   "bad": [
-   "table.tbl@664",
-   "caption.@664",
-   "thead.@664",
-   "tr.@664",
-   "th.@372",
-   "th.@664",
-   "tbody.@664",
-   "tr.@664"
+   "a.mp-pill@341",
+   "a.mp-pill@427",
+   "a.mp-pill@512",
+   "a.mp-pill@597",
+   "a.mp-pill@683",
+   "a.mp-pill@756",
+   "table.tbl@670",
+   "caption.@670"
   ],
   "tblWrapScroll": true,
   "bodyFs": "17px"
@@ -803,14 +803,14 @@
   "overflow": false,
   "flags": [],
   "bad": [
-   "table.tbl@664",
-   "caption.@664",
-   "thead.@664",
-   "tr.@664",
-   "th.@372",
-   "th.@664",
-   "tbody.@664",
-   "tr.@664"
+   "a.mp-pill@427",
+   "a.mp-pill@512",
+   "a.mp-pill@597",
+   "a.mp-pill@683",
+   "a.mp-pill@756",
+   "table.tbl@670",
+   "caption.@670",
+   "thead.@670"
   ],
   "tblWrapScroll": true,
   "bodyFs": "17px"
@@ -823,14 +823,14 @@
   "overflow": false,
   "flags": [],
   "bad": [
-   "table.tbl@664",
-   "caption.@664",
-   "thead.@664",
-   "tr.@664",
-   "th.@664",
-   "tbody.@664",
-   "tr.@664",
-   "td.num@664"
+   "a.mp-pill@427",
+   "a.mp-pill@512",
+   "a.mp-pill@597",
+   "a.mp-pill@683",
+   "a.mp-pill@756",
+   "table.tbl@670",
+   "caption.@670",
+   "thead.@670"
   ],
   "tblWrapScroll": true,
   "bodyFs": "17px"
@@ -843,14 +843,14 @@
   "overflow": false,
   "flags": [],
   "bad": [
-   "table.tbl@664",
-   "caption.@664",
-   "thead.@664",
-   "tr.@664",
-   "th.@664",
-   "tbody.@664",
-   "tr.@664",
-   "td.num@664"
+   "a.mp-pill@427",
+   "a.mp-pill@512",
+   "a.mp-pill@597",
+   "a.mp-pill@683",
+   "a.mp-pill@756",
+   "table.tbl@670",
+   "caption.@670",
+   "thead.@670"
   ],
   "tblWrapScroll": true,
   "bodyFs": "17px"
@@ -863,14 +863,14 @@
   "overflow": false,
   "flags": [],
   "bad": [
-   "table.tbl@664",
-   "caption.@664",
-   "thead.@664",
-   "tr.@664",
-   "th.@664",
-   "tbody.@664",
-   "tr.@664",
-   "td.num@664"
+   "a.mp-pill@683",
+   "a.mp-pill@756",
+   "table.tbl@670",
+   "caption.@670",
+   "thead.@670",
+   "tr.@670",
+   "th.@670",
+   "tbody.@670"
   ],
   "tblWrapScroll": true,
   "bodyFs": "17px"
@@ -882,7 +882,9 @@
   "client": 720,
   "overflow": false,
   "flags": [],
-  "bad": [],
+  "bad": [
+   "a.mp-pill@760"
+  ],
   "tblWrapScroll": true,
   "bodyFs": "17px"
  },
@@ -894,7 +896,7 @@
   "overflow": false,
   "flags": [],
   "bad": [],
-  "tblWrapScroll": true,
+  "tblWrapScroll": false,
   "bodyFs": "17px"
  },
  {
@@ -905,7 +907,7 @@
   "overflow": false,
   "flags": [],
   "bad": [],
-  "tblWrapScroll": true,
+  "tblWrapScroll": false,
   "bodyFs": "17px"
  },
  {
@@ -916,7 +918,7 @@
   "overflow": false,
   "flags": [],
   "bad": [],
-  "tblWrapScroll": true,
+  "tblWrapScroll": false,
   "bodyFs": "17px"
  },
  {
@@ -927,7 +929,7 @@
   "overflow": false,
   "flags": [],
   "bad": [],
-  "tblWrapScroll": true,
+  "tblWrapScroll": false,
   "bodyFs": "17px"
  },
  {
@@ -938,7 +940,7 @@
   "overflow": false,
   "flags": [],
   "bad": [],
-  "tblWrapScroll": true,
+  "tblWrapScroll": false,
   "bodyFs": "17px"
  },
  {
@@ -949,7 +951,7 @@
   "overflow": false,
   "flags": [],
   "bad": [],
-  "tblWrapScroll": true,
+  "tblWrapScroll": false,
   "bodyFs": "17px"
  },
  {
@@ -960,7 +962,7 @@
   "overflow": false,
   "flags": [],
   "bad": [],
-  "tblWrapScroll": true,
+  "tblWrapScroll": false,
   "bodyFs": "17px"
  },
  {
@@ -971,7 +973,7 @@
   "overflow": false,
   "flags": [],
   "bad": [],
-  "tblWrapScroll": true,
+  "tblWrapScroll": false,
   "bodyFs": "17px"
  },
  {
@@ -982,7 +984,7 @@
   "overflow": false,
   "flags": [],
   "bad": [],
-  "tblWrapScroll": true,
+  "tblWrapScroll": false,
   "bodyFs": "17px"
  },
  {
@@ -993,7 +995,7 @@
   "overflow": false,
   "flags": [],
   "bad": [],
-  "tblWrapScroll": true,
+  "tblWrapScroll": false,
   "bodyFs": "17px"
  },
  {
@@ -1267,7 +1269,7 @@
    "tbody.@678",
    "tr.@678",
    "td.@678",
-   "b.@651"
+   "b.@652"
   ],
   "tblWrapScroll": false,
   "bodyFs": "17px"
@@ -1855,6 +1857,209 @@
  },
  {
   "page": "d-fund-guide",
+  "width": 2560,
+  "scroll": 2560,
+  "client": 2560,
+  "overflow": false,
+  "flags": [],
+  "bad": [],
+  "tblWrapScroll": false,
+  "bodyFs": "17px"
+ },
+ {
+  "page": "d-stock-review",
+  "width": 320,
+  "scroll": 320,
+  "client": 320,
+  "overflow": false,
+  "flags": [],
+  "bad": [
+   "table.tbl@395",
+   "thead.@395",
+   "tr.@395",
+   "th.@395",
+   "tbody.@395",
+   "tr.@395",
+   "td.@395",
+   "tr.@395"
+  ],
+  "tblWrapScroll": true,
+  "bodyFs": "17px"
+ },
+ {
+  "page": "d-stock-review",
+  "width": 360,
+  "scroll": 360,
+  "client": 360,
+  "overflow": false,
+  "flags": [],
+  "bad": [
+   "table.tbl@395",
+   "thead.@395",
+   "tr.@395",
+   "th.@395",
+   "tbody.@395",
+   "tr.@395",
+   "td.@395",
+   "tr.@395"
+  ],
+  "tblWrapScroll": true,
+  "bodyFs": "17px"
+ },
+ {
+  "page": "d-stock-review",
+  "width": 390,
+  "scroll": 390,
+  "client": 390,
+  "overflow": false,
+  "flags": [],
+  "bad": [
+   "table.tbl@395",
+   "thead.@395",
+   "tr.@395",
+   "th.@395",
+   "tbody.@395",
+   "tr.@395",
+   "td.@395",
+   "tr.@395"
+  ],
+  "tblWrapScroll": true,
+  "bodyFs": "17px"
+ },
+ {
+  "page": "d-stock-review",
+  "width": 414,
+  "scroll": 414,
+  "client": 414,
+  "overflow": false,
+  "flags": [],
+  "bad": [],
+  "tblWrapScroll": false,
+  "bodyFs": "17px"
+ },
+ {
+  "page": "d-stock-review",
+  "width": 640,
+  "scroll": 640,
+  "client": 640,
+  "overflow": false,
+  "flags": [],
+  "bad": [],
+  "tblWrapScroll": false,
+  "bodyFs": "17px"
+ },
+ {
+  "page": "d-stock-review",
+  "width": 720,
+  "scroll": 720,
+  "client": 720,
+  "overflow": false,
+  "flags": [],
+  "bad": [],
+  "tblWrapScroll": false,
+  "bodyFs": "17px"
+ },
+ {
+  "page": "d-stock-review",
+  "width": 768,
+  "scroll": 768,
+  "client": 768,
+  "overflow": false,
+  "flags": [],
+  "bad": [],
+  "tblWrapScroll": false,
+  "bodyFs": "17px"
+ },
+ {
+  "page": "d-stock-review",
+  "width": 834,
+  "scroll": 834,
+  "client": 834,
+  "overflow": false,
+  "flags": [],
+  "bad": [],
+  "tblWrapScroll": false,
+  "bodyFs": "17px"
+ },
+ {
+  "page": "d-stock-review",
+  "width": 980,
+  "scroll": 980,
+  "client": 980,
+  "overflow": false,
+  "flags": [],
+  "bad": [],
+  "tblWrapScroll": false,
+  "bodyFs": "17px"
+ },
+ {
+  "page": "d-stock-review",
+  "width": 1024,
+  "scroll": 1024,
+  "client": 1024,
+  "overflow": false,
+  "flags": [],
+  "bad": [],
+  "tblWrapScroll": false,
+  "bodyFs": "17px"
+ },
+ {
+  "page": "d-stock-review",
+  "width": 1152,
+  "scroll": 1152,
+  "client": 1152,
+  "overflow": false,
+  "flags": [],
+  "bad": [],
+  "tblWrapScroll": false,
+  "bodyFs": "17px"
+ },
+ {
+  "page": "d-stock-review",
+  "width": 1280,
+  "scroll": 1280,
+  "client": 1280,
+  "overflow": false,
+  "flags": [],
+  "bad": [],
+  "tblWrapScroll": false,
+  "bodyFs": "17px"
+ },
+ {
+  "page": "d-stock-review",
+  "width": 1440,
+  "scroll": 1440,
+  "client": 1440,
+  "overflow": false,
+  "flags": [],
+  "bad": [],
+  "tblWrapScroll": false,
+  "bodyFs": "17px"
+ },
+ {
+  "page": "d-stock-review",
+  "width": 1920,
+  "scroll": 1920,
+  "client": 1920,
+  "overflow": false,
+  "flags": [],
+  "bad": [],
+  "tblWrapScroll": false,
+  "bodyFs": "17px"
+ },
+ {
+  "page": "d-stock-review",
+  "width": 2149,
+  "scroll": 2149,
+  "client": 2149,
+  "overflow": false,
+  "flags": [],
+  "bad": [],
+  "tblWrapScroll": false,
+  "bodyFs": "17px"
+ },
+ {
+  "page": "d-stock-review",
   "width": 2560,
   "scroll": 2560,
   "client": 2560,

@@ -127,9 +127,12 @@ class TestSanitizeScopeNarrowed(unittest.TestCase):
         return self.stage / "docs" / "daily" / TARGET_DATE / "stock-assistant.html"
 
     def _run(self, *extra: str):
+        # 合成测试只提供 stock-assistant 单一任务产物；--task 收敛收集范围，
+        # 隔离 A-03 缺失任务硬失败逻辑（详见 test_sanitize_pipeline._run_publish 注释）。
         return subprocess.run(
             [pub.MANAGED_PY, str(HERE / "publish_to_github.py"),
-             "--date", TARGET_DATE, "--source-root", str(self.src),
+             "--date", TARGET_DATE, "--task", "stock-assistant",
+             "--source-root", str(self.src),
              "--stage", str(self.stage), *extra],
             capture_output=True, text=True)
 
